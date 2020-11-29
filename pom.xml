@@ -16,6 +16,10 @@
 
 	<properties>
 		<java.version>11</java.version>
+		
+		<sonar.projectKey>AndryLat_NC_ODS_Team-3_2020</sonar.projectKey>
+		<sonar.organization>ncods2020team3</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
