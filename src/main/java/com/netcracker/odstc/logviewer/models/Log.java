@@ -9,25 +9,25 @@ public class Log {
     private String text;
     private LogLevel level;
     private Date creationDate;
-    private LogFile parent;
+    private LogFile parentFile;
     private String name;
 
     public Log() {
     }
 
-    public Log(long id, String text, LogLevel level, Date creationDate, LogFile parent) {
+    public Log(long id, String text, LogLevel level, Date creationDate, LogFile parentFile) {
         this.id = id;
         this.text = text;
         this.level = level;
         this.creationDate = creationDate;
-        this.parent = parent;
+        this.parentFile = parentFile;
     }
 
-    public Log(String text, LogLevel level, Date creationDate, LogFile parent) {
+    public Log(String text, LogLevel level, Date creationDate, LogFile parentFile) {
         this.text = text;
         this.level = level;
         this.creationDate = creationDate;
-        this.parent = parent;
+        this.parentFile = parentFile;
     }
 
     public long getId() {
@@ -62,12 +62,12 @@ public class Log {
         this.creationDate = creationDate;
     }
 
-    public LogFile getParent() {
-        return parent;
+    public LogFile getParentFile() {
+        return parentFile;
     }
 
-    public void setParent(LogFile parent) {
-        this.parent = parent;
+    public void setParentFile(LogFile parentFile) {
+        this.parentFile = parentFile;
     }
 
     public String getName() {

@@ -1,17 +1,15 @@
 package com.netcracker.odstc.logviewer.models;
 
-import java.util.Date;
-
 public class Config {
-    private Date changesPollingPeriod;
-    private Date activityPollingPeriod;
-    private short storagePeriod;
+    private short changesPollingPeriod; //milliseconds
+    private short activityPollingPeriod; //milliseconds
+    private short storagePeriod; //milliseconds
     private static Config instance = null;
 
     public Config() {
     }
 
-    public Config(Date changesPollingPeriod, Date activityPollingPeriod, short storagePeriod) {
+    public Config(short changesPollingPeriod, short activityPollingPeriod, short storagePeriod) {
         this.changesPollingPeriod = changesPollingPeriod;
         this.activityPollingPeriod = activityPollingPeriod;
         this.storagePeriod = storagePeriod;
@@ -24,19 +22,19 @@ public class Config {
         return instance;
     }
 
-    public Date getChangesPollingPeriod() {
+    public short getChangesPollingPeriod() {
         return changesPollingPeriod;
     }
 
-    public void setChangesPollingPeriod(Date changesPollingPeriod) {
+    public void setChangesPollingPeriod(short changesPollingPeriod) {
         this.changesPollingPeriod = changesPollingPeriod;
     }
 
-    public Date getActivityPollingPeriod() {
+    public short getActivityPollingPeriod() {
         return activityPollingPeriod;
     }
 
-    public void setActivityPollingPeriod(Date activityPollingPeriod) {
+    public void setActivityPollingPeriod(short activityPollingPeriod) {
         this.activityPollingPeriod = activityPollingPeriod;
     }
 
