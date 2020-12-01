@@ -3,6 +3,7 @@ package com.netcracker.odstc.logviewer.models;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
 
 import java.util.Date;
+import java.util.List;
 
 public class Server {
     private long id;
@@ -12,23 +13,37 @@ public class Server {
     private Protocol protocol;
     private int port;
     private boolean isActive;
-    private Date lastAccessByJod;
+    private Date lastAccessByJob;
     private Date lastAccessByUser;
     private User parentUser;
+    private String name;
+    private List<Directory> directoryList;
 
     public Server() {
     }
 
-    public Server(long id, String ip, String login, String password, Protocol protocol, int port, boolean isActive, Date lastAccessByJod, Date lastAccessByUser, User parentUser) {
+    public Server(long id, String ip, String login, String password, Protocol protocol, int port, User parentUser) {
         this.id = id;
         this.ip = ip;
         this.login = login;
         this.password = password;
         this.protocol = protocol;
         this.port = port;
-        this.isActive = isActive;
-        this.lastAccessByJod = lastAccessByJod;
-        this.lastAccessByUser = lastAccessByUser;
+        this.isActive = true;
+        this.lastAccessByJob = new Date();
+        this.lastAccessByUser = new Date();
+        this.parentUser = parentUser;
+    }
+
+    public Server(String ip, String login, String password, Protocol protocol, int port, User parentUser) {
+        this.ip = ip;
+        this.login = login;
+        this.password = password;
+        this.protocol = protocol;
+        this.port = port;
+        this.isActive = true;
+        this.lastAccessByJob = new Date();
+        this.lastAccessByUser = new Date();
         this.parentUser = parentUser;
     }
 
@@ -88,12 +103,12 @@ public class Server {
         isActive = active;
     }
 
-    public Date getLastAccessByJod() {
-        return lastAccessByJod;
+    public Date getLastAccessByJob() {
+        return lastAccessByJob;
     }
 
-    public void setLastAccessByJod(Date lastAccessByJod) {
-        this.lastAccessByJod = lastAccessByJod;
+    public void setLastAccessByJob(Date lastAccessByJob) {
+        this.lastAccessByJob = lastAccessByJob;
     }
 
     public Date getLastAccessByUser() {
@@ -110,5 +125,21 @@ public class Server {
 
     public void setParentUser(User parentUser) {
         this.parentUser = parentUser;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Directory> getDirectoryList() {
+        return directoryList;
+    }
+
+    public void setDirectoryList(List<Directory> directoryList) {
+        this.directoryList = directoryList;
     }
 }

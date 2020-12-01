@@ -1,23 +1,32 @@
 package com.netcracker.odstc.logviewer.models;
 
 import java.util.Date;
+import java.util.List;
 
 public class LogFile {
     private long id;
     private String name;
     private Date lastUpdate;
-    private String lastRow;
-    private Directory parent;
+    private int lastRow;
+    private Directory parentDirectory;
+    private List<Log> logList;
 
     public LogFile() {
     }
 
-    public LogFile(long id, String name, Date lastUpdate, String lastRow, Directory parent) {
+    public LogFile(long id, String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
         this.id = id;
         this.name = name;
         this.lastUpdate = lastUpdate;
         this.lastRow = lastRow;
-        this.parent = parent;
+        this.parentDirectory = parentDirectory;
+    }
+
+    public LogFile(String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
+        this.name = name;
+        this.lastUpdate = lastUpdate;
+        this.lastRow = lastRow;
+        this.parentDirectory = parentDirectory;
     }
 
     public long getId() {
@@ -44,19 +53,27 @@ public class LogFile {
         this.lastUpdate = lastUpdate;
     }
 
-    public String getLastRow() {
+    public int getLastRow() {
         return lastRow;
     }
 
-    public void setLastRow(String lastRow) {
+    public void setLastRow(int lastRow) {
         this.lastRow = lastRow;
     }
 
-    public Directory getParent() {
-        return parent;
+    public Directory getParentDirectory() {
+        return parentDirectory;
     }
 
-    public void setParent(Directory parent) {
-        this.parent = parent;
+    public void setParentDirectory(Directory parentDirectory) {
+        this.parentDirectory = parentDirectory;
+    }
+
+    public List<Log> getLogList() {
+        return logList;
+    }
+
+    public void setLogList(List<Log> logList) {
+        this.logList = logList;
     }
 }

@@ -1,6 +1,7 @@
 package com.netcracker.odstc.logviewer.models;
 
 import java.util.Date;
+import java.util.List;
 
 public class Directory {
     private long id;
@@ -8,18 +9,28 @@ public class Directory {
     private long size;
     private boolean isActive;
     private Date lastExistenceCheck;
-    private Server parent;
+    private Server parentServer;
+    private String name;
+    private List<LogFile> logFileList;
 
     public Directory() {
     }
 
-    public Directory(long id, String path, long size, boolean isActive, Date lastExistenceCheck, Server parent) {
+    public Directory(long id, String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {
         this.id = id;
         this.path = path;
         this.size = size;
         this.isActive = isActive;
         this.lastExistenceCheck = lastExistenceCheck;
-        this.parent = parent;
+        this.parentServer = parentServer;
+    }
+
+    public Directory(String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {
+        this.path = path;
+        this.size = size;
+        this.isActive = isActive;
+        this.lastExistenceCheck = lastExistenceCheck;
+        this.parentServer = parentServer;
     }
 
     public long getId() {
@@ -62,11 +73,27 @@ public class Directory {
         this.lastExistenceCheck = lastExistenceCheck;
     }
 
-    public Server getParent() {
-        return parent;
+    public Server getParentServer() {
+        return parentServer;
     }
 
-    public void setParent(Server parent) {
-        this.parent = parent;
+    public void setParentServer(Server parentServer) {
+        this.parentServer = parentServer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<LogFile> getLogFileList() {
+        return logFileList;
+    }
+
+    public void setLogFileList(List<LogFile> logFileList) {
+        this.logFileList = logFileList;
     }
 }

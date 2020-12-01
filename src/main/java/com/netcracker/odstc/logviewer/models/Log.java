@@ -10,12 +10,20 @@ public class Log {
     private LogLevel level;
     private Date creationDate;
     private LogFile parent;
+    private String name;
 
     public Log() {
     }
 
     public Log(long id, String text, LogLevel level, Date creationDate, LogFile parent) {
         this.id = id;
+        this.text = text;
+        this.level = level;
+        this.creationDate = creationDate;
+        this.parent = parent;
+    }
+
+    public Log(String text, LogLevel level, Date creationDate, LogFile parent) {
         this.text = text;
         this.level = level;
         this.creationDate = creationDate;
@@ -60,5 +68,13 @@ public class Log {
 
     public void setParent(LogFile parent) {
         this.parent = parent;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
