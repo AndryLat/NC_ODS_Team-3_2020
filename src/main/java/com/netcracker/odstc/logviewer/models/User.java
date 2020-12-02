@@ -12,6 +12,7 @@ public class User {
     private Role role;
     private String name;
     private List<Server> serverList;
+    private int created;
 
     public User() {
     }
@@ -85,5 +86,13 @@ public class User {
 
     public void setServerList(List<Server> serverList) {
         this.serverList = serverList;
+    }
+
+    public int getCreated() {
+        return created;
+    }
+
+    public void setCreated(int created) {
+        this.created = created;
     }
 }
