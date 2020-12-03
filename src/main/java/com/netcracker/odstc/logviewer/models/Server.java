@@ -21,6 +21,7 @@ public class Server {
     private List<Directory> directoryList;
 
     public Server() {
+        this.directoryList = new ArrayList<>();
     }
 
     public Server(long id, String ip, String login, String password, Protocol protocol, int port, User parentUser) {

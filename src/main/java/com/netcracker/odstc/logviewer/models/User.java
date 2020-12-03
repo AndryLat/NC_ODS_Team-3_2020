@@ -16,6 +16,7 @@ public class User {
     private int created;
 
     public User() {
+        this.serverList = new ArrayList<>();
     }
 
     public User(long id, String email, String login, String password, Role role) {

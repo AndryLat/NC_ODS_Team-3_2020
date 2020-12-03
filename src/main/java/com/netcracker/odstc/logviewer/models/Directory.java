@@ -16,6 +16,7 @@ public class Directory {
     private List<LogFile> logFileList;
 
     public Directory() {
+        this.logFileList = new ArrayList<>();
     }
 
     public Directory(long id, String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {

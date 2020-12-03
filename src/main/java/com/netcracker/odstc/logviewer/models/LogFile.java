@@ -13,6 +13,7 @@ public class LogFile {
     private List<Log> logList;
 
     public LogFile() {
+        this.logList = new ArrayList<>();
     }
 
     public LogFile(long id, String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
