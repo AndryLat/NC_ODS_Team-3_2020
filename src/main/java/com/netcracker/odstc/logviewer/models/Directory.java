@@ -9,6 +9,7 @@ public class Directory {
     private long size;
     private boolean isActive;
     private Date lastExistenceCheck;
+    private Date lastAccessByUser;
     private Server parentServer;
     private String name;
     private List<LogFile> logFileList;
@@ -71,6 +72,14 @@ public class Directory {
 
     public void setLastExistenceCheck(Date lastExistenceCheck) {
         this.lastExistenceCheck = lastExistenceCheck;
+    }
+
+    public Date getLastAccessByUser() {
+        return lastAccessByUser;
+    }
+
+    public void setLastAccessByUser(Date lastAccessByUser) {
+        this.lastAccessByUser = lastAccessByUser;
     }
 
     public Server getParentServer() {
