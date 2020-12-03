@@ -67,6 +67,11 @@ public class Log {
     }
 
     public void setParentFile(LogFile parentFile) {
+        boolean exist = false;
+        for (Log l : parentFile.getLogList()) {
+            exist = l.equals(this);
+        }
+        if (!exist) parentFile.addLog(this);
         this.parentFile = parentFile;
     }
 
@@ -76,5 +81,12 @@ public class Log {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getParentTree() {
+        return "User: " + this.parentFile.getParentDirectory().getParentServer().getParentUser().getName()
+                + "\n Server: " + this.parentFile.getParentDirectory().getParentServer().getName()
+                + "\n Directory: " + this.parentFile.getParentDirectory().getName()
+                + "\n File: " + this.parentFile.getName();
     }
 }

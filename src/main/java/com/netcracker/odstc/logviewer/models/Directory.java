@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class Directory {
         this.isActive = isActive;
         this.lastExistenceCheck = lastExistenceCheck;
         this.parentServer = parentServer;
+        this.logFileList = new ArrayList<>();
     }
 
     public Directory(String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {
@@ -32,6 +34,7 @@ public class Directory {
         this.isActive = isActive;
         this.lastExistenceCheck = lastExistenceCheck;
         this.parentServer = parentServer;
+        this.logFileList = new ArrayList<>();
     }
 
     public long getId() {
@@ -87,6 +90,11 @@ public class Directory {
     }
 
     public void setParentServer(Server parentServer) {
+        boolean exist = false;
+        for (Directory d : parentServer.getDirectoryList()) {
+            exist = d.equals(this);
+        }
+        if (!exist) parentServer.addDirectory(this);
         this.parentServer = parentServer;
     }
 
@@ -104,5 +112,19 @@ public class Directory {
 
     public void setLogFileList(List<LogFile> logFileList) {
         this.logFileList = logFileList;
+    }
+
+    public boolean addLogFile(LogFile logFile) {
+        for (LogFile l : logFileList) {
+            if (l.equals(logFile)) return false;
+        }
+        logFileList.add(logFile);
+        logFile.setParentDirectory(this);
+        return true;
+    }
+
+    public String getParentTree() {
+        return "User: " + this.getParentServer().getParentUser().getName()
+                + "\n Server: " + this.getParentServer().getName();
     }
 }

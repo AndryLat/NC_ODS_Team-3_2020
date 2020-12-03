@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class LogFile {
         this.lastUpdate = lastUpdate;
         this.lastRow = lastRow;
         this.parentDirectory = parentDirectory;
+        this.logList = new ArrayList<>();
     }
 
     public LogFile(String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
@@ -27,6 +29,7 @@ public class LogFile {
         this.lastUpdate = lastUpdate;
         this.lastRow = lastRow;
         this.parentDirectory = parentDirectory;
+        this.logList = new ArrayList<>();
     }
 
     public long getId() {
@@ -66,6 +69,11 @@ public class LogFile {
     }
 
     public void setParentDirectory(Directory parentDirectory) {
+        boolean exist = false;
+        for (LogFile l : parentDirectory.getLogFileList()) {
+            exist = l.equals(this);
+        }
+        if (!exist) parentDirectory.addLogFile(this);
         this.parentDirectory = parentDirectory;
     }
 
@@ -75,5 +83,20 @@ public class LogFile {
 
     public void setLogList(List<Log> logList) {
         this.logList = logList;
+    }
+
+    public boolean addLog(Log log) {
+        for (Log l : logList) {
+            if (l.equals(log)) return false;
+        }
+        logList.add(log);
+        log.setParentFile(this);
+        return true;
+    }
+
+    public String getParentTree() {
+        return "User: " + this.getParentDirectory().getParentServer().getParentUser().getName()
+                + "\n Server: " + this.getParentDirectory().getParentServer().getName()
+                + "\n Directory: " + this.getParentDirectory().getName();
     }
 }

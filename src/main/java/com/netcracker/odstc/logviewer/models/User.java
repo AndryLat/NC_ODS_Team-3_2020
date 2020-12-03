@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.lists.Role;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -23,6 +24,7 @@ public class User {
         this.login = login;
         this.password = password;
         this.role = role;
+        this.serverList = new ArrayList<>();
     }
 
     public User(String email, String login, String password, Role role) {
@@ -30,6 +32,7 @@ public class User {
         this.login = login;
         this.password = password;
         this.role = role;
+        this.serverList = new ArrayList<>();
     }
 
     public long getId() {
@@ -94,5 +97,14 @@ public class User {
 
     public void setCreated(int created) {
         this.created = created;
+    }
+
+    public boolean addServer(Server server) {
+        for (Server s : serverList) {
+            if (s.equals(server)) return false;
+        }
+        serverList.add(server);
+        server.setParentUser(this);
+        return true;
     }
 }

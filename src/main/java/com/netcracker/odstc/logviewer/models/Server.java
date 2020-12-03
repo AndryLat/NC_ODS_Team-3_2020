@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class Server {
         this.lastAccessByJob = new Date();
         this.lastAccessByUser = new Date();
         this.parentUser = parentUser;
+        this.directoryList = new ArrayList<>();
     }
 
     public Server(String ip, String login, String password, Protocol protocol, int port, User parentUser) {
@@ -45,6 +47,7 @@ public class Server {
         this.lastAccessByJob = new Date();
         this.lastAccessByUser = new Date();
         this.parentUser = parentUser;
+        this.directoryList = new ArrayList<>();
     }
 
     public long getId() {
@@ -124,6 +127,11 @@ public class Server {
     }
 
     public void setParentUser(User parentUser) {
+        boolean exist = false;
+        for (Server s : parentUser.getServerList()) {
+            exist = s.equals(this);
+        }
+        if (!exist) parentUser.addServer(this);
         this.parentUser = parentUser;
     }
 
@@ -141,5 +149,14 @@ public class Server {
 
     public void setDirectoryList(List<Directory> directoryList) {
         this.directoryList = directoryList;
+    }
+
+    public boolean addDirectory(Directory directory) {
+        for (Directory d : directoryList) {
+            if (d.equals(directory)) return false;
+        }
+        directoryList.add(directory);
+        directory.setParentServer(this);
+        return true;
     }
 }
