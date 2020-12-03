@@ -1,9 +1,11 @@
 package com.netcracker.odstc.logviewer.serverconnection;
 
+import com.netcracker.odstc.logviewer.LogClass;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
+import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +58,7 @@ public abstract class AbstractServerConnection implements ServerConnection {
                 try {
                     logCreationDate = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss.SSS").parse(matcher.group(1));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    LogClass.log(Level.ERROR,e.getMessage());
                 }
                 Log log;
                 if(matcher.group(2)==null){
@@ -74,7 +76,7 @@ public abstract class AbstractServerConnection implements ServerConnection {
         try {
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LogClass.log(Level.ERROR,e.getMessage());
         }
         sc.close();
         return result;
