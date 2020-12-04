@@ -6,7 +6,6 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,14 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Description:
- *
- * @author Aleksanid
- * created 01.12.2020
- */
 public class SSHServerConnection extends AbstractServerConnection {
-
     private JSch jSchClient;
     private Session session;
     private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
@@ -38,7 +30,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean connect() {
-        logger.debug("Making connection to " + server.getName());
+        logger.debug("Making connection to {}" , server.getName());
         try {
             session = jSchClient.getSession(server.getLogin(), server.getIp(), server.getPort());
             session.setPassword(server.getPassword());
@@ -46,7 +38,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             session.connect();
             return session.isConnected();
         } catch (JSchException e) {
-            logger.error( "Error with connection to " + server.getName());
+            logger.error("Error with connection to {}", server.getName(),e);
             server.setActive(false);
         }
         return false;
@@ -69,6 +61,8 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean isDirectoryValid(Directory directory) {
+        if(!super.isDirectoryValid(directory))
+            return false;
         try {
             Channel sftp = session.openChannel("sftp");
             sftp.connect(500);
@@ -96,7 +90,6 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             Channel sftp = session.openChannel("sftp");
 
-            // TODO:Тайм аут
             sftp.connect(500);
 
             ChannelSftp channelSftp = (ChannelSftp) sftp;
@@ -110,14 +103,14 @@ public class SSHServerConnection extends AbstractServerConnection {
                     for (int j = 0; j < directory.getLogFileList().size(); j++) {
                         LogFile logFile = directory.getLogFileList().get(j);
                         try {
-                            InputStream inputStream = channelSftp.get(logFile.getName());//TODO: Игнорировать если файл не доступен или помечать диркторию?
+                            InputStream inputStream = channelSftp.get(logFile.getName());
                             result.addAll(extractLogsFromStream(inputStream, logFile));
                         }catch (SftpException e){
-                            logger.error("Error with reading file from "+logFile.getParentTree());//TODO: Заменить на новый метод
+                            logger.error("Error with reading file from {}",logFile.getParentTree(),e);
                         }
                     }
                 } catch (SftpException e) {
-                    logger.info("Mark directory " + directory.getPath() + " as unavilable");
+                    logger.info("Mark directory {} as unavailable",directory.getPath(),e);
                     directory.setActive(false);
                 } finally {
                     channelSftp.cd("/");//Не работает

@@ -7,31 +7,21 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class Config extends EAVObject {
-    private short changesPollingPeriod; //milliseconds To Long
-    private short activityPollingPeriod; //milliseconds To Long
-    private Date storageLogPeriod;
-    private Date directoryActivityPeriod;
     private static Config instance = null;
+    public Config(long changesPollingPeriod, long activityPollingPeriod, Date storageLogPeriod, Date directoryActivityPeriod, Date serverActivityPeriod) {
+        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId(), String.valueOf(changesPollingPeriod));
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(activityPollingPeriod));
+        setAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId(), storageLogPeriod);
+        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId(), directoryActivityPeriod);
+        setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), serverActivityPeriod);
+    }
 
     public Config() {
         super();
     }
 
-    public Config(BigInteger objectId){
+    public Config(BigInteger objectId) {
         super(objectId);
-        changesPollingPeriod = Short.parseShort(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
-        activityPollingPeriod = Short.parseShort(getAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId()));
-
-        storageLogPeriod = getAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId());
-        directoryActivityPeriod = getAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId());
-    }
-
-    public Config(short changesPollingPeriod, short activityPollingPeriod, Date storageLogPeriod, Date directoryActivityPeriod) {
-        super();
-        this.changesPollingPeriod = changesPollingPeriod;//TODO: Добавить заполнение атрибутов EAV.
-        this.activityPollingPeriod = activityPollingPeriod;
-        this.storageLogPeriod = storageLogPeriod;
-        this.directoryActivityPeriod = directoryActivityPeriod;
     }
 
     public static Config getInstance() {
@@ -41,38 +31,43 @@ public class Config extends EAVObject {
         return instance;
     }
 
-    public short getChangesPollingPeriod() {
-        return Short.parseShort(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
-    }
-    // Заменить все set и гет на такие как сверху и снизу.
-    public void setChangesPollingPeriod(short changesPollingPeriod) {
-        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId(),String.valueOf(changesPollingPeriod));
+    public long getActivityPollingPeriod() {
+        return Long.parseLong(getAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId()));
     }
 
-    public short getActivityPollingPeriod() {
-        return activityPollingPeriod;
+    public void setActivityPollingPeriod(long activityPollingPeriod) {
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(activityPollingPeriod));
     }
 
-    public void setActivityPollingPeriod(short activityPollingPeriod) {
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(),String.valueOf(activityPollingPeriod));
-        this.activityPollingPeriod = activityPollingPeriod;
+    public long getChangesPollingPeriod() {
+        return Long.parseLong(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
+    }
+
+    public void setChangesPollingPeriod(long changesPollingPeriod) {
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(changesPollingPeriod));
     }
 
     public Date getStorageLogPeriod() {
-        return storageLogPeriod;
+        return getAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId());
     }
 
     public void setStorageLogPeriod(Date storageLogPeriod) {
-        setAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId(),storageLogPeriod);
-        this.storageLogPeriod = storageLogPeriod;
+        setAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId(), storageLogPeriod);
     }
 
     public Date getDirectoryActivityPeriod() {
-        return directoryActivityPeriod;
+        return getAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId());
     }
 
     public void setDirectoryActivityPeriod(Date directoryActivityPeriod) {
-        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId(),directoryActivityPeriod);
-        this.directoryActivityPeriod = directoryActivityPeriod;
+        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId(), directoryActivityPeriod);
+    }
+
+    public Date getServerActivityPeriod() {
+        return getAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId());
+    }
+
+    public void setServerActivityPeriod(Date serverActivityPeriod) {
+        setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), serverActivityPeriod);
     }
 }
