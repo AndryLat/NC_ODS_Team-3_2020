@@ -40,6 +40,9 @@ public class EAVObject {
         references = new HashMap<>();
 
         List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
+        if(columns==null||columns.size()<3){
+            throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
+        }
 
         parentId = (BigInteger) columns.remove(0);
         objectType = (BigInteger) columns.remove(0);
@@ -72,18 +75,21 @@ public class EAVObject {
 
         List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
 
+        if(columns==null||columns.size()<3){
+            throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
+        }
         parentId = (BigInteger) columns.remove(0);
         objectType = (BigInteger) columns.remove(0);
         name = (String) columns.remove(0);
 
 
-        String sqlStatement = "SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ? AND ATTR_ID = " + attrIds[0] + " ";// Или лучше много запросов?
+        StringBuilder sqlStatement = new StringBuilder("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ? AND ATTR_ID = " + attrIds[0] + " ");// Или лучше много запросов?
 
         for (int i = 1; i < attrIds.length; i++) {
-            sqlStatement += "OR ATTR_ID = " + attrIds[i] + " ";
+            sqlStatement.append("OR ATTR_ID = ").append(attrIds[i]).append(" ");// Я знаю что это не безопасно и надо изменить, но чет уже замсыпаю.
         }
 
-        List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(sqlStatement,
+        List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(sqlStatement.toString(),
                 new AttributeMapper(),// Новый мапер?
                 objectId);
 
