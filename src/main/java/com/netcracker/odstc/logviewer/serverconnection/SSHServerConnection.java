@@ -1,13 +1,14 @@
 package com.netcracker.odstc.logviewer.serverconnection;
 
 import com.jcraft.jsch.*;
-import com.netcracker.odstc.logviewer.LogClass;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -21,8 +22,10 @@ import java.util.Properties;
  * created 01.12.2020
  */
 public class SSHServerConnection extends AbstractServerConnection {
+
     private JSch jSchClient;
     private Session session;
+    private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
 
     public SSHServerConnection(Server server) {
         super(server);
@@ -35,7 +38,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean connect() {
-        LogClass.log(Level.DEBUG, "Making connection to " + server.getName());
+        logger.debug("Making connection to " + server.getName());
         try {
             session = jSchClient.getSession(server.getLogin(), server.getIp(), server.getPort());
             session.setPassword(server.getPassword());
@@ -43,7 +46,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             session.connect();
             return session.isConnected();
         } catch (JSchException e) {
-            LogClass.log(Level.ERROR, "Error with connection to " + server.getName());
+            logger.error( "Error with connection to " + server.getName());
             server.setActive(false);
         }
         return false;
@@ -110,11 +113,11 @@ public class SSHServerConnection extends AbstractServerConnection {
                             InputStream inputStream = channelSftp.get(logFile.getName());//TODO: Игнорировать если файл не доступен или помечать диркторию?
                             result.addAll(extractLogsFromStream(inputStream, logFile));
                         }catch (SftpException e){
-                            LogClass.log(Level.ERROR,"Error with reading file from "+logFile.getParentTree());//TODO: Заменить на новый метод
+                            logger.error("Error with reading file from "+logFile.getParentTree());//TODO: Заменить на новый метод
                         }
                     }
                 } catch (SftpException e) {
-                    LogClass.log(Level.INFO, "Mark directory " + directory.getPath() + " as unavilable");
+                    logger.info("Mark directory " + directory.getPath() + " as unavilable");
                     directory.setActive(false);
                 } finally {
                     channelSftp.cd("/");//Не работает

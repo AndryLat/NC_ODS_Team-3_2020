@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.serverconnection;
 
-import com.netcracker.odstc.logviewer.LogClass;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
@@ -20,7 +19,8 @@ import java.util.List;
  * created 01.12.2020
  */
 public class ServerManager {
-    private Logger logger = LogManager.getLogger(ServerManager.class.getName());
+
+    private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
     private static ServerManager instance;
     //TODO: Разбить на 4 потока
     private List<ServerConnection> serverConnectionList;
@@ -45,11 +45,11 @@ public class ServerManager {
     public boolean addServerConnection(ServerConnection serverConnection) {
         boolean isServerActive = serverConnection.connect();
         if (isServerActive) {
-            LogClass.log(Level.INFO, "Got new server " + serverConnection.getServer().getName() + " moved to valid");
+            logger.info( "Got new server " + serverConnection.getServer().getName() + " moved to valid");
             serverConnectionList.add(serverConnection);
         } else {
             serverConnection.getServer().setActive(false);
-            LogClass.log(Level.INFO, "Got new server " + serverConnection.getServer().getName() + " moved to non-valid");
+            logger.info( "Got new server " + serverConnection.getServer().getName() + " moved to non-valid");
             nonConnectedServers.add(serverConnection);
         }
         return isServerActive;
@@ -90,7 +90,7 @@ public class ServerManager {
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
             if (serverConnection.connect()) {
-                LogClass.log(Level.INFO, "Moved server with name " + serverConnection.getServer().getName() + " to valid connections");
+                logger.info("Moved server with name " + serverConnection.getServer().getName() + " to valid connections");
                 serverConnection.getServer().setActive(true);
                 serverConnectionList.add(serverConnection);
                 serverConnectionIterator.remove();

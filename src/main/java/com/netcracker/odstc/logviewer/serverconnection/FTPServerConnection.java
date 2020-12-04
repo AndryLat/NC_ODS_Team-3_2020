@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.serverconnection;
 
-import com.netcracker.odstc.logviewer.LogClass;
 import com.netcracker.odstc.logviewer.models.*;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
 import org.apache.commons.net.ftp.FTPClient;
@@ -16,7 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FTPServerConnection extends AbstractServerConnection {
-    private Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
+
+    private final Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
+
     FTPClient ftpClient;
     FTPServerConnection(Server server){
         super(server);
@@ -25,18 +26,18 @@ public class FTPServerConnection extends AbstractServerConnection {
     @Override
     public boolean connect() {
 
-        LogClass.log(Level.DEBUG,"Making connection to "+server.getName());
+        logger.debug("Making connection to "+server.getName());
         try {
             ftpClient.connect(server.getIp(), server.getPort());
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                     ftpClient.disconnect();
-                    LogClass.log(Level.ERROR,"Error with connect into "+server.getIp());
+                    logger.error("Error with connect into "+server.getIp());
                 return false;
             }
             return ftpClient.login(server.getLogin(), server.getPassword());
         } catch (IOException e) {
-            LogClass.log(Level.ERROR,"Error with connect into "+server.getIp());
+            logger.error("Error with connect into "+server.getIp());
         }
         return false;
     }
@@ -46,7 +47,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         try {
             ftpClient.disconnect();
         } catch (IOException e) {
-            LogClass.log(Level.ERROR,"Error with disconnect "+e.getMessage());
+            logger.error("Error with disconnect "+e.getMessage());
         }
     }
 
