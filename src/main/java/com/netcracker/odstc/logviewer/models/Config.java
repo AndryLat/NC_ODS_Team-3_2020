@@ -44,7 +44,7 @@ public class Config extends EAVObject {
     public short getChangesPollingPeriod() {
         return Short.parseShort(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
     }
-
+    // Заменить все set и гет на такие как сверху и снизу.
     public void setChangesPollingPeriod(short changesPollingPeriod) {
         setAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId(),String.valueOf(changesPollingPeriod));
     }

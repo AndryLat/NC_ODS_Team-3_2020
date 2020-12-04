@@ -22,7 +22,7 @@ public enum  Attributes {
     LAST_ACCESS_BY_JOB(12),
     LAST_ACCESS_BY_USER(13),
     PATH(14),
-    SIZE_OT_DIRECTORY(15),// Заменить наименования
+    SIZE_OT_DIRECTORY(15),// Заменить наименования такой шаблон
     IS_ACTIVE_OT_DIRECTORY(16),
     LAST_EXISTENCE_CHECK(17),
     LAST_ACCESS_BY_USER_OT_DIRECTORY(18),

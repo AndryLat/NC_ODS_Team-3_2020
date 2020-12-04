@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
-import com.netcracker.odstc.logviewer.config.WebConfig;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.AttributeMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ObjectMapper;
@@ -88,10 +87,10 @@ public class EAVObject {
 
 
         StringBuilder sqlStatement = new StringBuilder("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ? AND ATTR_ID = " + attrIds[0] + " ");// Или лучше много запросов?
-        // Несколько запросов
         for (int i = 1; i < attrIds.length; i++) {
-            sqlStatement.append("OR ATTR_ID = ").append(attrIds[i]).append(" ");// Я знаю что это не безопасно и надо изменить, но чет уже замсыпаю.
+            sqlStatement.append("OR ATTR_ID = ").append(attrIds[i]).append(" ");
         }// Заменить на PreparedStatement
+        // Добавить запрос на References
 
         List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(sqlStatement.toString(),
                 new AttributeMapper(),
@@ -109,7 +108,7 @@ public class EAVObject {
         } else {
             attributes.put(attrId,new Attribute(value));
         }
-    }
+    }// Поменять сеттеры на такие
 
     public void setAttributeDateValue(BigInteger attrId, Date dateValue) {
         if (attributes.containsKey(attrId)) {
