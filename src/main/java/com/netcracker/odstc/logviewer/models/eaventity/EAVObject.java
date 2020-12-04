@@ -5,7 +5,9 @@ import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeEx
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.AttributeMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ObjectMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ReferenceMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -19,12 +21,14 @@ import java.util.Map;
  * @author Aleksanid
  * created 03.12.2020
  */
+@Component // Анотация
 public class EAVObject {
-    JdbcTemplate jdbcTemplate = BeanUtil.getBean(WebConfig.class).getJdbcTemplate();
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     private BigInteger objectId;
-    private BigInteger parentId;// Как отследить null?
-    private BigInteger objectType;
+    private BigInteger parentId;
+    private BigInteger objectTypeId;
     private String name;
     private Map<BigInteger, Attribute> attributes;// Чтоб эти БигИнтеджеры
     private Map<BigInteger, BigInteger> references;
@@ -45,7 +49,7 @@ public class EAVObject {
         }
 
         parentId = (BigInteger) columns.remove(0);
-        objectType = (BigInteger) columns.remove(0);
+        objectTypeId = (BigInteger) columns.remove(0);
         name = (String) columns.remove(0);
 
         List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ?",
@@ -79,18 +83,18 @@ public class EAVObject {
             throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
         }
         parentId = (BigInteger) columns.remove(0);
-        objectType = (BigInteger) columns.remove(0);
+        objectTypeId = (BigInteger) columns.remove(0);
         name = (String) columns.remove(0);
 
 
         StringBuilder sqlStatement = new StringBuilder("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ? AND ATTR_ID = " + attrIds[0] + " ");// Или лучше много запросов?
-
+        // Несколько запросов
         for (int i = 1; i < attrIds.length; i++) {
             sqlStatement.append("OR ATTR_ID = ").append(attrIds[i]).append(" ");// Я знаю что это не безопасно и надо изменить, но чет уже замсыпаю.
-        }
+        }// Заменить на PreparedStatement
 
         List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(sqlStatement.toString(),
-                new AttributeMapper(),// Новый мапер?
+                new AttributeMapper(),
                 objectId);
 
         for (Map.Entry<BigInteger, Attribute> attribute :
@@ -103,9 +107,9 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setValue(value);
         } else {
-            throw new EAVAttributeException("Setting non existing attribute");
+            attributes.put(attrId,new Attribute(value));
         }
-    }// А как новые добавлять? Проверять на существование и заменять? А если нет то добавлять?
+    }
 
     public void setAttributeDateValue(BigInteger attrId, Date dateValue) {
         if (attributes.containsKey(attrId)) {
@@ -172,8 +176,9 @@ public class EAVObject {
                 objectId,
                 name,
                 parentId,
-                objectType);
+                objectTypeId);
 
+        // Сделать проверку на изменение
         String updateAttributeSQL = "MERGE INTO ATTRIBUTES p\n" +
                 "   USING (   SELECT ? object_id, ? attr_id, ? value, ? date_value, ? list_value_id FROM DUAL) p1\n" +
                 "   ON (p.object_id = p1.object_id AND p.attr_id = p1.attr_id)\n" +
@@ -248,7 +253,7 @@ public class EAVObject {
         this.parentId = parentId;
     }
 
-    public BigInteger getObjectType() {
-        return objectType;
+    public BigInteger getObjectTypeId() {
+        return objectTypeId;
     }
 }

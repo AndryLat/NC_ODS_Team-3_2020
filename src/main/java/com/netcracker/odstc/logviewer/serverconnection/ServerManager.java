@@ -6,6 +6,8 @@ import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +20,7 @@ import java.util.List;
  * created 01.12.2020
  */
 public class ServerManager {
+    private Logger logger = LogManager.getLogger(ServerManager.class.getName());
     private static ServerManager instance;
     //TODO: Разбить на 4 потока
     private List<ServerConnection> serverConnectionList;
@@ -72,7 +75,7 @@ public class ServerManager {
             try {
                 result.addAll(serverConnection.getNewLogs());
             } catch (ServerLogProcessingException e) {
-                LogClass.log(Level.INFO, "Get Error in polling time " + serverConnection.getServer().getName() + " to non-valid connections");
+                logger.info( "Get Error in polling time " + serverConnection.getServer().getName() + " to non-valid connections");
                 serverConnection.getServer().setActive(false);
                 nonConnectedServers.add(serverConnection);//TODO: Замена без итератора?
                 serverConnectionIterator.remove();

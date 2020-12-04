@@ -7,8 +7,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class Config extends EAVObject {
-    private short changesPollingPeriod; //milliseconds
-    private short activityPollingPeriod; //milliseconds
+    private short changesPollingPeriod; //milliseconds To Long
+    private short activityPollingPeriod; //milliseconds To Long
     private Date storageLogPeriod;
     private Date directoryActivityPeriod;
     private static Config instance = null;
@@ -42,12 +42,11 @@ public class Config extends EAVObject {
     }
 
     public short getChangesPollingPeriod() {
-        return changesPollingPeriod;
+        return Short.parseShort(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
     }
 
     public void setChangesPollingPeriod(short changesPollingPeriod) {
         setAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId(),String.valueOf(changesPollingPeriod));
-        this.changesPollingPeriod = changesPollingPeriod;
     }
 
     public short getActivityPollingPeriod() {

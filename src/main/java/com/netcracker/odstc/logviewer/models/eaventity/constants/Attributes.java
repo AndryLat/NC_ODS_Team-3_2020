@@ -22,10 +22,10 @@ public enum  Attributes {
     LAST_ACCESS_BY_JOB(12),
     LAST_ACCESS_BY_USER(13),
     PATH(14),
-    SIZE(15),
-    DIRECTORY_IS_ACTIVE(16),
+    SIZE_OT_DIRECTORY(15),// Заменить наименования
+    IS_ACTIVE_OT_DIRECTORY(16),
     LAST_EXISTENCE_CHECK(17),
-    DIRECTORY_LAST_ACCESS_BY_USER(18),
+    LAST_ACCESS_BY_USER_OT_DIRECTORY(18),
     NAME(19),
     LAST_UPDATE(20),
     LAST_ROW(21),
@@ -42,7 +42,7 @@ public enum  Attributes {
 
     Attributes(int valueArg) {
         attrId = BigInteger.valueOf(valueArg);
-    }
+    }// Заменить на BigInteger
 
     public BigInteger getAttrId() {
         return attrId;

@@ -6,6 +6,8 @@ import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProce
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FTPServerConnection extends AbstractServerConnection {
+    private Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
     FTPClient ftpClient;
     FTPServerConnection(Server server){
         super(server);
@@ -97,10 +100,11 @@ public class FTPServerConnection extends AbstractServerConnection {
                             result.addAll(extractLogsFromStream(inputStream, logFile));
                             ftpClient.completePendingCommand();
                         }catch (IOException e){
-                            LogClass.log(Level.ERROR,"Error with reading file from "+logFile.getParentTree());
+                            logger.error("Error with reading file from "+logFile.getParentTree(),e);//TODO: Сделать Error - record
                         }
                     }
                 } catch (IOException e) {
+                    logger.error("Error with reading file from "+directory.getParentTree(),e);
                     directory.setActive(false);
                 }
                 ftpClient.changeToParentDirectory();

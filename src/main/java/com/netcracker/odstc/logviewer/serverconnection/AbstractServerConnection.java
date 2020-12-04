@@ -67,7 +67,7 @@ public abstract class AbstractServerConnection implements ServerConnection {
                     log = new Log(line, LogLevel.valueOf(matcher.group(2)), logCreationDate, logFile);
                 }
                 result.add(log);
-                logFile.addLog(log);//TODO: Заменить на добавление одному.
+                logFile.addLog(log);
                 count++;
             }
             localCount++;
