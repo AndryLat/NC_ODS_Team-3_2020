@@ -58,11 +58,16 @@ public abstract class AbstractServerConnection implements ServerConnection {
                 } catch (ParseException e) {
                     logger.error(e.getMessage(),e);
                 }
+                boolean isLeveled = false;
+
+                if(matcher.group(2)!=null) {
+                    isLeveled = LogLevel.contains(matcher.group(2));
+                }
                 Log log;
-                if(matcher.group(2)==null){
-                    log = new Log(line,null,logCreationDate,logFile);
-                } else{
+                if(isLeveled) {
                     log = new Log(line, LogLevel.valueOf(matcher.group(2)), logCreationDate, logFile);
+                }else {
+                    log = new Log(line, null, logCreationDate, logFile);
                 }
                 result.add(log);
                 logFile.addLog(log);

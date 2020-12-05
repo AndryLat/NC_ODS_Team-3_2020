@@ -32,18 +32,20 @@ public class FTPServerConnection extends AbstractServerConnection {
             if (!FTPReply.isPositiveCompletion(reply)) {
                     ftpClient.disconnect();
                     logger.error("Error with connect into {}",server.getIp());
-                return false;
+                    server.setActive(false);
             }
-            return ftpClient.login(server.getLogin(), server.getPassword());
+            server.setActive(ftpClient.login(server.getLogin(), server.getPassword()));
         } catch (IOException e) {
+            server.setActive(false);
             logger.error("Error with connect into {}",server.getIp(),e);
         }
-        return false;
+        return server.isActive();
     }
 
     @Override
     public void disconnect() {
         try {
+            server.setActive(false);
             ftpClient.disconnect();
         } catch (IOException e) {
             logger.error("Error with disconnect {}",e.getMessage(),e);
@@ -78,37 +80,52 @@ public class FTPServerConnection extends AbstractServerConnection {
     @Override
     public List<Log> getNewLogs() {
         List<Log> result = new LinkedList<>();
-        if(!ftpClient.isConnected()&&!connect()){
+        try {
+            if(ftpClient.listHelp()==null&&!connect()){
+                throw new ServerLogProcessingException("Cant establish connection");
+            }
+        } catch (IOException e) {
+            logger.error("Cant get activity check from ftp ",e);
             throw new ServerLogProcessingException("Cant establish connection");
         }
         try {
             for (int i = 0; i < server.getDirectoryList().size(); i++) {
                 Directory directory = server.getDirectoryList().get(i);
-                try {
-                    if(!ftpClient.changeWorkingDirectory(directory.getPath())){
-                        directory.setActive(false);
-                        continue;
-                    }
-                    if (!directory.isActive())
-                        continue;
-                    for (int j = 0; j < directory.getLogFileList().size(); j++) {
-                        LogFile logFile = directory.getLogFileList().get(j);
-                        try {
-                            InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName());
-                            result.addAll(extractLogsFromStream(inputStream, logFile));
-                            ftpClient.completePendingCommand();
-                        }catch (IOException e){
-                            logger.error("Error with reading file from {}",logFile.getParentTree(),e);//TODO: Сделать Error - record
-                        }
-                    }
-                } catch (IOException e) {
-                    logger.error("Marking directory as unavailable {}",directory.getParentTree(),e);
-                    directory.setActive(false);
-                }
+                result.addAll(tryExtractLogsFromDirectory(directory));
                 ftpClient.changeToParentDirectory();
             }
         } catch (IOException e) {
             throw new ServerLogProcessingException(e);
+        }
+        return result;
+    }
+    private List<Log> tryExtractLogsFromDirectory(Directory directory){
+        List<Log> result = new LinkedList<>();
+        try {
+            if(!ftpClient.changeWorkingDirectory(directory.getPath())){
+                directory.setActive(false);
+                return result;
+            }
+            if (!directory.isActive())
+                return result;
+            for (int j = 0; j < directory.getLogFileList().size(); j++) {
+                LogFile logFile = directory.getLogFileList().get(j);
+                result.addAll(tryExtractLogsFromFile(logFile));
+            }
+        } catch (IOException e) {
+            logger.error("Marking directory as unavailable {}",directory.getParentTree(),e);
+            directory.setActive(false);
+        }
+        return result;
+    }
+    private List<Log> tryExtractLogsFromFile(LogFile logFile){
+        List<Log> result = new LinkedList<>();
+        try {
+            InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName());
+            result.addAll(extractLogsFromStream(inputStream, logFile));
+            ftpClient.completePendingCommand();
+        }catch (IOException e){
+            logger.error("Error with reading file from {}",logFile.getParentTree(),e);//TODO: Сделать Error - record
         }
         return result;
     }

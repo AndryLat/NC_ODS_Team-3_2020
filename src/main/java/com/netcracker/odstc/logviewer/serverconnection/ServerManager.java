@@ -20,6 +20,7 @@ public class ServerManager {
     //TODO: Разбить на 4 потока
     private List<ServerConnection> validServerConnections;
     private List<ServerConnection> disabledServerConnections;
+
     private ServerManager() {
         validServerConnections = new LinkedList<>();
         disabledServerConnections = new LinkedList<>();
@@ -72,23 +73,38 @@ public class ServerManager {
             return disabledServerConnections.remove(serverConnection);
         }
     }
+
     public boolean removerServerConnection(Server server){
-        //Реализация?
+        if(server.isActive()){
+            for (ServerConnection serverConnection :
+                    validServerConnections) {
+                if(server.getId()==serverConnection.getServer().getId()){
+                    return validServerConnections.remove(serverConnection);
+                }
+            }
+        }else {
+            for (ServerConnection serverConnection :
+                    disabledServerConnections) {
+                if(server.getId()==serverConnection.getServer().getId()){
+                    return disabledServerConnections.remove(serverConnection);
+                }
+            }
+        }
         return false;
     }
 
-    public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы?
+    public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы с дочерними объектами?
         List<Log> result = new LinkedList<>();
         Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
+            serverConnection.getServer().setLastAccessByJob(new Date());
             try {
                 result.addAll(serverConnection.getNewLogs());
-                serverConnection.getServer().setLastAccessByJob(new Date());
             } catch (ServerLogProcessingException e) {
                 logger.info("Get Error in polling time {} to non-valid connections",serverConnection.getServer().getName(),e);
                 serverConnection.getServer().setActive(false);
-                disabledServerConnections.add(serverConnection);//TODO: Замена без итератора?
+                disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
                 serverConnectionIterator.remove();
             }
         }
@@ -102,11 +118,8 @@ public class ServerManager {
             ServerConnection serverConnection = serverConnectionIterator.next();
             if (new Date(serverConnection.getServer().getLastAccessByUser().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date()))
                 return;
-
-
             if (serverConnection.connect()) {
-                logger.info("Moved server with name {}} to valid connections",serverConnection.getServer().getName());
-                serverConnection.getServer().setActive(true);
+                logger.info("Moved server with name {} to valid connections",serverConnection.getServer().getName());
                 validServerConnections.add(serverConnection);
                 serverConnectionIterator.remove();
             }
@@ -114,9 +127,8 @@ public class ServerManager {
     }
 
     public void revalidateActiveDirectories() {
-        Iterator<ServerConnection> serverConnectionIterator = disabledServerConnections.iterator();
-        while (serverConnectionIterator.hasNext()) {
-            serverConnectionIterator.next().revalidateDirectories();
+        for (ServerConnection disabledServerConnection : disabledServerConnections) {
+            disabledServerConnection.revalidateDirectories();
         }
     }
 }

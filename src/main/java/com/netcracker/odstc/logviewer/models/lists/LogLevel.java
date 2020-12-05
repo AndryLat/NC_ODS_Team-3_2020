@@ -22,4 +22,12 @@ public enum LogLevel {
     public int getValue() {
         return value;
     }
+    public static boolean contains(String value) {
+        for (LogLevel level : LogLevel.values()) {
+            if (level.name().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

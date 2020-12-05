@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Properties;
 
 public class SSHServerConnection extends AbstractServerConnection {
+    private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
     private JSch jSchClient;
     private Session session;
-    private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
 
     public SSHServerConnection(Server server) {
         super(server);
@@ -30,22 +30,22 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean connect() {
-        logger.debug("Making connection to {}" , server.getName());
+        logger.debug("Making connection to {}", server.getName());
         try {
             session = jSchClient.getSession(server.getLogin(), server.getIp(), server.getPort());
             session.setPassword(server.getPassword());
-            session.setTimeout(500);
             session.connect();
-            return session.isConnected();
+            server.setActive(session.isConnected());
         } catch (JSchException e) {
-            logger.error("Error with connection to {}", server.getName(),e);
+            logger.error("Error with connection to {}", server.getName(), e);
             server.setActive(false);
         }
-        return false;
+        return server.isActive();
     }
 
     @Override
     public void disconnect() {
+        server.setActive(false);
         session.disconnect();
     }
 
@@ -61,11 +61,11 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean isDirectoryValid(Directory directory) {
-        if(!super.isDirectoryValid(directory))
+        if (!super.isDirectoryValid(directory))
             return false;
         try {
             Channel sftp = session.openChannel("sftp");
-            sftp.connect(500);
+            sftp.connect();
 
             ChannelSftp channelSftp = (ChannelSftp) sftp;
             if (channelSftp.ls(directory.getPath()).isEmpty()) {
@@ -83,41 +83,52 @@ public class SSHServerConnection extends AbstractServerConnection {
         if (session == null) {
             throw new ServerLogProcessingException("Session is not created");
         }
-        if(!session.isConnected()&&!connect()){
+        if (!session.isConnected() && !connect()) {
             throw new ServerLogProcessingException("Cant establish connection");
         }
         List<Log> result = new LinkedList<>();
         try {
             Channel sftp = session.openChannel("sftp");
-
-            sftp.connect(500);
-
+            sftp.connect();
             ChannelSftp channelSftp = (ChannelSftp) sftp;
             for (int i = 0; i < server.getDirectoryList().size(); i++) {
                 Directory directory = server.getDirectoryList().get(i);
-                try {
-                    channelSftp.cd("/" + directory.getPath());
-                    if (!directory.isActive()) {
-                        continue;
-                    }
-                    for (int j = 0; j < directory.getLogFileList().size(); j++) {
-                        LogFile logFile = directory.getLogFileList().get(j);
-                        try {
-                            InputStream inputStream = channelSftp.get(logFile.getName());
-                            result.addAll(extractLogsFromStream(inputStream, logFile));
-                        }catch (SftpException e){
-                            logger.error("Error with reading file from {}",logFile.getParentTree(),e);
-                        }
-                    }
-                } catch (SftpException e) {
-                    logger.info("Mark directory {} as unavailable",directory.getPath(),e);
-                    directory.setActive(false);
-                } finally {
-                    channelSftp.cd("/");//Не работает
-                }
+                result.addAll(tryExtractLogsFromDirectory(channelSftp, directory));
             }
+            channelSftp.disconnect();
         } catch (JSchException | SftpException e) {
             throw new ServerLogProcessingException(e);
+        }
+        return result;
+    }
+
+    private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
+        List<Log> result = new LinkedList<>();
+        try {
+            channelSftp.cd("/" + directory.getPath());
+            if (!directory.isActive()) {
+                return result;
+            }
+            for (int j = 0; j < directory.getLogFileList().size(); j++) {
+                LogFile logFile = directory.getLogFileList().get(j);
+                result.addAll(tryExtractLogsFromFile(channelSftp, logFile));
+            }
+        } catch (SftpException e) {
+            logger.info("Mark directory {} as unavailable", directory.getPath(), e);
+            directory.setActive(false);
+        } finally {
+            channelSftp.cd("/");//Не работает
+        }
+        return result;
+    }
+
+    private List<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
+        List<Log> result = new LinkedList<>();
+        try {
+            InputStream inputStream = channelSftp.get(logFile.getName());
+            result.addAll(extractLogsFromStream(inputStream, logFile));
+        } catch (SftpException e) {
+            logger.error("Error with reading file from {}", logFile.getParentTree(), e);
         }
         return result;
     }
