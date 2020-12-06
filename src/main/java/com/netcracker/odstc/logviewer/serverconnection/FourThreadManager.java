@@ -37,8 +37,9 @@ public class FourThreadManager {//TODO: Требует доработки и т�
             if (future.getValue().isDone()) {
                 try {
                     logs.addAll(future.getValue().get());
-                } catch (InterruptedException e) {//TODO: Разобраться с ругательством
+                } catch (InterruptedException e) {
                     future.getKey().getServer().setActive(false);
+                    Thread.currentThread().interrupt();// Так точно правильно?
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
                     future.getKey().getServer().setActive(false);
