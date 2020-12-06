@@ -19,6 +19,6 @@ public class ReferenceMapper implements RowMapper<Map.Entry<BigInteger,BigIntege
     public Map.Entry<BigInteger, BigInteger> mapRow(ResultSet resultSet, int i) throws SQLException {
         return new AbstractMap.SimpleEntry<BigInteger, BigInteger>(
                 BigInteger.valueOf(resultSet.getLong("ATTR_ID")),
-                BigInteger.valueOf(resultSet.getLong("REFERENCE")));
+                BigInteger.valueOf(resultSet.getLong("OBJECT_ID")));
     }
 }

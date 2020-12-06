@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.models;
 
-import com.netcracker.odstc.logviewer.mapper.UserMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
@@ -35,7 +34,7 @@ public class User extends EAVObject {
             login = getAttributeValue(Attributes.LOGIN.getAttrId());
             password = getAttributeValue(Attributes.PASSWORD.getAttrId());
             role = getAttributeListValueId(Attributes.ROLE.getAttrId()); // int или enum?
-            created = jdbcTemplate.queryForObject("select object_id from objReference where reference = ? and attr_id = 5",new UserMapper(),id).id;
+            created = getReference(BigInteger.valueOf(5));
         }catch (EAVAttributeException eave){
             log.warning(eave.getMessage());
         }
@@ -105,22 +104,5 @@ public class User extends EAVObject {
         serverList.add(server);
         server.setParentUser(this);
         return true;
-    }
-
-    @Override
-    public void saveToDB() {
-        super.saveToDB();
-        if(created != null){
-            String updateCreated = "MERGE INTO OBJREFERENCE p\n" +
-                    "   USING (   SELECT ? object_id, ? attr_id, ? reference FROM DUAL) p1\n" +
-                    "   ON (p.reference = p1.reference AND p.attr_id = p1.attr_id)\n" +
-                    "   WHEN MATCHED THEN UPDATE SET p.object_id = p1.object_id    \n" +
-                    "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.reference)\n" +
-                    "    VALUES (p1.attr_id, p1.object_id,p1.reference)";
-            jdbcTemplate.update(updateCreated,
-                    created,
-                    5,
-                    id);
-        }
     }
 }
