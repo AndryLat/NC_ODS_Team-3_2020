@@ -62,7 +62,7 @@ public class EAVObject {
             attributes.put(attribute.getKey(), attribute.getValue());
         }
 
-        List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query("SELECT ATTR_ID,REFERENCE FROM OBJREFERENCE WHERE object_id = ?",
+        List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query("SELECT ATTR_ID,OBJECT_ID FROM OBJREFERENCE WHERE REFERENCE = ?",
                 new ReferenceMapper(),
                 objectId);
 
@@ -199,17 +199,17 @@ public class EAVObject {
 
         String updateReferenceSQL = "MERGE INTO OBJREFERENCE p\n" +
                 "   USING (   SELECT ? object_id, ? attr_id, ? reference FROM DUAL) p1\n" +
-                "   ON (p.object_id = p1.object_id AND p.attr_id = p1.attr_id)\n" +
-                "   WHEN MATCHED THEN UPDATE SET p.reference = p1.reference    \n" +
+                "   ON (p.reference = p1.reference AND p.attr_id = p1.attr_id)\n" +
+                "   WHEN MATCHED THEN UPDATE SET p.object_id = p1.object_id    \n" +
                 "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.reference)\n" +
                 "    VALUES (p1.attr_id, p1.object_id,p1.reference)";
 
         for (Map.Entry<BigInteger, BigInteger> reference :
                 references.entrySet()) {
             jdbcTemplate.update(updateReferenceSQL,
-                    objectId,
+                    reference.getValue(),
                     reference.getKey(),
-                    reference.getValue());
+                    objectId);
         }
     }
 
