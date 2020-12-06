@@ -46,7 +46,18 @@ public class UserDao {
                 "INTO objreference(attr_id, reference, object_id)\n" +
                 "VALUES(5,OBJECT_ID_seq.currval, ?)" +
                 "SELECT * FROM dual";
-        jdbcTemplate.update(sql, name, email, login, password, role, created);
+        jdbcTemplate.update(sql, name, email, login, password, role, created); // устаревший метод
+    }
+
+    public void setUser(String name, String email, String login, String password, BigInteger role, BigInteger created){
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setLogin(login);
+        user.setPassword(password);
+        user.setRole(role);
+        user.setCreated(created);
+        user.saveToDB();
     }
 
     public void deleteUser(int id){

@@ -25,7 +25,7 @@ public class EAVObject {
     //@Autowired
     //JdbcTemplate jdbcTemplate;
 
-    JdbcTemplate jdbcTemplate = BeanUtil.getBean(WebConfig.class).getJdbcTemplate(); // работает пока только так
+    public JdbcTemplate jdbcTemplate = BeanUtil.getBean(WebConfig.class).getJdbcTemplate(); // работает пока только так
 
     private BigInteger objectId;
     private BigInteger parentId;
@@ -256,5 +256,9 @@ public class EAVObject {
 
     public BigInteger getObjectTypeId() {
         return objectTypeId;
+    }
+
+    public void setObjectTypeId(BigInteger objectTypeId) {
+        this.objectTypeId = objectTypeId;
     }
 }

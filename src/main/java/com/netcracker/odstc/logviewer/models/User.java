@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.models;
 
+import com.netcracker.odstc.logviewer.mapper.UserMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class User extends EAVObject {
+
     private BigInteger id;
     private String email;
     private String login;
@@ -21,6 +23,7 @@ public class User extends EAVObject {
 
     public User() {
         super();
+        setObjectTypeId(BigInteger.ONE);
         this.serverList = new ArrayList<>();
     }
 
@@ -32,6 +35,7 @@ public class User extends EAVObject {
             login = getAttributeValue(Attributes.LOGIN.getAttrId());
             password = getAttributeValue(Attributes.PASSWORD.getAttrId());
             role = getAttributeListValueId(Attributes.ROLE.getAttrId()); // int или enum?
+            created = jdbcTemplate.queryForObject("select object_id from objReference where reference = ? and attr_id = 5",new UserMapper(),id).id;
         }catch (EAVAttributeException eave){
             log.warning(eave.getMessage());
         }
@@ -42,16 +46,13 @@ public class User extends EAVObject {
         return id;
     }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+        setAttributeValue(Attributes.EMAIL.getAttrId(), email);
     }
 
     public String getLogin() {
@@ -60,6 +61,7 @@ public class User extends EAVObject {
 
     public void setLogin(String login) {
         this.login = login;
+        setAttributeValue(Attributes.LOGIN.getAttrId(), login);
     }
 
     public String getPassword() {
@@ -68,6 +70,7 @@ public class User extends EAVObject {
 
     public void setPassword(String password) {
         this.password = password;
+        setAttributeValue(Attributes.PASSWORD.getAttrId(), password);
     }
 
     public BigInteger getRole() {
@@ -76,6 +79,7 @@ public class User extends EAVObject {
 
     public void setRole(BigInteger role) {
         this.role = role;
+        setAttributeListValueId(Attributes.ROLE.getAttrId(), role);
     }
 
     public List<Server> getServerList() {
@@ -101,5 +105,22 @@ public class User extends EAVObject {
         serverList.add(server);
         server.setParentUser(this);
         return true;
+    }
+
+    @Override
+    public void saveToDB() {
+        super.saveToDB();
+        if(created != null){
+            String updateCreated = "MERGE INTO OBJREFERENCE p\n" +
+                    "   USING (   SELECT ? object_id, ? attr_id, ? reference FROM DUAL) p1\n" +
+                    "   ON (p.reference = p1.reference AND p.attr_id = p1.attr_id)\n" +
+                    "   WHEN MATCHED THEN UPDATE SET p.object_id = p1.object_id    \n" +
+                    "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.reference)\n" +
+                    "    VALUES (p1.attr_id, p1.object_id,p1.reference)";
+            jdbcTemplate.update(updateCreated,
+                    created,
+                    5,
+                    id);
+        }
     }
 }
