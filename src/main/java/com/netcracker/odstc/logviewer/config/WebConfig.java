@@ -11,17 +11,17 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource("classpath:connectionBD.properties")
+@PropertySource("classpath:connectionDB.properties")
 @ComponentScan("com.netcracker.odstc.logviewer")
 public class WebConfig {
 
-    @Value("${connectionBD.url}")
+    @Value("${connectionDB.url}")
     private String urlBd;
 
-    @Value("${connectionBD.login}")
+    @Value("${connectionDB.login}")
     private String login;
 
-    @Value("${connectionBD.password}")
+    @Value("${connectionDB.password}")
     private String pass;
 
     @Bean

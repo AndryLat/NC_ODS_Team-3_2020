@@ -27,14 +27,14 @@ public class ServerDAO {
     public List<Server> findAll() {
         String sql = "select OBJECT_ID " +
                 "from OBJECTS" +
-                " where  object_type_id = ?;";
+                " where  object_type_id = 2;";
         return jdbcTemplate.query(sql, new ServerMapper());
 
     }
 
     public Server findById(BigInteger id) {
         String sql = "select OBJECT_ID \n" +
-                "from OBJECTS where  object_id = ?;";
+                "from OBJECTS where  object_id = ? and  object_type_id = 2;";
         return jdbcTemplate.queryForObject(sql, new ServerMapper(), id);
     }
 
@@ -42,14 +42,14 @@ public class ServerDAO {
     public List<Server> findByIpAddress(String ipAddress) {
         String sql = "select obj.OBJECT_ID from OBJECTS obj, attributes ip_address1 " +
                 "where  ip_address1.value like ? " +
-                "and  ip_address1.attr_id = 6 and obj.object_id = ip_address1.object_id; ";
+                "and  ip_address1.attr_id = 6 and obj.object_id = ip_address1.object_id and  object_type_id = 2; ";
         return jdbcTemplate.query(sql, new ServerMapper(), ipAddress);
     }
 
     public Server findByLogin(String login) {
         String sql = "select obj.OBJECT_ID from OBJECTS obj, attributes login1 " +
                 "where  login1.value like ? " +
-                "and  login1.attr_id = 7 and obj.object_id = login1.object_id; ";
+                "and  login1.attr_id = 7 and obj.object_id = login1.object_id and  object_type_id = 2; ";
         return jdbcTemplate.queryForObject(sql, new ServerMapper(), login);
     }
 
@@ -58,7 +58,8 @@ public class ServerDAO {
                 "where  protocols.value like ? \n" +
                 "and  protocol1.attr_id = 9 \n" +
                 "and protocols.list_value_id = protocol1.list_value_id\n" +
-                "and obj.object_id = protocol1.object_id; ";
+                "and obj.object_id = protocol1.object_id \n" +
+                "and  object_type_id = 2; ";
         return jdbcTemplate.query(sql, new ServerMapper(), protocol);
     }
 
@@ -66,7 +67,8 @@ public class ServerDAO {
         String sql = "select obj.OBJECT_ID from OBJECTS obj, attributes port1\n" +
                 "where  port1.value = ? \n" +
                 "and  port1.attr_id = 10 \n" +
-                "and obj.object_id = port1.object_id; ";
+                "and obj.object_id = port1.object_id \n" +
+                "and object_type_id = 2; ";
         return jdbcTemplate.query(sql, new ServerMapper(), port);
     }
 
@@ -76,7 +78,8 @@ public class ServerDAO {
         String sql = "SELECT obj.OBJECT_ID FROM OBJECTS obj, attributes last_access_by_job\n" +
                 "where last_access_by_job.date_value = to_date(?)\n" +
                 "and last_access_by_job.attr_id = 12\n" +
-                "and obj.object_id = last_access_by_job.object_id;";
+                "and obj.object_id = last_access_by_job.object_id \n" +
+                "and object_type_id = 2;";
         return jdbcTemplate.query(sql, new ServerMapper(), strDate);
     }
 
@@ -86,7 +89,8 @@ public class ServerDAO {
         String sql = "SELECT obj.OBJECT_ID FROM OBJECTS obj, attributes last_access_by_user\n" +
                 "where last_access_by_user.date_value = to_date(?)\n" +
                 "and last_access_by_user.attr_id = 13\n" +
-                "and obj.object_id = last_access_by_user.object_id;";
+                "and obj.object_id = last_access_by_user.object_id \n" +
+                "and  object_type_id = 2;";
         return jdbcTemplate.query(sql, new ServerMapper(), strDate);
     }
 

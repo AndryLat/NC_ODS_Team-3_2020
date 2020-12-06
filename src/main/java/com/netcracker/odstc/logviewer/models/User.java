@@ -1,46 +1,48 @@
 package com.netcracker.odstc.logviewer.models;
 
-import com.netcracker.odstc.logviewer.models.lists.Role;
+import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-public class User {
-    private long id;
+public class User extends EAVObject {
+    private BigInteger id;
     private String email;
     private String login;
     private String password;
-    private Role role;
-    private String name;
+    private BigInteger role; // int или enum?
     private List<Server> serverList;
-    private int created;
+    private BigInteger created;
+    private static Logger log = Logger.getLogger(User.class.getName());
 
     public User() {
+        super();
         this.serverList = new ArrayList<>();
     }
 
-    public User(long id, String email, String login, String password, Role role) {
+    public User(BigInteger id) {
+        super(id);
         this.id = id;
-        this.email = email;
-        this.login = login;
-        this.password = password;
-        this.role = role;
+        try{
+            email = getAttributeValue(Attributes.EMAIL.getAttrId());
+            login = getAttributeValue(Attributes.LOGIN.getAttrId());
+            password = getAttributeValue(Attributes.PASSWORD.getAttrId());
+            role = getAttributeListValueId(Attributes.ROLE.getAttrId()); // int или enum?
+        }catch (EAVAttributeException eave){
+            log.warning(eave.getMessage());
+        }
         this.serverList = new ArrayList<>();
     }
 
-    public User(String email, String login, String password, Role role) {
-        this.email = email;
-        this.login = login;
-        this.password = password;
-        this.role = role;
-        this.serverList = new ArrayList<>();
-    }
-
-    public long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
@@ -68,20 +70,12 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
+    public BigInteger getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(BigInteger role) {
         this.role = role;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Server> getServerList() {
@@ -92,11 +86,11 @@ public class User {
         this.serverList = serverList;
     }
 
-    public int getCreated() {
+    public BigInteger getCreated() {
         return created;
     }
 
-    public void setCreated(int created) {
+    public void setCreated(BigInteger created) {
         this.created = created;
     }
 
