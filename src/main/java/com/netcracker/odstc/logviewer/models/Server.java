@@ -1,13 +1,15 @@
 package com.netcracker.odstc.logviewer.models;
 
+import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Server {
-    private long id;
+public class Server extends EAVObject {
+    private BigInteger id;
     private String ip;
     private String login;
     private String password;
@@ -24,8 +26,12 @@ public class Server {
         this.directoryList = new ArrayList<>();
     }
 
-    public Server(long id, String ip, String login, String password, Protocol protocol, int port, User parentUser) {
-        this.id = id;
+    public Server(BigInteger integer){
+        super(integer);
+    }
+
+    public Server(BigInteger id, String ip, String login, String password, Protocol protocol, int port, User parentUser) {
+        super(id);
         this.ip = ip;
         this.login = login;
         this.password = password;
@@ -39,6 +45,7 @@ public class Server {
     }
 
     public Server(String ip, String login, String password, Protocol protocol, int port, User parentUser) {
+        super();
         this.ip = ip;
         this.login = login;
         this.password = password;
@@ -51,11 +58,11 @@ public class Server {
         this.directoryList = new ArrayList<>();
     }
 
-    public long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
