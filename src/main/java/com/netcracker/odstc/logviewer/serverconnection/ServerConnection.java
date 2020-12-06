@@ -5,8 +5,9 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.Server;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
-public interface ServerConnection {
+public interface ServerConnection extends Callable<List<Log>> {
     Server getServer();
     boolean connect();
     void disconnect();

@@ -4,7 +4,6 @@ import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
-import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,9 +16,9 @@ public class ServerManager {
 
     private static ServerManager instance;
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
-    //TODO: Разбить на 4 потока
     private List<ServerConnection> validServerConnections;
     private List<ServerConnection> disabledServerConnections;
+    private FourThreadManager fourThreadManager = FourThreadManager.getInstance();
 
     private ServerManager() {
         validServerConnections = new LinkedList<>();
@@ -78,14 +77,14 @@ public class ServerManager {
         if(server.isActive()){
             for (ServerConnection serverConnection :
                     validServerConnections) {
-                if(server.getId()==serverConnection.getServer().getId()){
+                if(server.getId().equals(serverConnection.getServer().getId())){
                     return validServerConnections.remove(serverConnection);
                 }
             }
         }else {
             for (ServerConnection serverConnection :
                     disabledServerConnections) {
-                if(server.getId()==serverConnection.getServer().getId()){
+                if(server.getId().equals(serverConnection.getServer().getId())){
                     return disabledServerConnections.remove(serverConnection);
                 }
             }
@@ -94,21 +93,19 @@ public class ServerManager {
     }
 
     public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы с дочерними объектами?
-        List<Log> result = new LinkedList<>();
-        Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
-        while (serverConnectionIterator.hasNext()) {
-            ServerConnection serverConnection = serverConnectionIterator.next();
-            serverConnection.getServer().setLastAccessByJob(new Date());
-            try {
-                result.addAll(serverConnection.getNewLogs());
-            } catch (ServerLogProcessingException e) {
-                logger.info("Get Error in polling time {} to non-valid connections",serverConnection.getServer().getName(),e);
-                serverConnection.getServer().setActive(false);
-                disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
-                serverConnectionIterator.remove();
+            List<Log> result = new LinkedList<>(fourThreadManager.getAsyncLogs());
+            Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
+            while (serverConnectionIterator.hasNext()) {
+                ServerConnection serverConnection = serverConnectionIterator.next();
+                if(!serverConnection.getServer().isActive()){
+                    logger.debug("Got nonactive server in valid, moved to non active");
+                    disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
+                    serverConnectionIterator.remove();
+                }else {
+                    fourThreadManager.executeExtractingLogs(serverConnection);
+                }
             }
-        }
-        return result;//TODO: Кому то отдавать или вызывать на всех сейв
+            return result;//TODO: Кому то отдавать или вызывать на всех сейв
     }
 
     public void revalidateDisabledServers() {
@@ -120,7 +117,7 @@ public class ServerManager {
                 return;
             if (serverConnection.connect()) {
                 logger.info("Moved server with name {} to valid connections",serverConnection.getServer().getName());
-                validServerConnections.add(serverConnection);
+                validServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
                 serverConnectionIterator.remove();
             }
         }

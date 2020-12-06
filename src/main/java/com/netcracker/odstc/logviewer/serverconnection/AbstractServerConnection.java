@@ -41,36 +41,28 @@ public abstract class AbstractServerConnection implements ServerConnection {
 
         int count = logFile.getLastRow();
         int localCount = 0;
+        Log lastLog = null;
         while (sc.hasNextLine()) {
             if(localCount<count){
                 sc.nextLine();
             }else {
                 String line = sc.nextLine();
 
-
                 Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d{4} \\d+:\\d+:\\d+\\.\\d+) ([A-Z]+)?.*$");
                 Matcher matcher = pattern.matcher(line);
-                matcher.find();
 
-                Date logCreationDate = null;
-                try {
-                    logCreationDate = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss.SSS").parse(matcher.group(1));
-                } catch (ParseException e) {
-                    logger.error(e.getMessage(),e);
+                boolean isLogEntry = matcher.find();
+                if(!isLogEntry && lastLog==null){
+                    continue;//TODO: Исправить на обнаружение StackTrace
+                }else if(!isLogEntry){
+                    lastLog.setText(lastLog.getText()+"\n"+line);
+                    continue;
                 }
-                boolean isLeveled = false;
 
-                if(matcher.group(2)!=null) {
-                    isLeveled = LogLevel.contains(matcher.group(2));
-                }
-                Log log;
-                if(isLeveled) {
-                    log = new Log(line, LogLevel.valueOf(matcher.group(2)), logCreationDate, logFile);
-                }else {
-                    log = new Log(line, null, logCreationDate, logFile);
-                }
+                Log log = new Log(line, formatLogLevel(matcher.group(2)), formatDate(matcher.group(1)), logFile);
                 result.add(log);
                 logFile.addLog(log);
+                lastLog = log;
                 count++;
             }
             localCount++;
@@ -83,5 +75,30 @@ public abstract class AbstractServerConnection implements ServerConnection {
         }
         sc.close();
         return result;
+    }
+
+    @Override
+    public List<Log> call() {
+        return getNewLogs();
+    }
+
+    private Date formatDate(String date){
+        Date logCreationDate = null;
+        try {
+            logCreationDate = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss.SSS").parse(date);
+        } catch (ParseException e) {
+            logger.error(e.getMessage(),e);
+        }
+        return logCreationDate;
+    }
+    private LogLevel formatLogLevel(String level){
+        if(level==null){
+            return null;
+        }
+        if(LogLevel.contains(level)){
+            return LogLevel.valueOf(level);
+        }else{
+            return null;
+        }
     }
 }
