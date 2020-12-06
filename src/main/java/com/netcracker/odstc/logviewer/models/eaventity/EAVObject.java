@@ -1,12 +1,12 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
+import com.netcracker.odstc.logviewer.config.WebConfig;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.AttributeMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ObjectMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ReferenceMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -20,10 +20,12 @@ import java.util.Map;
  * @author Aleksanid
  * created 03.12.2020
  */
-@Component // Анотация
+//@Component // Анотация
 public class EAVObject {
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+    //@Autowired
+    //JdbcTemplate jdbcTemplate;
+
+    JdbcTemplate jdbcTemplate = BeanUtil.getBean(WebConfig.class).getJdbcTemplate(); // работает пока только так
 
     private BigInteger objectId;
     private BigInteger parentId;

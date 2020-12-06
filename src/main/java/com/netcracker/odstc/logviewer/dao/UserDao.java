@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -19,35 +20,15 @@ public class UserDao {
     }
 
     public List<User> users(){
-        String sql = "select ob.object_id id, email.value email, login.value login, password.value pass, role_list.value role, obref.object_id created\n" +
-                "from attributes email, attributes login, attributes password, attributes role, lists role_list, objects ob left join objReference obref on obref.reference = ob.object_id and obref.attr_id = 5\n" +
-                "where ob.object_type_id = 1\n" +
-                "and email.object_id = ob.object_id\n" +
-                "and email.attr_id = 1\n" +
-                "and login.object_id = ob.object_id\n" +
-                "and login.attr_id = 2\n" +
-                "and password.object_id = ob.object_id\n" +
-                "and password.attr_id = 3\n" +
-                "and role.object_id = ob.object_id\n" +
-                "and role.attr_id = 4\n" +
-                "and role_list.list_value_id = role.list_value_id";
+        String sql = "select object_id " +
+                "from objects ob " +
+                "where ob.object_type_id = 1";
         return jdbcTemplate.query(sql, new UserMapper());
     }
 
     public User getById(int id){
-        String sql = "select ob.object_id id, email.value email, login.value login, password.value pass, role_list.value role, obref.object_id created\n" +
-                "from attributes email, attributes login, attributes password, attributes role, lists role_list, objects ob left join objReference obref on obref.reference = ob.object_id and obref.attr_id = 5\n" +
-                "where ob.object_id = ? \n" +
-                "and email.object_id = ob.object_id\n" +
-                "and email.attr_id = 1\n" +
-                "and login.object_id = ob.object_id\n" +
-                "and login.attr_id = 2\n" +
-                "and password.object_id = ob.object_id\n" +
-                "and password.attr_id = 3\n" +
-                "and role.object_id = ob.object_id\n" +
-                "and role.attr_id = 4\n" +
-                "and role_list.list_value_id = role.list_value_id";
-        return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+        User user = new User(BigInteger.valueOf(id));
+        return user;
     }
 
     public void addUser(String name, String email, String login, String password, int role, int created){
