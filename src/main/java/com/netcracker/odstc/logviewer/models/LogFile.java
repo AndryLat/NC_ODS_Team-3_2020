@@ -1,11 +1,14 @@
 package com.netcracker.odstc.logviewer.models;
 
+import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LogFile {
-    private long id;
+public class LogFile extends EAVObject {
+    private BigInteger id;
     private String name;
     private Date lastUpdate;
     private int lastRow;
@@ -16,7 +19,11 @@ public class LogFile {
         this.logList = new ArrayList<>();
     }
 
-    public LogFile(long id, String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
+    public LogFile(BigInteger integer) {
+        super(integer);
+    }
+
+    public LogFile(BigInteger id, String name, Date lastUpdate, int lastRow, Directory parentDirectory) {
         this.id = id;
         this.name = name;
         this.lastUpdate = lastUpdate;
@@ -33,11 +40,11 @@ public class LogFile {
         this.logList = new ArrayList<>();
     }
 
-    public long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
