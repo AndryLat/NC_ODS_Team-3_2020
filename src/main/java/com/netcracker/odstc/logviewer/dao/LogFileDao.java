@@ -6,9 +6,6 @@ import com.netcracker.odstc.logviewer.models.LogFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +37,7 @@ public class LogFileDao {
                 "where ob.object_type_id = 4\n" +
                 "and NAME.object_id = ob.object_id\n" +
                 "and NAME.attr_id = 18\n" +
-                "and NAME.value = ?\n"+
+                "and NAME.value = ?\n" +
                 "and LAST_CHECK.object_id = ob.object_id\n" +
                 "and LAST_CHECK.attr_id = 19\n" +
                 "and LAST_ROW.object_id = ob.object_id\n" +
@@ -53,7 +50,7 @@ public class LogFileDao {
                 "from attributes NAME, attributes LAST_CHECK, attributes LAST_ROW, objects ob " +
                 "where ob.object_type_id = 4\n" +
                 "and NAME.object_id = ob.object_id\n" +
-                "and NAME.attr_id = 18\n"+
+                "and NAME.attr_id = 18\n" +
                 "and LAST_CHECK.object_id = ob.object_id\n" +
                 "and LAST_CHECK.attr_id = 19\n" +
                 "and LAST_CHECK.date_value = ?\n" +
@@ -67,7 +64,7 @@ public class LogFileDao {
                 "from attributes NAME, attributes LAST_CHECK, attributes LAST_ROW, objects ob " +
                 "where ob.object_type_id = 4\n" +
                 "and NAME.object_id = ob.object_id\n" +
-                "and NAME.attr_id = 18\n"+
+                "and NAME.attr_id = 18\n" +
                 "and LAST_CHECK.object_id = ob.object_id\n" +
                 "and LAST_CHECK.attr_id = 19\n" +
                 "and LAST_ROW.object_id = ob.object_id\n" +
