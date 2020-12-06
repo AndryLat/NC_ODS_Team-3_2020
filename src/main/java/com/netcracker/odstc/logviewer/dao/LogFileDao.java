@@ -25,7 +25,7 @@ public class LogFileDao {
 
     public List<LogFile> logFiles() {
         String sql = "select ob.object_id id" +
-                "from attributes NAME, attributes LAST_CHECK, attributes LAST_ROW, objects ob " +
+                "from objects ob " +
                 "where ob.object_type_id = 4";
         return jdbcTemplate.query(sql, new LogFileMapper());
     }
