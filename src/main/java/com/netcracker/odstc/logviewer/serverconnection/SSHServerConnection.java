@@ -10,9 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class SSHServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
@@ -79,6 +77,38 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
+    public List<LogFile> getLogFileList(Directory directory, String extension) {
+        List<LogFile> logFiles = new LinkedList<>();
+        if (session == null) {
+            throw new ServerLogProcessingException("Session is not created");
+        }
+        ChannelSftp channelSftp = null;
+        try {
+            Channel sftp = session.openChannel("sftp");
+            sftp.connect();
+            channelSftp = (ChannelSftp) sftp;
+        } catch (JSchException e) {
+            logger.error("Error with checking directory ", e);
+            return logFiles;
+        }
+        try {
+            Vector<ChannelSftp.LsEntry> files = channelSftp.ls(directory.getPath());
+            long size = 0;
+            for (ChannelSftp.LsEntry file :
+                    files) {
+                if (file.getFilename().endsWith(extension)) {
+                    size += file.getAttrs().getSize();
+                    logFiles.add(new LogFile(file.getFilename(), new Date(), 0, directory));
+                }
+            }
+            directory.setSize(size);// А надо ли оно нам?
+        } catch (SftpException e) {
+            logger.error("Error with working with session", e);
+        }
+        return logFiles;
+    }
+
+    @Override
     public List<Log> getNewLogs() {
         if (session == null) {
             throw new ServerLogProcessingException("Session is not created");
@@ -101,6 +131,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         }
         return result;
     }
+
 
     private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
         List<Log> result = new LinkedList<>();

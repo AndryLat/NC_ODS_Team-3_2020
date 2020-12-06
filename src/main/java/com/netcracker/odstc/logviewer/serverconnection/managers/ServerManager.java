@@ -1,9 +1,12 @@
-package com.netcracker.odstc.logviewer.serverconnection;
+package com.netcracker.odstc.logviewer.serverconnection.managers;
 
 import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
+import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,11 +46,11 @@ public class ServerManager {
     public boolean addServerConnection(ServerConnection serverConnection) {
         boolean isServerActive = serverConnection.connect();
         if (isServerActive) {
-            logger.info("Got new server {} moved to valid",serverConnection.getServer().getName());
+            logger.info("Got new server {} moved to valid", serverConnection.getServer().getName());
             validServerConnections.add(serverConnection);
         } else {
             serverConnection.getServer().setActive(false);
-            logger.info("Got new server {} moved to non-valid",serverConnection.getServer().getName());
+            logger.info("Got new server {} moved to non-valid", serverConnection.getServer().getName());
             disabledServerConnections.add(serverConnection);
         }
         return isServerActive;
@@ -65,26 +68,26 @@ public class ServerManager {
         return addServerConnection(serverConnection);
     }
 
-    public boolean removerServerConnection(ServerConnection serverConnection){
-        if(serverConnection.getServer().isActive()){
+    public boolean removerServerConnection(ServerConnection serverConnection) {
+        if (serverConnection.getServer().isActive()) {
             return validServerConnections.remove(serverConnection);
-        }else {
+        } else {
             return disabledServerConnections.remove(serverConnection);
         }
     }
 
-    public boolean removerServerConnection(Server server){
-        if(server.isActive()){
+    public boolean removerServerConnection(Server server) {
+        if (server.isActive()) {
             for (ServerConnection serverConnection :
                     validServerConnections) {
-                if(server.getId().equals(serverConnection.getServer().getId())){
+                if (server.getId().equals(serverConnection.getServer().getId())) {
                     return validServerConnections.remove(serverConnection);
                 }
             }
-        }else {
+        } else {
             for (ServerConnection serverConnection :
                     disabledServerConnections) {
-                if(server.getId().equals(serverConnection.getServer().getId())){
+                if (server.getId().equals(serverConnection.getServer().getId())) {
                     return disabledServerConnections.remove(serverConnection);
                 }
             }
@@ -93,19 +96,19 @@ public class ServerManager {
     }
 
     public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы с дочерними объектами?
-            List<Log> result = new LinkedList<>(fourThreadManager.getAsyncLogs());
-            Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
-            while (serverConnectionIterator.hasNext()) {
-                ServerConnection serverConnection = serverConnectionIterator.next();
-                if(!serverConnection.getServer().isActive()){
-                    logger.debug("Got nonactive server in valid, moved to non active");
-                    disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
-                    serverConnectionIterator.remove();
-                }else {
-                    fourThreadManager.executeExtractingLogs(serverConnection);
-                }
+        List<Log> result = new LinkedList<>(fourThreadManager.getAsyncLogs());
+        Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
+        while (serverConnectionIterator.hasNext()) {
+            ServerConnection serverConnection = serverConnectionIterator.next();
+            if (!serverConnection.getServer().isActive()) {
+                logger.debug("Got nonactive server in valid, moved to non active");
+                disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
+                serverConnectionIterator.remove();
+            } else {
+                fourThreadManager.executeExtractingLogs(serverConnection);
             }
-            return result;//TODO: Кому то отдавать или вызывать на всех сейв
+        }
+        return result;//TODO: Кому то отдавать или вызывать на всех сейв
     }
 
     public void revalidateDisabledServers() {
@@ -116,7 +119,7 @@ public class ServerManager {
             if (new Date(serverConnection.getServer().getLastAccessByUser().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date()))
                 return;
             if (serverConnection.connect()) {
-                logger.info("Moved server with name {} to valid connections",serverConnection.getServer().getName());
+                logger.info("Moved server with name {} to valid connections", serverConnection.getServer().getName());
                 validServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
                 serverConnectionIterator.remove();
             }
