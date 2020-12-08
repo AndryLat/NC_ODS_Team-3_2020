@@ -16,13 +16,13 @@ import javax.sql.DataSource;
 public class WebConfig {
 
     @Value("${connectionDB.url}")
-    private String urlBd;
+    private String urlDb;
 
     @Value("${connectionDB.login}")
     private String login;
 
     @Value("${connectionDB.password}")
-    private String pass;
+    private String password;
 
     @Bean
     public JdbcTemplate getJdbcTemplate(){
@@ -34,9 +34,9 @@ public class WebConfig {
     @Bean
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(urlBd);
+        dataSource.setUrl(urlDb);
         dataSource.setUsername(login);
-        dataSource.setPassword(pass);
+        dataSource.setPassword(password);
         dataSource.setDriverClassName(oracle.jdbc.driver.OracleDriver.class.getName());
         return dataSource;
     }
