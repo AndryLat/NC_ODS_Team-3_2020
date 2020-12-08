@@ -13,13 +13,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Deque;
 
 public class FTPServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
-    FTPClient ftpClient;
+    private FTPClient ftpClient;
 
     public FTPServerConnection(Server server) {
         super(server);
@@ -58,8 +58,7 @@ public class FTPServerConnection extends AbstractServerConnection {
 
     @Override
     public void revalidateDirectories() {
-        for (Directory directory :
-                server.getDirectoryList()) {
+        for (Directory directory : server.getDirectoryList()) {
             if (!isDirectoryValid(directory)) {
                 directory.setActive(false);
             }
@@ -82,14 +81,13 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFileList(Directory directory, String extension) {
-        List<LogFile> logFiles = new LinkedList<>();
+    public Deque<LogFile> getLogFileList(Directory directory, String extension) {
+        Deque<LogFile> logFiles = new ArrayDeque<>();
         try {
             if (ftpClient.changeWorkingDirectory(directory.getPath())) {
                 FTPFile[] files = ftpClient.listFiles();
                 long size = 0;
-                for (FTPFile file :
-                        files) {
+                for (FTPFile file : files) {
                     if (file.getName().endsWith(extension)) {
                         size += file.getSize();
                         logFiles.add(new LogFile(file.getName(), new Date(), 0, directory));
@@ -105,8 +103,8 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<Log> getNewLogs() {
-        List<Log> result = new LinkedList<>();
+    public Deque<Log> getNewLogs() {
+        Deque<Log> result = new ArrayDeque<>();
         try {
             if (ftpClient.listHelp() == null && !connect()) {
                 throw new ServerLogProcessingException("Cant establish connection");
@@ -127,8 +125,8 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private List<Log> tryExtractLogsFromDirectory(Directory directory) {
-        List<Log> result = new LinkedList<>();
+    private Deque<Log> tryExtractLogsFromDirectory(Directory directory) {
+        Deque<Log> result = new ArrayDeque<>();
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
                 directory.setActive(false);
@@ -147,8 +145,8 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private List<Log> tryExtractLogsFromFile(LogFile logFile) {
-        List<Log> result = new LinkedList<>();
+    private Deque<Log> tryExtractLogsFromFile(LogFile logFile) {
+        Deque<Log> result = new ArrayDeque<>();
         try {
             InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName());
             result.addAll(extractLogsFromStream(inputStream, logFile));

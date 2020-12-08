@@ -49,8 +49,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public void revalidateDirectories() {
-        for (Directory directory :
-                server.getDirectoryList()) {
+        for (Directory directory : server.getDirectoryList()) {
             if (!isDirectoryValid(directory)) {
                 directory.setActive(false);
             }
@@ -77,8 +76,8 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFileList(Directory directory, String extension) {
-        List<LogFile> logFiles = new LinkedList<>();
+    public Deque<LogFile> getLogFileList(Directory directory, String extension) {
+        Deque<LogFile> logFiles = new ArrayDeque<>();
         if (session == null) {
             throw new ServerLogProcessingException("Session is not created");
         }
@@ -94,8 +93,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(directory.getPath());
             long size = 0;
-            for (ChannelSftp.LsEntry file :
-                    files) {
+            for (ChannelSftp.LsEntry file : files) {
                 if (file.getFilename().endsWith(extension)) {
                     size += file.getAttrs().getSize();
                     logFiles.add(new LogFile(file.getFilename(), new Date(), 0, directory));
@@ -109,14 +107,14 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<Log> getNewLogs() {
+    public Deque<Log> getNewLogs() {
         if (session == null) {
             throw new ServerLogProcessingException("Session is not created");
         }
         if (!session.isConnected() && !connect()) {
             throw new ServerLogProcessingException("Cant establish connection");
         }
-        List<Log> result = new LinkedList<>();
+        Deque<Log> result = new ArrayDeque<>();
         try {
             Channel sftp = session.openChannel("sftp");
             sftp.connect();
@@ -133,8 +131,8 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
 
-    private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
-        List<Log> result = new LinkedList<>();
+    private Deque<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
+        Deque<Log> result = new ArrayDeque<>();
         try {
             channelSftp.cd("/" + directory.getPath());
             if (!directory.isActive()) {
@@ -153,8 +151,8 @@ public class SSHServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private List<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
-        List<Log> result = new LinkedList<>();
+    private Deque<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
+        Deque<Log> result = new ArrayDeque<>();
         try {
             InputStream inputStream = channelSftp.get(logFile.getName());
             result.addAll(extractLogsFromStream(inputStream, logFile));

@@ -7,18 +7,19 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Deque;
 import java.util.Scanner;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class AbstractServerConnection implements ServerConnection {
     private final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
+    protected ServerConnectionService serverConnectionService;
 
     protected AbstractServerConnection(Server server) {
+        serverConnectionService = ServerConnectionService.getInstance();
         this.server = server;
     }
 
@@ -33,32 +34,30 @@ public abstract class AbstractServerConnection implements ServerConnection {
         return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
     }
 
-    protected List<Log> extractLogsFromStream(InputStream inputStream, LogFile logFile) {
-        List<Log> result = new LinkedList<>();
-        assert inputStream != null;
-        Scanner sc = new Scanner(inputStream);
+    protected Deque<Log> extractLogsFromStream(InputStream inputStream, LogFile logFile) {
+        Deque<Log> result = new ArrayDeque<>();
+        Scanner scanner = new Scanner(inputStream);
 
         int count = logFile.getLastRow();
         int localCount = 0;
         Log lastLog = null;
-        while (sc.hasNextLine()) {
+        while (scanner.hasNextLine()) {
             if (localCount < count) {
-                sc.nextLine();
+                scanner.nextLine();
             } else {
-                String line = sc.nextLine();
+                String line = scanner.nextLine();
 
-                Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d{4} \\d+:\\d+:\\d+\\.\\d+) ([A-Z]+)?.*$");
-                Matcher matcher = pattern.matcher(line);
+                Matcher matcher = serverConnectionService.getLogMatcher(line);
 
-                boolean isLogEntry = matcher.find();
+                boolean isLogEntry = matcher != null;
                 if (!isLogEntry && lastLog == null) {
-                    continue;//TODO: Исправить на обнаружение StackTrace
+                    continue;
                 } else if (!isLogEntry) {
                     lastLog.setText(lastLog.getText() + "\n" + line);
                     continue;
                 }
 
-                Log log = new Log(line, ServerConnectionService.formatLogLevel(matcher.group(2)), ServerConnectionService.formatDate(matcher.group(1)), logFile);
+                Log log = new Log(line, serverConnectionService.formatLogLevel(matcher.group(2)), serverConnectionService.formatDate(matcher.group(1)), logFile);
                 result.add(log);
                 logFile.addLog(log);
                 lastLog = log;
@@ -72,12 +71,12 @@ public abstract class AbstractServerConnection implements ServerConnection {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        sc.close();
+        scanner.close();
         return result;
     }
 
     @Override
-    public List<Log> call() {
+    public Deque<Log> call() {
         return getNewLogs();
     }
 }

@@ -12,17 +12,28 @@ import org.apache.logging.log4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ServerConnectionService {
-    private static final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
+    private static ServerConnectionService instance;
+    private final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
+    protected List<Pattern> logSearchPatterns; // На случай если паттернов поиска будет несколько
 
     private ServerConnectionService() {
+        logSearchPatterns = new LinkedList<>();
+        logSearchPatterns.add(Pattern.compile("(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"));// Может заменено на получение из базы, или просто перечислить все паттерны
     }
 
-    public static Date formatDate(String date) {
+    public static ServerConnectionService getInstance() {
+        if (instance == null) {
+            instance = new ServerConnectionService();
+        }
+        return instance;
+    }
+
+    public Date formatDate(String date) {
         Date logCreationDate = null;
         try {
             logCreationDate = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss.SSS").parse(date);
@@ -32,7 +43,7 @@ public class ServerConnectionService {
         return logCreationDate;
     }
 
-    public static LogLevel formatLogLevel(String level) {
+    public LogLevel formatLogLevel(String level) {
         if (level == null) {
             return null;
         }
@@ -43,8 +54,8 @@ public class ServerConnectionService {
         }
     }
 
-    public static List<LogFile> getFilesFromRemoteDirectory(Directory directory, String extension) {
-        List<LogFile> logFiles = new LinkedList<>();
+    public Deque<LogFile> getFilesFromRemoteDirectory(Directory directory, String extension) {
+        Deque<LogFile> logFiles = new ArrayDeque<>();
         ServerConnection serverConnection;
         if (directory.getParentServer().getProtocol().equals(Protocol.FTP)) {
             serverConnection = new FTPServerConnection(directory.getParentServer());
@@ -57,5 +68,17 @@ public class ServerConnectionService {
             logFiles.addAll(serverConnection.getLogFileList(directory, extension));
         }
         return logFiles;
+    }
+
+    public Matcher getLogMatcher(String line) {
+        Matcher matcher;
+        for (Pattern pattern :
+                logSearchPatterns) {
+            matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                return matcher;
+            }
+        }
+        return null;
     }
 }
