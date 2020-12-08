@@ -10,22 +10,19 @@ import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ServerManager {
 
     private static ServerManager instance;
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
-    private List<ServerConnection> validServerConnections;
-    private List<ServerConnection> disabledServerConnections;
-    private FourThreadManager fourThreadManager = FourThreadManager.getInstance();
+    private Set<ServerConnection> validServerConnections;
+    private Set<ServerConnection> disabledServerConnections;
+    private ServerPollManager serverPollManager = ServerPollManager.getInstance();
 
     private ServerManager() {
-        validServerConnections = new LinkedList<>();
-        disabledServerConnections = new LinkedList<>();
+        validServerConnections = new HashSet<>();
+        disabledServerConnections = new HashSet<>();
     }
 
     public static ServerManager getInstance() {
@@ -35,11 +32,11 @@ public class ServerManager {
         return instance;
     }
 
-    public List<ServerConnection> getDisabledServerConnections() {
+    public Set<ServerConnection> getDisabledServerConnections() {
         return disabledServerConnections;
     }
 
-    public List<ServerConnection> getValidServerConnections() {
+    public Set<ServerConnection> getValidServerConnections() {
         return validServerConnections;
     }
 
@@ -78,15 +75,13 @@ public class ServerManager {
 
     public boolean removerServerConnection(Server server) {
         if (server.isActive()) {
-            for (ServerConnection serverConnection :
-                    validServerConnections) {
+            for (ServerConnection serverConnection : validServerConnections) {
                 if (server.getId().equals(serverConnection.getServer().getId())) {
                     return validServerConnections.remove(serverConnection);
                 }
             }
         } else {
-            for (ServerConnection serverConnection :
-                    disabledServerConnections) {
+            for (ServerConnection serverConnection : disabledServerConnections) {
                 if (server.getId().equals(serverConnection.getServer().getId())) {
                     return disabledServerConnections.remove(serverConnection);
                 }
@@ -96,7 +91,7 @@ public class ServerManager {
     }
 
     public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы с дочерними объектами?
-        List<Log> result = new LinkedList<>(fourThreadManager.getAsyncLogs());
+        List<Log> result = new LinkedList<>(serverPollManager.getAsyncLogs());
         Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
@@ -105,7 +100,7 @@ public class ServerManager {
                 disabledServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
                 serverConnectionIterator.remove();
             } else {
-                fourThreadManager.executeExtractingLogs(serverConnection);
+                serverPollManager.executeExtractingLogs(serverConnection);
             }
         }
         return result;//TODO: Кому то отдавать или вызывать на всех сейв

@@ -5,10 +5,10 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 
-import java.util.List;
+import java.util.Deque;
 import java.util.concurrent.Callable;
 
-public interface ServerConnection extends Callable<List<Log>> {
+public interface ServerConnection extends Callable<Deque<Log>> {
     Server getServer();
 
     boolean connect();
@@ -19,7 +19,7 @@ public interface ServerConnection extends Callable<List<Log>> {
 
     boolean isDirectoryValid(Directory directory);
 
-    List<LogFile> getLogFileList(Directory directory, String extension);
+    Deque<LogFile> getLogFileList(Directory directory, String extension);
 
-    List<Log> getNewLogs();
+    Deque<Log> getNewLogs();
 }
