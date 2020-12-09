@@ -5,18 +5,21 @@ import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ServerPollManager {//TODO: Требует доработки и тщательного разбора
+public class ServerPollManager {// Пока так...
     private static ServerPollManager instance;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     ExecutorService service = Executors.newFixedThreadPool(4);
 
-    private HashMap<ServerConnection, Future<Deque<Log>>> serverConnectionsResults;
+    private HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private ServerPollManager() {
         serverConnectionsResults = new HashMap<>();
@@ -35,7 +38,7 @@ public class ServerPollManager {//TODO: Требует доработки и т�
 
     public List<Log> getAsyncLogs() {
         List<Log> logs = new ArrayList<>();
-        for (Map.Entry<ServerConnection, Future<Deque<Log>>> future : serverConnectionsResults.entrySet()) {
+        for (Map.Entry<ServerConnection, Future<List<Log>>> future : serverConnectionsResults.entrySet()) {
             if (future.getValue().isDone()) {
                 try {
                     logs.addAll(future.getValue().get());

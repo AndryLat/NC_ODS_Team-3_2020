@@ -7,9 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Deque;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
@@ -24,6 +24,11 @@ public abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
+    public void disconnect() {
+        server.setActive(false);
+    }
+
+    @Override
     public Server getServer() {
         return server;
     }
@@ -34,8 +39,13 @@ public abstract class AbstractServerConnection implements ServerConnection {
         return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
     }
 
-    protected Deque<Log> extractLogsFromStream(InputStream inputStream, LogFile logFile) {
-        Deque<Log> result = new ArrayDeque<>();
+    @Override
+    public List<Log> call() {
+        return getNewLogs();
+    }
+
+    protected List<Log> extractLogsFromStream(InputStream inputStream, LogFile logFile) {
+        List<Log> result = new ArrayList<>();
         Scanner scanner = new Scanner(inputStream);
 
         int count = logFile.getLastRow();
@@ -57,9 +67,14 @@ public abstract class AbstractServerConnection implements ServerConnection {
                     continue;
                 }
 
-                Log log = new Log(line, serverConnectionService.formatLogLevel(matcher.group(2)), serverConnectionService.formatDate(matcher.group(1)), logFile);
+                Log log = new Log(line,
+                        serverConnectionService.formatLogLevel(matcher.group(2)),
+                        serverConnectionService.formatDate(matcher.group(1)),
+                        logFile);
+
                 result.add(log);
                 logFile.addLog(log);
+
                 lastLog = log;
                 count++;
             }
@@ -73,10 +88,5 @@ public abstract class AbstractServerConnection implements ServerConnection {
         }
         scanner.close();
         return result;
-    }
-
-    @Override
-    public Deque<Log> call() {
-        return getNewLogs();
     }
 }

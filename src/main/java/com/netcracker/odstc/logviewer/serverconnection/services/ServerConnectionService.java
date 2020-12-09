@@ -12,7 +12,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +24,7 @@ public class ServerConnectionService {
     protected List<Pattern> logSearchPatterns; // На случай если паттернов поиска будет несколько
 
     private ServerConnectionService() {
-        logSearchPatterns = new LinkedList<>();
+        logSearchPatterns = new ArrayList<>();
         logSearchPatterns.add(Pattern.compile("(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"));// Может заменено на получение из базы, или просто перечислить все паттерны
     }
 
@@ -54,8 +56,8 @@ public class ServerConnectionService {
         }
     }
 
-    public Deque<LogFile> getFilesFromRemoteDirectory(Directory directory, String extension) {
-        Deque<LogFile> logFiles = new ArrayDeque<>();
+    public List<LogFile> getFilesFromRemoteDirectory(Directory directory, String extension) {
+        List<LogFile> logFiles = new ArrayList<>();
         ServerConnection serverConnection;
         if (directory.getParentServer().getProtocol().equals(Protocol.FTP)) {
             serverConnection = new FTPServerConnection(directory.getParentServer());
@@ -65,7 +67,7 @@ public class ServerConnectionService {
             return logFiles;
         }
         if (serverConnection.connect() && serverConnection.isDirectoryValid(directory)) {
-            logFiles.addAll(serverConnection.getLogFileList(directory, extension));
+            logFiles.addAll(serverConnection.getLogFiles(directory, extension));
         }
         return logFiles;
     }

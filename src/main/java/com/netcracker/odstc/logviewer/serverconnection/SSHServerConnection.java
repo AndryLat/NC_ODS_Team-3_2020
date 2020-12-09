@@ -5,7 +5,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
+import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +43,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public void disconnect() {
-        server.setActive(false);
+        super.disconnect();
         session.disconnect();
     }
 
@@ -61,60 +61,57 @@ public class SSHServerConnection extends AbstractServerConnection {
         if (!super.isDirectoryValid(directory))
             return false;
         try {
-            Channel sftp = session.openChannel("sftp");
-            sftp.connect();
-
-            ChannelSftp channelSftp = (ChannelSftp) sftp;
+            ChannelSftp channelSftp = getChannelSftp();
             if (channelSftp.ls(directory.getPath()).isEmpty()) {
                 directory.setActive(false);
             }
             return true;
-        } catch (JSchException | SftpException e) {
+        } catch (SftpException e) {
             server.setActive(false);
             return false;
         }
     }
 
     @Override
-    public Deque<LogFile> getLogFileList(Directory directory, String extension) {
-        Deque<LogFile> logFiles = new ArrayDeque<>();
-        if (session == null) {
-            throw new ServerLogProcessingException("Session is not created");
-        }
-        ChannelSftp channelSftp = null;
+    public List<LogFile> getLogFiles(Directory directory, String extension) {// Логика не разбивается, технический метод ест всю логику.
+        validateConnection();
+        ChannelSftp channelSftp = getChannelSftp();
+        List<LogFile> logFiles = new ArrayList<>();
         try {
-            Channel sftp = session.openChannel("sftp");
-            sftp.connect();
-            channelSftp = (ChannelSftp) sftp;
-        } catch (JSchException e) {
-            logger.error("Error with checking directory ", e);
-            return logFiles;
-        }
-        try {
-            Vector<ChannelSftp.LsEntry> files = channelSftp.ls(directory.getPath());
-            long size = 0;
+            List<ChannelSftp.LsEntry> files = channelSftp.ls(directory.getPath());
             for (ChannelSftp.LsEntry file : files) {
                 if (file.getFilename().endsWith(extension)) {
-                    size += file.getAttrs().getSize();
                     logFiles.add(new LogFile(file.getFilename(), new Date(), 0, directory));
                 }
             }
-            directory.setSize(size);// А надо ли оно нам?
         } catch (SftpException e) {
             logger.error("Error with working with session", e);
         }
         return logFiles;
     }
 
+
     @Override
-    public Deque<Log> getNewLogs() {
-        if (session == null) {
-            throw new ServerLogProcessingException("Session is not created");
+    public List<Log> getNewLogs() {
+        validateConnection();
+        return collectNewLogs();
+    }
+
+    private ChannelSftp getChannelSftp() {
+        ChannelSftp channelSftp;
+        try {
+            Channel sftp = session.openChannel("sftp");
+            sftp.connect();
+            channelSftp = (ChannelSftp) sftp;
+        } catch (JSchException e) {
+            logger.error("Error with creating SFTP", e);
+            throw new ServerConnectionException("Error with creating SFTP ", e);
         }
-        if (!session.isConnected() && !connect()) {
-            throw new ServerLogProcessingException("Cant establish connection");
-        }
-        Deque<Log> result = new ArrayDeque<>();
+        return channelSftp;
+    }
+
+    private List<Log> collectNewLogs() {
+        List<Log> result = new ArrayList<>();
         try {
             Channel sftp = session.openChannel("sftp");
             sftp.connect();
@@ -125,14 +122,19 @@ public class SSHServerConnection extends AbstractServerConnection {
             }
             channelSftp.disconnect();
         } catch (JSchException | SftpException e) {
-            throw new ServerLogProcessingException(e);
+            throw new ServerConnectionException("Error in polling time", e);
         }
         return result;
     }
 
+    private void validateConnection() {
+        if (session == null && !connect()) {
+            throw new ServerConnectionException("Cant establish connection");
+        }
+    }
 
-    private Deque<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
-        Deque<Log> result = new ArrayDeque<>();
+    private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, Directory directory) throws SftpException {
+        List<Log> result = new ArrayList<>();
         try {
             channelSftp.cd("/" + directory.getPath());
             if (!directory.isActive()) {
@@ -151,8 +153,8 @@ public class SSHServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private Deque<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
-        Deque<Log> result = new ArrayDeque<>();
+    private List<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
+        List<Log> result = new ArrayList<>();
         try {
             InputStream inputStream = channelSftp.get(logFile.getName());
             result.addAll(extractLogsFromStream(inputStream, logFile));

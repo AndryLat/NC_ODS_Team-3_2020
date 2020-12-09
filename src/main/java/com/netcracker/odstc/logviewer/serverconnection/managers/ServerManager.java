@@ -10,19 +10,22 @@ import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 public class ServerManager {
 
     private static ServerManager instance;
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
-    private Set<ServerConnection> validServerConnections;
-    private Set<ServerConnection> disabledServerConnections;
+    private List<ServerConnection> validServerConnections;
+    private List<ServerConnection> disabledServerConnections;
     private ServerPollManager serverPollManager = ServerPollManager.getInstance();
 
     private ServerManager() {
-        validServerConnections = new HashSet<>();
-        disabledServerConnections = new HashSet<>();
+        validServerConnections = new ArrayList<>();
+        disabledServerConnections = new ArrayList<>();
     }
 
     public static ServerManager getInstance() {
@@ -32,11 +35,11 @@ public class ServerManager {
         return instance;
     }
 
-    public Set<ServerConnection> getDisabledServerConnections() {
+    public List<ServerConnection> getDisabledServerConnections() {
         return disabledServerConnections;
     }
 
-    public Set<ServerConnection> getValidServerConnections() {
+    public List<ServerConnection> getValidServerConnections() {
         return validServerConnections;
     }
 
@@ -90,8 +93,8 @@ public class ServerManager {
         return false;
     }
 
-    public List<Log> getLogsFromAllServers() {// Я точно смогу получать листы с дочерними объектами?
-        List<Log> result = new LinkedList<>(serverPollManager.getAsyncLogs());
+    public List<Log> getLogsFromAllServers() {
+        List<Log> result = new ArrayList<>(serverPollManager.getAsyncLogs());
         Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();

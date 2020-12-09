@@ -4,7 +4,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerLogProcessingException;
+import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -13,9 +13,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Deque;
+import java.util.List;
 
 public class FTPServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
@@ -48,8 +48,8 @@ public class FTPServerConnection extends AbstractServerConnection {
 
     @Override
     public void disconnect() {
+        super.disconnect();
         try {
-            server.setActive(false);
             ftpClient.disconnect();
         } catch (IOException e) {
             logger.error("Error with disconnect {}", e.getMessage(), e);
@@ -81,19 +81,17 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public Deque<LogFile> getLogFileList(Directory directory, String extension) {
-        Deque<LogFile> logFiles = new ArrayDeque<>();
+    public List<LogFile> getLogFiles(Directory directory, String extension) {
+        validateConnection();
+        List<LogFile> logFiles = new ArrayList<>();
         try {
             if (ftpClient.changeWorkingDirectory(directory.getPath())) {
                 FTPFile[] files = ftpClient.listFiles();
-                long size = 0;
                 for (FTPFile file : files) {
                     if (file.getName().endsWith(extension)) {
-                        size += file.getSize();
                         logFiles.add(new LogFile(file.getName(), new Date(), 0, directory));
                     }
                 }
-                directory.setSize(size);// А надо ли оно нам?
                 ftpClient.changeToParentDirectory();
             }
         } catch (IOException e) {
@@ -103,16 +101,13 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public Deque<Log> getNewLogs() {
-        Deque<Log> result = new ArrayDeque<>();
-        try {
-            if (ftpClient.listHelp() == null && !connect()) {
-                throw new ServerLogProcessingException("Cant establish connection");
-            }
-        } catch (IOException e) {
-            logger.error("Cant get activity check from ftp ", e);
-            throw new ServerLogProcessingException("Cant establish connection");
-        }
+    public List<Log> getNewLogs() {
+        validateConnection();
+        return collectNewLogs();
+    }
+
+    private List<Log> collectNewLogs() {
+        List<Log> result = new ArrayList<>();
         try {
             for (int i = 0; i < server.getDirectoryList().size(); i++) {
                 Directory directory = server.getDirectoryList().get(i);
@@ -120,13 +115,24 @@ public class FTPServerConnection extends AbstractServerConnection {
                 ftpClient.changeToParentDirectory();
             }
         } catch (IOException e) {
-            throw new ServerLogProcessingException(e);
+            throw new ServerConnectionException("Server Connection Problem", e);
         }
         return result;
     }
 
-    private Deque<Log> tryExtractLogsFromDirectory(Directory directory) {
-        Deque<Log> result = new ArrayDeque<>();
+    private void validateConnection() {
+        try {
+            if (ftpClient.listHelp() == null && !connect()) {
+                throw new ServerConnectionException("Cant establish connection");
+            }
+        } catch (IOException e) {
+            logger.error("Cant get activity check from ftp ", e);
+            throw new ServerConnectionException("Cant establish connection", e);
+        }
+    }
+
+    private List<Log> tryExtractLogsFromDirectory(Directory directory) {
+        List<Log> result = new ArrayList<>();
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
                 directory.setActive(false);
@@ -145,8 +151,8 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private Deque<Log> tryExtractLogsFromFile(LogFile logFile) {
-        Deque<Log> result = new ArrayDeque<>();
+    private List<Log> tryExtractLogsFromFile(LogFile logFile) {
+        List<Log> result = new ArrayList<>();
         try {
             InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName());
             result.addAll(extractLogsFromStream(inputStream, logFile));
