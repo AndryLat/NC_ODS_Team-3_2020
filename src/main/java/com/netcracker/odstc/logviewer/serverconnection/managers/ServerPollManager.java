@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -14,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ServerPollManager {// Пока так...
+public class ServerPollManager {
     private static ServerPollManager instance;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     ExecutorService service = Executors.newFixedThreadPool(4);
@@ -36,9 +37,11 @@ public class ServerPollManager {// Пока так...
         serverConnectionsResults.put(serverConnection, service.submit(serverConnection));
     }
 
-    public List<Log> getAsyncLogs() {
+    public List<Log> getLogsFromThreads() {
         List<Log> logs = new ArrayList<>();
-        for (Map.Entry<ServerConnection, Future<List<Log>>> future : serverConnectionsResults.entrySet()) {
+        Iterator<Map.Entry<ServerConnection, Future<List<Log>>>> resultIterator = serverConnectionsResults.entrySet().iterator();
+        while (resultIterator.hasNext()) {
+            Map.Entry<ServerConnection, Future<List<Log>>> future = resultIterator.next();
             if (future.getValue().isDone()) {
                 try {
                     logs.addAll(future.getValue().get());
@@ -50,9 +53,9 @@ public class ServerPollManager {// Пока так...
                     future.getKey().getServer().setActive(false);
                     logger.error("Thread execution error ", e);
                 }
+                resultIterator.remove();
             }
         }
-        serverConnectionsResults.clear();
         return logs;
     }
 }
