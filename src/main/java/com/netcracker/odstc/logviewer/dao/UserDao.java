@@ -2,67 +2,67 @@ package com.netcracker.odstc.logviewer.dao;
 
 import com.netcracker.odstc.logviewer.mapper.UserMapper;
 import com.netcracker.odstc.logviewer.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class UserDao {
+@Repository
+public class UserDao extends EAVObjectDAO implements DAO<User> {
 
-    public final JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public UserDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        super(jdbcTemplate);
     }
 
-    public List<User> users(){
+    public User getByName(String name) {
+        String sql = "select ob.object_id\n" +
+                "        from objects ob, attributes attr\n" +
+                "        where attr.attr_id = 2 and ob.object_type_id = 1 and attr.object_id = ob.object_id\n" +
+                "        and attr.value = ? ";
+        User userId = jdbcTemplate.queryForObject(sql, new UserMapper(), name);
+        User result = new User(getObject(userId.getObjectId()));
+        return result;
+    }
+
+    @Override
+    public List<User> getAll() {
         String sql = "select object_id " +
                 "from objects ob " +
                 "where ob.object_type_id = 1";
-        return jdbcTemplate.query(sql, new UserMapper());
+        List<User> userIds = jdbcTemplate.query(sql, new UserMapper());
+        List<User> result = new ArrayList<>();
+        for (User userId : userIds) {
+            result.add(new User(getObject(userId.getObjectId())));
+        }
+        return result;
     }
 
-    public User getById(int id){
-        User user = new User(BigInteger.valueOf(id));
-        return user;
+    @Override
+    public void save(User user) {
+        saveObject(user);
+        saveAttributes(user.getObjectId(), user.getAttributes());
+        saveReferences(user.getObjectId(), user.getReferences());
     }
 
-    public void addUser(String name, String email, String login, String password, int role, int created){
-        String sql = "INSERT ALL\n" +
-                "INTO OBJECTS(OBJECT_ID, OBJECT_TYPE_ID, NAME)\n" +
-                "VALUES(OBJECT_ID_seq.nextval, 1, ?)\n" +
-                "INTO ATTRIBUTES(attr_id, object_id, value)\n" +
-                "VALUES(1, OBJECT_ID_seq.currval, ?)\n" +
-                "INTO ATTRIBUTES(attr_id, object_id, value)\n" +
-                "VALUES(2, OBJECT_ID_seq.currval, ?)\n" +
-                "INTO ATTRIBUTES(attr_id, object_id, value)\n" +
-                "VALUES(3, OBJECT_ID_seq.currval, ?)\n" +
-                "INTO ATTRIBUTES(attr_id, object_id, list_value_id)\n" +
-                "VALUES(4, OBJECT_ID_seq.currval, ?)\n" +
-                "INTO objreference(attr_id, reference, object_id)\n" +
-                "VALUES(5,OBJECT_ID_seq.currval, ?)" +
-                "SELECT * FROM dual";
-        jdbcTemplate.update(sql, name, email, login, password, role, created); // устаревший метод
+    @Override
+    public void update(User user) {
+        saveObject(user);
+        saveAttributes(user.getObjectId(), user.getAttributes());
+        saveReferences(user.getObjectId(), user.getReferences());
     }
 
-    public void setUser(String name, String email, String login, String password, BigInteger role, BigInteger created){
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setRole(role);
-        user.setCreated(created);
-        user.saveToDB();
-    }
-
-    public void deleteUser(int id){
+    @Override
+    public void deleteById(BigInteger id) {
         String sql = "DELETE FROM OBJECTS WHERE object_id = ?";
         jdbcTemplate.update(sql, id);
     }
 
+    @Override
+    public User get(BigInteger id) {
+        User user = new User(getObject(id));
+        return user;
+    }
 }

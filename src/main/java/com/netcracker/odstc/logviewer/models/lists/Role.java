@@ -10,6 +10,13 @@ public enum Role {
         value = valueArg;
     }
 
+    public static Role getByID(int id){
+        if(Role.ADMIN.value == id){
+            return Role.ADMIN;
+        }
+        return Role.USER;
+    }
+
     public int getValue() {
         return value;
     }
