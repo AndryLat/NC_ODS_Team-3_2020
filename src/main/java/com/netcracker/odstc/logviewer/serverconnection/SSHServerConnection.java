@@ -147,9 +147,8 @@ public class SSHServerConnection extends AbstractServerConnection {
         } catch (SftpException e) {
             logger.info("Mark directory {} as unavailable", directory.getPath(), e);
             directory.setActive(false);
-        } finally {
-            channelSftp.cd("/");//Не работает
         }
+        channelSftp.cd("/");
         return result;
     }
 

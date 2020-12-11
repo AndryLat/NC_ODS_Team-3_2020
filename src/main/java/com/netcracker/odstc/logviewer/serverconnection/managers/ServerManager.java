@@ -68,7 +68,7 @@ public class ServerManager {
         return addServerConnection(serverConnection);
     }
 
-    public boolean removerServerConnection(ServerConnection serverConnection) {
+    public boolean removeServerConnection(ServerConnection serverConnection) {
         if (serverConnection.getServer().isActive()) {
             return validServerConnections.remove(serverConnection);
         } else {
@@ -76,7 +76,7 @@ public class ServerManager {
         }
     }
 
-    public boolean removerServerConnection(Server server) {
+    public boolean removeServerConnection(Server server) {
         if (server.isActive()) {
             for (ServerConnection serverConnection : validServerConnections) {
                 if (server.getId().equals(serverConnection.getServer().getId())) {
@@ -94,7 +94,7 @@ public class ServerManager {
     }
 
     public List<Log> getLogsFromAllServers() {
-        List<Log> result = new ArrayList<>(serverPollManager.getAsyncLogs());
+        List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
         Iterator<ServerConnection> serverConnectionIterator = validServerConnections.iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
