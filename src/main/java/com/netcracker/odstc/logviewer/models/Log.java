@@ -6,7 +6,7 @@ import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class Log extends EAVObject {
+public class Log extends EAVObject{
     private long id;
     private String text;
     private LogLevel level;
@@ -14,7 +14,7 @@ public class Log extends EAVObject {
     private LogFile parentFile;
     private String name;
 
-    public Log() {
+    public Log(BigInteger object_id) {
     }
 
     public Log(long id, String text, LogLevel level, Date creationDate, LogFile parentFile) {
@@ -32,8 +32,6 @@ public class Log extends EAVObject {
         this.parentFile = parentFile;
     }
 
-    public Log(BigInteger id) {
-    }
 
     public long getId() {
         return id;
