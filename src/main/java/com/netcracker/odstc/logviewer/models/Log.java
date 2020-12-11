@@ -14,7 +14,7 @@ public class Log extends EAVObject{
     private LogFile parentFile;
     private String name;
 
-    public Log(BigInteger object_id) {
+    public Log(BigInteger objectid) {
     }
 
     public Log(long id, String text, LogLevel level, Date creationDate, LogFile parentFile) {
