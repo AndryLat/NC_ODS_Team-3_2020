@@ -9,25 +9,19 @@ import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.Map;
 
-/**
- * Description:
- *
- * @author Aleksanid
- * created 03.12.2020
- */
 public class AttributeMapper implements RowMapper<Map.Entry<BigInteger, Attribute>> {
     @Override
     public Map.Entry<BigInteger,Attribute> mapRow(ResultSet resultSet, int i) throws SQLException {
 
-        Object listValueId = resultSet.getObject("LIST_VALUE_ID");
-        BigInteger listValue = null;
-        if(listValueId!=null){
-            listValue = BigInteger.valueOf(resultSet.getInt("LIST_VALUE_ID"));
+        Object listValueObject = resultSet.getObject("LIST_VALUE_ID");
+        BigInteger listValueId = null;
+        if(listValueObject!=null){
+            listValueId = resultSet.getBigDecimal("LIST_VALUE_ID").toBigInteger();
         }
 
-        return new AbstractMap.SimpleEntry<>(BigInteger.valueOf(resultSet.getInt("ATTR_ID")),
+        return new AbstractMap.SimpleEntry<>(resultSet.getBigDecimal("ATTR_ID").toBigInteger(),
                 new Attribute(resultSet.getString("VALUE"),
-                        resultSet.getDate("DATE_VALUE"),
-                        listValue));
+                        resultSet.getTimestamp("DATE_VALUE"),
+                        listValueId));
     }
 }

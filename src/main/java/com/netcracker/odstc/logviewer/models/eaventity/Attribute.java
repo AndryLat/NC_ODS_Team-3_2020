@@ -3,12 +3,6 @@ package com.netcracker.odstc.logviewer.models.eaventity;
 import java.math.BigInteger;
 import java.util.Date;
 
-/**
- * Description:
- *
- * @author Aleksanid
- * created 03.12.2020
- */
 public class Attribute {
     private String value;
     private Date dateValue;
@@ -35,21 +29,6 @@ public class Attribute {
         this.listValueId = listValueId;
     }
 
-    @Override
-    public String toString() {
-        return "Attribute{" +
-                "value='" + value + '\'' +
-                ", dateValue=" + dateValue +
-                ", listValueId=" + listValueId +
-                '}';
-    }
-
-    public Attribute(String value, java.sql.Date date_value, BigInteger list_value_id) {
-        this.value = value;
-        this.dateValue = date_value;
-        this.listValueId = list_value_id;
-    }
-
     public String getValue() {
         return value;
     }
@@ -72,5 +51,15 @@ public class Attribute {
 
     public void setListValueId(BigInteger listValueId) {
         this.listValueId = listValueId;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Attribute{" +
+                "value='" + value + '\'' +
+                ", dateValue=" + dateValue +
+                ", listValueId=" + listValueId +
+                '}';
     }
 }

@@ -1,33 +1,19 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
-import com.netcracker.odstc.logviewer.models.eaventity.mappers.AttributeMapper;
-import com.netcracker.odstc.logviewer.models.eaventity.mappers.ObjectMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-/**
- * Description:
- *
- * @author Aleksanid
- * created 03.12.2020
- */
-
 public class EAVObject {
-
-    public JdbcTemplate jdbcTemplate; // работает пока только так
 
     private BigInteger objectId;
     private BigInteger parentId;
     private BigInteger objectTypeId;
     private String name;
-    private Map<BigInteger, Attribute> attributes;// Чтоб эти БигИнтеджеры
+    private Map<BigInteger, Attribute> attributes;
     private Map<BigInteger, BigInteger> references;
 
     public EAVObject(){
@@ -39,65 +25,6 @@ public class EAVObject {
         this.objectId = objectId;
         attributes = new HashMap<>();
         references = new HashMap<>();
-
-        /*List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
-        if(columns==null||columns.size()<3){
-            throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
-        }
-
-        parentId = (BigInteger) columns.remove(0);
-        objectTypeId = (BigInteger) columns.remove(0);
-        name = (String) columns.remove(0);
-
-        List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ?",
-                new AttributeMapper(),
-                objectId);
-
-        for (Map.Entry<BigInteger, Attribute> attribute :
-                objectAttributes) {
-            attributes.put(attribute.getKey(), attribute.getValue());
-        }
-
-        List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query("SELECT ATTR_ID,OBJECT_ID FROM OBJREFERENCE WHERE REFERENCE = ?",
-                new ReferenceMapper(),
-                objectId);
-
-        for (Map.Entry<BigInteger, BigInteger> attribute :
-                objectReferences) {
-            references.put(attribute.getKey(), attribute.getValue());
-        }*/
-    }
-
-    public EAVObject(BigInteger objectId, BigInteger... attrIds) {// А референсы как?
-        this.objectId = objectId;
-        attributes = new HashMap<>();
-        references = new HashMap<>();
-
-
-        List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
-
-        if(columns==null||columns.size()<3){
-            throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
-        }
-        parentId = (BigInteger) columns.remove(0);
-        objectTypeId = (BigInteger) columns.remove(0);
-        name = (String) columns.remove(0);
-
-
-        StringBuilder sqlStatement = new StringBuilder("SELECT ATTR_ID,VALUE,DATE_VALUE,LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ? AND ATTR_ID = " + attrIds[0] + " ");// Или лучше много запросов?
-        for (int i = 1; i < attrIds.length; i++) {
-            sqlStatement.append("OR ATTR_ID = ").append(attrIds[i]).append(" ");
-        }// Заменить на PreparedStatement
-        // Добавить запрос на References
-
-        List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(sqlStatement.toString(),
-                new AttributeMapper(),
-                objectId);
-
-        for (Map.Entry<BigInteger, Attribute> attribute :
-                objectAttributes) {
-            attributes.put(attribute.getKey(), attribute.getValue());
-        }
     }
 
     public void setAttributeValue(BigInteger attrId, String value) {
@@ -106,14 +33,13 @@ public class EAVObject {
         } else {
             attributes.put(attrId,new Attribute(value));
         }
-    }// Поменять сеттеры на такие
+    }
 
     public void setAttributeDateValue(BigInteger attrId, Date dateValue) {
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setDateValue(dateValue);
         } else {
             attributes.put(attrId,new Attribute(dateValue));
-            //throw new EAVAttributeException("Setting non existing attribute");
         }
     }
 
@@ -122,7 +48,6 @@ public class EAVObject {
             attributes.get(attrId).setListValueId(listValueId);
         } else {
             attributes.put(attrId,new Attribute(listValueId));
-            //throw new EAVAttributeException("Setting non existing attribute");
         }
     }
 
@@ -130,7 +55,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             return attributes.get(attrId).getValue();
         } else {
-            throw new EAVAttributeException("Accessing non existing attribute");
+            throw new EAVAttributeException(EAVAttributeException.NON_EXISTING_ATTRIBUTE);
         }
     }
 
@@ -138,7 +63,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             return attributes.get(attrId).getDateValue();
         } else {
-            throw new EAVAttributeException("Accessing non existing attribute");
+            throw new EAVAttributeException(EAVAttributeException.NON_EXISTING_ATTRIBUTE);
         }
     }
 
@@ -146,7 +71,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             return attributes.get(attrId).getListValueId();
         } else {
-            throw new EAVAttributeException("Accessing non existing attribute");
+            throw new EAVAttributeException(EAVAttributeException.NON_EXISTING_ATTRIBUTE);
         }
     }
 
@@ -155,7 +80,6 @@ public class EAVObject {
             references.replace(attrId, reference);
         } else {
             references.put(attrId,reference);
-            //throw new EAVAttributeException("Setting non existing reference");
         }
     }
 
@@ -163,52 +87,7 @@ public class EAVObject {
         if (references.containsKey(attrId)) {
             return references.get(attrId);
         } else {
-            throw new EAVAttributeException("Accessing non existing reference");
-        }
-    }
-
-    public void saveToDB() {
-        if(objectId==null){
-            objectId = BigInteger.valueOf(jdbcTemplate.queryForObject("SELECT OBJECT_ID_seq.nextval FROM DUAL",Integer.class));
-        }
-        String updateObjectSQL = "MERGE INTO OBJECTS p USING (SELECT ? object_id, ? name,? parent_id,? object_type_id FROM DUAL) p1 ON (p.object_id = p1.object_id)WHEN MATCHED THEN UPDATE SET p.name = p1.name,p.PARENT_ID=p1.parent_id WHEN NOT MATCHED THEN INSERT (p.object_id, p.name,p.OBJECT_TYPE_ID,p.PARENT_ID)    VALUES (p1.object_id, p1.name,p1.object_type_id,p1.parent_id)";
-        jdbcTemplate.update(updateObjectSQL,
-                objectId,
-                name,
-                parentId,
-                objectTypeId);
-
-        // Сделать проверку на изменение
-        String updateAttributeSQL = "MERGE INTO ATTRIBUTES p\n" +
-                "   USING (   SELECT ? object_id, ? attr_id, ? value, ? date_value, ? list_value_id FROM DUAL) p1\n" +
-                "   ON (p.object_id = p1.object_id AND p.attr_id = p1.attr_id)\n" +
-                "   WHEN MATCHED THEN UPDATE SET p.value = p1.value,p.date_value = p1.date_value,p.list_value_id = p1.list_value_id     \n" +
-                "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.value,p.date_value,p.list_value_id)\n" +
-                "    VALUES (p1.attr_id, p1.object_id,p1.value,p1.date_value,p1.list_value_id)";
-
-        for (Map.Entry<BigInteger, Attribute> attribute :
-                attributes.entrySet()) {
-            jdbcTemplate.update(updateAttributeSQL,
-                    objectId,
-                    attribute.getKey(),
-                    attribute.getValue().getValue(),
-                    attribute.getValue().getDateValue(),
-                    attribute.getValue().getListValueId());
-        }
-
-        String updateReferenceSQL = "MERGE INTO OBJREFERENCE p\n" +
-                "   USING (   SELECT ? object_id, ? attr_id, ? reference FROM DUAL) p1\n" +
-                "   ON (p.reference = p1.reference AND p.attr_id = p1.attr_id)\n" +
-                "   WHEN MATCHED THEN UPDATE SET p.object_id = p1.object_id    \n" +
-                "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.reference)\n" +
-                "    VALUES (p1.attr_id, p1.object_id,p1.reference)";
-
-        for (Map.Entry<BigInteger, BigInteger> reference :
-                references.entrySet()) {
-            jdbcTemplate.update(updateReferenceSQL,
-                    reference.getValue(),
-                    reference.getKey(),
-                    objectId);
+            throw new EAVAttributeException(EAVAttributeException.NON_EXISTING_REFERENCE);
         }
     }
 

@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public class UserDao extends EAVObjectDAO implements DAO<User> {
 
-
     public UserDao(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
