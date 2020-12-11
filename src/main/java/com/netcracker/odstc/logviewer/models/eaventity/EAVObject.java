@@ -3,8 +3,8 @@ package com.netcracker.odstc.logviewer.models.eaventity;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.AttributeMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.mappers.ObjectMapper;
-import com.netcracker.odstc.logviewer.models.eaventity.mappers.ReferenceMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -19,9 +19,9 @@ import java.util.Map;
  * created 03.12.2020
  */
 
-public class EAVObject {//TODO: Перенести все запросы в ДАО
+public class EAVObject {
 
-    private JdbcTemplate jdbcTemplate;//TODO: Заглушка до исправлений
+    public JdbcTemplate jdbcTemplate; // работает пока только так
 
     private BigInteger objectId;
     private BigInteger parentId;
@@ -40,7 +40,7 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
         attributes = new HashMap<>();
         references = new HashMap<>();
 
-        List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
+        /*List<Object> columns = jdbcTemplate.queryForObject("SELECT NAME,PARENT_ID,OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?", new ObjectMapper(), objectId);
         if(columns==null||columns.size()<3){
             throw new EAVAttributeException("Object cant be find in DataBase or its corrupted");
         }
@@ -65,7 +65,7 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
         for (Map.Entry<BigInteger, BigInteger> attribute :
                 objectReferences) {
             references.put(attribute.getKey(), attribute.getValue());
-        }
+        }*/
     }
 
     public EAVObject(BigInteger objectId, BigInteger... attrIds) {// А референсы как?
@@ -112,7 +112,8 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setDateValue(dateValue);
         } else {
-            throw new EAVAttributeException("Setting non existing attribute");
+            attributes.put(attrId,new Attribute(dateValue));
+            //throw new EAVAttributeException("Setting non existing attribute");
         }
     }
 
@@ -120,7 +121,8 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setListValueId(listValueId);
         } else {
-            throw new EAVAttributeException("Setting non existing attribute");
+            attributes.put(attrId,new Attribute(listValueId));
+            //throw new EAVAttributeException("Setting non existing attribute");
         }
     }
 
@@ -152,7 +154,8 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
         if (references.containsKey(attrId)) {
             references.replace(attrId, reference);
         } else {
-            throw new EAVAttributeException("Setting non existing reference");
+            references.put(attrId,reference);
+            //throw new EAVAttributeException("Setting non existing reference");
         }
     }
 
@@ -165,7 +168,6 @@ public class EAVObject {//TODO: Перенести все запросы в ДА
     }
 
     public void saveToDB() {
-
         if(objectId==null){
             objectId = BigInteger.valueOf(jdbcTemplate.queryForObject("SELECT OBJECT_ID_seq.nextval FROM DUAL",Integer.class));
         }

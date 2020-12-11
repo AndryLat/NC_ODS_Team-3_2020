@@ -23,8 +23,10 @@ public class EAVObjectDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private BigInteger objectId;
+
     public void saveObject(EAVObject eavObject) {
-        BigInteger objectId = eavObject.getObjectId();
+        objectId = eavObject.getObjectId();
         if (objectId == null) {
             objectId = BigInteger.valueOf(jdbcTemplate.queryForObject("SELECT OBJECT_ID_seq.nextval FROM DUAL", Integer.class));
         }
@@ -47,6 +49,10 @@ public class EAVObjectDAO {
                 "    VALUES (p1.attr_id, p1.object_id,p1.value,p1.date_value,p1.list_value_id)";
 
         // Сделать проверку на изменение
+        /*if(objectId == null){
+            objectId = this.objectId;
+        }*/
+
         for (Map.Entry<BigInteger, Attribute> attribute :
                 attributes.entrySet()) {
             jdbcTemplate.update(updateAttributeSQL,
@@ -109,5 +115,9 @@ public class EAVObjectDAO {
         }
         eavObject.setReferences(references);
         return eavObject;
+    }
+
+    public BigInteger getObjectId(){
+        return objectId;
     }
 }

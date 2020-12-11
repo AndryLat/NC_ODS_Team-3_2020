@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.security.jwt;
 
-import com.netcracker.odstc.logviewer.models.lists.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,21 +15,21 @@ public class JwtUser implements UserDetails {
     private final String email;
     private final String login;
     private final String password;
-    private final Role role;
+    private final String role;
     private List<GrantedAuthority> authorities;
 
     public JwtUser(BigInteger id,
                    String email,
                    String login,
                    String password,
-                   Role role) {
+                   String role) {
         this.id = id;
         this.email = email;
         this.login = login;
         this.password = password;
         this.role = role;
         this.authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role.name()));
+        authorities.add(new SimpleGrantedAuthority(role));
     }
 
     @Override

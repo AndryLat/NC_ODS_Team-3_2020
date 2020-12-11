@@ -78,7 +78,10 @@ public class User extends EAVObject {
     }
 
     public String getLogin() {
-        return login;
+        if (login != null){
+            return login;
+        }
+        return getAttributeValue(Attributes.LOGIN.getAttrId());
     }
 
     public void setLogin(String login) {
@@ -87,7 +90,10 @@ public class User extends EAVObject {
     }
 
     public String getPassword() {
-        return password;
+        if (password != null){
+            return password;
+        }
+        return getAttributeValue(Attributes.PASSWORD.getAttrId());
     }
 
     public void setPassword(String password) {
@@ -96,7 +102,10 @@ public class User extends EAVObject {
     }
 
     public Role getRole() {
-        return role;
+        if (role != null){
+            return role;
+        }
+        return Role.getByID(getAttributeListValueId(Attributes.ROLE.getAttrId()).intValue());
     }
 
     public void setRole(Role role) {

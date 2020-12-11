@@ -43,8 +43,8 @@ public class UserDao extends EAVObjectDAO implements DAO<User> {
     @Override
     public void save(User user) {
         saveObject(user);
-        saveAttributes(user.getObjectId(), user.getAttributes());
-        saveReferences(user.getObjectId(), user.getReferences());
+        saveAttributes(getObjectId(), user.getAttributes());
+        saveReferences(getObjectId(), user.getReferences());
     }
 
     @Override

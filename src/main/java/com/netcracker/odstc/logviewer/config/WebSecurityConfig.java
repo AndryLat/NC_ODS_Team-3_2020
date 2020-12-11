@@ -20,7 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String SIGN_UP_ENDPOINT = "/users/sign_up"; // пример
-    private static final String ADMIN_ENDPOINT = "/admin";
+    private static final String ADMIN_ENDPOINT = "/users/admin";
 
     UserDetailsServiceImpl userDetailsService;
 
@@ -43,8 +43,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_ENDPOINT).permitAll()
-                .antMatchers(ADMIN_ENDPOINT).hasRole(Role.ADMIN.name())
+                .authorizeRequests()
+                .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
+                .antMatchers(HttpMethod.POST, SIGN_UP_ENDPOINT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
