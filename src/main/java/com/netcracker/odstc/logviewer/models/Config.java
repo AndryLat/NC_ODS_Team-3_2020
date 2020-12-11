@@ -9,10 +9,10 @@ import java.util.Date;
 public class Config extends EAVObject {
     private static Config instance = null;
     public Config(long changesPollingPeriod, long activityPollingPeriod, Date storageLogPeriod, Date directoryActivityPeriod, Date serverActivityPeriod) {
-        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId(), String.valueOf(changesPollingPeriod));
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(activityPollingPeriod));
-        setAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId(), storageLogPeriod);
-        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId(), directoryActivityPeriod);
+        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(changesPollingPeriod));
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(activityPollingPeriod));
+        setAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId(), storageLogPeriod);
+        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), directoryActivityPeriod);
         setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), serverActivityPeriod);
     }
 
@@ -32,35 +32,35 @@ public class Config extends EAVObject {
     }
 
     public long getActivityPollingPeriod() {
-        return Long.parseLong(getAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId()));
+        return Long.parseLong(getAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId()));
     }
 
     public void setActivityPollingPeriod(long activityPollingPeriod) {
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(activityPollingPeriod));
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(activityPollingPeriod));
     }
 
     public long getChangesPollingPeriod() {
-        return Long.parseLong(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD.getAttrId()));
+        return Long.parseLong(getAttributeValue(Attributes.CHANGES_POLLING_PERIOD_OT_CONFIG.getAttrId()));
     }
 
     public void setChangesPollingPeriod(long changesPollingPeriod) {
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD.getAttrId(), String.valueOf(changesPollingPeriod));
+        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(changesPollingPeriod));
     }
 
     public Date getStorageLogPeriod() {
-        return getAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId());
+        return getAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId());
     }
 
     public void setStorageLogPeriod(Date storageLogPeriod) {
-        setAttributeDateValue(Attributes.STORAGE_PERIOD.getAttrId(), storageLogPeriod);
+        setAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId(), storageLogPeriod);
     }
 
     public Date getDirectoryActivityPeriod() {
-        return getAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId());
+        return getAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId());
     }
 
     public void setDirectoryActivityPeriod(Date directoryActivityPeriod) {
-        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD.getAttrId(), directoryActivityPeriod);
+        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), directoryActivityPeriod);
     }
 
     public Date getServerActivityPeriod() {

@@ -44,10 +44,10 @@ public class User extends EAVObject {
         setAttributes(eavObject.getAttributes());
         setReferences(eavObject.getReferences());
         try {
-            email = getAttributeValue(Attributes.EMAIL.getAttrId());
-            login = getAttributeValue(Attributes.LOGIN.getAttrId());
-            password = getAttributeValue(Attributes.PASSWORD.getAttrId());
-            role = Role.getByID(getAttributeListValueId(Attributes.ROLE.getAttrId()).intValue());
+            email = getAttributeValue(Attributes.EMAIL_OT_USER.getAttrId());
+            login = getAttributeValue(Attributes.LOGIN_OT_USER.getAttrId());
+            password = getAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId());
+            role = Role.getByID(getAttributeListValueId(Attributes.ROLE_OT_USER.getAttrId()).intValue());
             created = getReference(BigInteger.valueOf(5));
         } catch (EAVAttributeException eave) {
             log.warning(eave.getMessage());
@@ -74,43 +74,43 @@ public class User extends EAVObject {
 
     public void setEmail(String email) {
         this.email = email;
-        setAttributeValue(Attributes.EMAIL.getAttrId(), email);
+        setAttributeValue(Attributes.EMAIL_OT_USER.getAttrId(), email);
     }
 
     public String getLogin() {
         if (login != null){
             return login;
         }
-        return getAttributeValue(Attributes.LOGIN.getAttrId());
+        return getAttributeValue(Attributes.LOGIN_OT_USER.getAttrId());
     }
 
     public void setLogin(String login) {
         this.login = login;
-        setAttributeValue(Attributes.LOGIN.getAttrId(), login);
+        setAttributeValue(Attributes.LOGIN_OT_USER.getAttrId(), login);
     }
 
     public String getPassword() {
         if (password != null){
             return password;
         }
-        return getAttributeValue(Attributes.PASSWORD.getAttrId());
+        return getAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId());
     }
 
     public void setPassword(String password) {
         this.password = password;
-        setAttributeValue(Attributes.PASSWORD.getAttrId(), password);
+        setAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId(), password);
     }
 
     public Role getRole() {
         if (role != null){
             return role;
         }
-        return Role.getByID(getAttributeListValueId(Attributes.ROLE.getAttrId()).intValue());
+        return Role.getByID(getAttributeListValueId(Attributes.ROLE_OT_USER.getAttrId()).intValue());
     }
 
     public void setRole(Role role) {
         this.role = role;
-        setAttributeListValueId(Attributes.ROLE.getAttrId(), BigInteger.valueOf(role.getValue()));
+        setAttributeListValueId(Attributes.ROLE_OT_USER.getAttrId(), BigInteger.valueOf(role.getValue()));
     }
 
     public List<Server> getServerList() {

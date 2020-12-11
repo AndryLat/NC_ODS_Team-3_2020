@@ -20,6 +20,7 @@ public class ServerPollManager {
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     ExecutorService service = Executors.newFixedThreadPool(4);
 
+    // Заменить на Set?
     private HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private ServerPollManager() {

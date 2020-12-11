@@ -3,18 +3,18 @@ package com.netcracker.odstc.logviewer.dao;
 import com.netcracker.odstc.logviewer.mapper.LogMapper;
 import com.netcracker.odstc.logviewer.models.Log;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
-public class LogDAO {
+@Repository
+public class LogDAO extends EAVObjectDAO {
 
-
-    public final JdbcTemplate jdbcTemplate;
 
     public LogDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        super(jdbcTemplate);
     }
 
     public List<Log> getLogByText (String text) {
@@ -38,7 +38,7 @@ public class LogDAO {
     }
 
     public void save(Log log) {
-        log.saveToDB();
+        super.saveObject(log);
     }
 
     public void deleteById(BigInteger id) {
