@@ -22,9 +22,14 @@ public class EAVObject {
     }
 
     public EAVObject(BigInteger objectId) {
+        this();
         this.objectId = objectId;
-        attributes = new HashMap<>();
-        references = new HashMap<>();
+    }
+    public EAVObject(BigInteger objectId, BigInteger parentId, BigInteger objectTypeId,String name){
+        this(objectId);
+        this.parentId = parentId;
+        this.objectTypeId = objectTypeId;
+        this.name = name;
     }
 
     public void setAttributeValue(BigInteger attrId, String value) {
@@ -90,7 +95,6 @@ public class EAVObject {
             throw new EAVAttributeException(EAVAttributeException.NON_EXISTING_REFERENCE);
         }
     }
-
 
     public BigInteger getObjectId() {
         return objectId;
