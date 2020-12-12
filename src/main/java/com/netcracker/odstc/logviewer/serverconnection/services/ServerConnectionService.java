@@ -24,7 +24,7 @@ public class ServerConnectionService {
     protected List<Pattern> logSearchPatterns; // На случай если паттернов поиска будет несколько
 
     private static final String[] SEARCH_PATTERNS = new String[]{
-            "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"
+            "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"//Добавить второй шаблон
     };//Может получатся из базы, но пока и так неплохо.
 
     private ServerConnectionService() {

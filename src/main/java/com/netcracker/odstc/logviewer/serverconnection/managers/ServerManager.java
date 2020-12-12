@@ -119,14 +119,16 @@ public class ServerManager {
             if (serverConnection.connect()) {
                 logger.info("Moved server with name {} to valid connections", serverConnection.getServer().getName());
                 validServerConnections.add(serverConnection);//TODO: Замена без итератора? Существует ли она?
+                serverConnection.revalidateDirectories();
+                serverConnection.getServer().setActive(true);
                 serverConnectionIterator.remove();
             }
         }
     }
 
     public void revalidateActiveDirectories() {
-        for (ServerConnection disabledServerConnection : disabledServerConnections) {
-            disabledServerConnection.revalidateDirectories();
+        for (ServerConnection serverConnection : validServerConnections) {
+            serverConnection.revalidateDirectories();
         }
     }
 }
