@@ -18,6 +18,18 @@ public class Server extends EAVObject {
         super(id);
     }
 
+    public Server(String ip, int port, String login, String password, Protocol protocol) {
+        super();
+        setIp(ip);
+        setLogin(login);
+        setPassword(password);
+        setProtocol(protocol);
+        setPort(port);
+        setActive(true);
+        setLastAccessByUser(new Date());
+        setLastAccessByJob(new Date());
+    }
+
     public String getIp() {
         return getAttributeValue(Attributes.IP_ADDRESS_OT_SERVER.getAttrId());
     }

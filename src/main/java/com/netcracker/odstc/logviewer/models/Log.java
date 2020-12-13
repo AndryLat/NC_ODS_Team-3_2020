@@ -17,6 +17,13 @@ public class Log extends EAVObject {
         super(id);
     }
 
+    public Log(String text, LogLevel level) {
+        super();
+        setText(text);
+        setLevel(level);
+        setCreationDate(new Date());
+    }
+
     public String getText() {
         return getAttributeValue(Attributes.TEXT_OT_LOG.getAttrId());
     }

@@ -16,6 +16,14 @@ public class Directory extends EAVObject {
         super(id);
     }
 
+    public Directory(String path) {
+        super();
+        setPath(path);
+        setActive(true);
+        setLastExistenceCheck(new Date());
+        setLastAccessByUser(new Date());
+    }
+
     public String getPath() {
         return (String.valueOf(getAttributeValue(Attributes.PATH_OT_DIRECTORY.getAttrId())));
     }

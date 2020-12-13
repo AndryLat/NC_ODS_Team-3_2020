@@ -16,6 +16,13 @@ public class LogFile extends EAVObject {
         super(id);
     }
 
+    public LogFile(String name, int lastRow) {
+        super();
+        setName(name);
+        setLastRow(lastRow);
+        setLastUpdate(new Date());
+    }
+
     public String getName() {
         return getAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId());
     }
