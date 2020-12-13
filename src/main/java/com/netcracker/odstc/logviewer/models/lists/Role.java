@@ -10,11 +10,13 @@ public enum Role {
         value = valueArg;
     }
 
-    public static Role getByID(int id){
-        if(Role.ADMIN.value == id){
-            return Role.ADMIN;
+    public static Role getByID(int id) {
+        for (Role r : values()) {
+            if (r.value == id) {
+                return r;
+            }
         }
-        return Role.USER;
+        throw new IllegalArgumentException(String.valueOf(id));
     }
 
     public int getValue() {

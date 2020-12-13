@@ -19,9 +19,19 @@ public enum LogLevel {
         value = valueArg;
     }
 
+    public static LogLevel getByID(int id) {
+        for (LogLevel l : values()) {
+            if (l.value == id) {
+                return l;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(id));
+    }
+
     public int getValue() {
         return value;
     }
+
     public static boolean contains(String value) {
         for (LogLevel level : LogLevel.values()) {
             if (level.name().equals(value)) {

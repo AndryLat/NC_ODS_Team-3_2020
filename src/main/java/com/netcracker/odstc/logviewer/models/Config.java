@@ -8,13 +8,6 @@ import java.util.Date;
 
 public class Config extends EAVObject {
     private static Config instance = null;
-    public Config(long changesPollingPeriod, long activityPollingPeriod, Date storageLogPeriod, Date directoryActivityPeriod, Date serverActivityPeriod) {
-        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(changesPollingPeriod));
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(activityPollingPeriod));
-        setAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId(), storageLogPeriod);
-        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), directoryActivityPeriod);
-        setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), serverActivityPeriod);
-    }
 
     public Config() {
         super();
