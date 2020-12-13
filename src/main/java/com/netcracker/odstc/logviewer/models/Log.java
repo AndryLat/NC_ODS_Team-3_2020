@@ -17,11 +17,11 @@ public class Log extends EAVObject {
         super(id);
     }
 
-    public Log(String text, LogLevel level) {
+    public Log(String text, LogLevel level, Date creationDate) {
         super();
         setText(text);
         setLevel(level);
-        setCreationDate(new Date());
+        setCreationDate(creationDate);
     }
 
     public String getText() {
