@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class UserDao extends EAVObjectDAO implements DAO<User> {
+public class UserDao extends EAVObjectDAO {
 
     public UserDao(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
@@ -26,7 +26,6 @@ public class UserDao extends EAVObjectDAO implements DAO<User> {
         return result;
     }
 
-    @Override
     public List<User> getAll() {
         String sql = "select object_id " +
                 "from objects ob " +
@@ -39,14 +38,12 @@ public class UserDao extends EAVObjectDAO implements DAO<User> {
         return result;
     }
 
-    @Override
     public void save(User user) {
         saveObject(user);
         saveAttributes(getObjectId(), user.getAttributes());
         saveReferences(getObjectId(), user.getReferences());
     }
 
-    @Override
     public void update(User user) {
         saveObject(user);
         saveAttributes(user.getObjectId(), user.getAttributes());
@@ -59,7 +56,6 @@ public class UserDao extends EAVObjectDAO implements DAO<User> {
         jdbcTemplate.update(sql, id);
     }
 
-    @Override
     public User get(BigInteger id) {
         User user = new User(getObject(id));
         return user;

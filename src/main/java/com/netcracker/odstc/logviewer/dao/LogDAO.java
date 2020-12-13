@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class LogDAO extends EAVObjectDAO implements DAO<Log> {
+public class LogDAO extends EAVObjectDAO {
 
     public LogDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
@@ -81,7 +81,6 @@ public class LogDAO extends EAVObjectDAO implements DAO<Log> {
         return jdbcTemplate.query(sql, new LogMapper(), id);
     }
 
-    @Override
     public List<Log> getAll() {
         String sql = "select ob.object_id       as id, \n" +
                 "       fcl.value          as fcl_value,\n" +
@@ -100,12 +99,10 @@ public class LogDAO extends EAVObjectDAO implements DAO<Log> {
         return jdbcTemplate.query(sql, new LogMapper());
     }
 
-    @Override
     public void save(Log log) {
         super.saveObject(log);
     }
 
-    @Override
     public void update(Log log) {
         saveObject(log);
         saveAttributes(log.getObjectId(), log.getAttributes());
@@ -117,7 +114,6 @@ public class LogDAO extends EAVObjectDAO implements DAO<Log> {
         jdbcTemplate.update(sql, id);
     }
 
-    @Override
     public Log get(BigInteger id) {
         Log log = new Log(getObject(id));
         return log;
