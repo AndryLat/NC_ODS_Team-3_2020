@@ -10,6 +10,15 @@ public enum Protocol {
         value = valueArg;
     }
 
+    public static Protocol getByID(int id) {
+        for (Protocol p : values()) {
+            if (p.value == id) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(id));
+    }
+
     public int getValue() {
         return value;
     }

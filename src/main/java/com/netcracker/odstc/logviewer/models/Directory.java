@@ -1,131 +1,50 @@
 package com.netcracker.odstc.logviewer.models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 
-public class Directory {
-    private long id;
-    private String path;
-    private long size;
-    private boolean isActive;
-    private Date lastExistenceCheck;
-    private Date lastAccessByUser;
-    private Server parentServer;
-    private String name;
-    private List<LogFile> logFileList;
+import java.math.BigInteger;
+import java.util.Date;
+
+public class Directory extends EAVObject {
 
     public Directory() {
-        this.logFileList = new ArrayList<>();
+        super();
     }
 
-    public Directory(long id, String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {
-        this.id = id;
-        this.path = path;
-        this.size = size;
-        this.isActive = isActive;
-        this.lastExistenceCheck = lastExistenceCheck;
-        this.parentServer = parentServer;
-        this.logFileList = new ArrayList<>();
-    }
-
-    public Directory(String path, long size, boolean isActive, Date lastExistenceCheck, Server parentServer) {
-        this.path = path;
-        this.size = size;
-        this.isActive = isActive;
-        this.lastExistenceCheck = lastExistenceCheck;
-        this.parentServer = parentServer;
-        this.logFileList = new ArrayList<>();
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public Directory(BigInteger id) {
+        super(id);
     }
 
     public String getPath() {
-        return path;
+        return (String.valueOf(getAttributeValue(Attributes.PATH_OT_DIRECTORY.getAttrId())));
     }
 
     public void setPath(String path) {
-        this.path = path;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
+        setAttributeValue(Attributes.PATH_OT_DIRECTORY.getAttrId(), path);
     }
 
     public boolean isActive() {
-        return isActive;
+        return Boolean.parseBoolean(getAttributeValue(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId()));
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        setAttributeValue(getAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId()), String.valueOf(active));
     }
 
     public Date getLastExistenceCheck() {
-        return lastExistenceCheck;
+        return getAttributeDateValue(Attributes.LAST_EXISTENCE_CHECK_OT_DIRECTORY.getAttrId());
     }
 
     public void setLastExistenceCheck(Date lastExistenceCheck) {
-        this.lastExistenceCheck = lastExistenceCheck;
+        setAttributeDateValue(Attributes.LAST_EXISTENCE_CHECK_OT_DIRECTORY.getAttrId(), lastExistenceCheck);
     }
 
     public Date getLastAccessByUser() {
-        return lastAccessByUser;
+        return getAttributeDateValue(Attributes.LAST_ACCESS_BY_USER_OT_DIRECTORY.getAttrId());
     }
 
     public void setLastAccessByUser(Date lastAccessByUser) {
-        this.lastAccessByUser = lastAccessByUser;
-    }
-
-    public Server getParentServer() {
-        return parentServer;
-    }
-
-    public void setParentServer(Server parentServer) {
-        boolean exist = false;
-        for (Directory d : parentServer.getDirectoryList()) {
-            exist = d.equals(this);
-        }
-        if (!exist) parentServer.addDirectory(this);
-        this.parentServer = parentServer;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<LogFile> getLogFileList() {
-        return logFileList;
-    }
-
-    public void setLogFileList(List<LogFile> logFileList) {
-        this.logFileList = logFileList;
-    }
-
-    public boolean addLogFile(LogFile logFile) {
-        for (LogFile l : logFileList) {
-            if (l.equals(logFile)) return false;
-        }
-        logFileList.add(logFile);
-        logFile.setParentDirectory(this);
-        return true;
-    }
-
-    public String getParentTree() {
-        return "User: " + this.getParentServer().getParentUser().getName()
-                + "\n Server: " + this.getParentServer().getName();
+        setAttributeDateValue(Attributes.LAST_ACCESS_BY_USER_OT_DIRECTORY.getAttrId(), lastAccessByUser);
     }
 }

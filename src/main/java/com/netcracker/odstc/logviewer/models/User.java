@@ -6,8 +6,6 @@ import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeEx
 import com.netcracker.odstc.logviewer.models.lists.Role;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class User extends EAVObject {
@@ -17,21 +15,18 @@ public class User extends EAVObject {
     private String login;
     private String password;
     private Role role; // int или enum?
-    private List<Server> serverList;
     private BigInteger created;
     private static Logger log = Logger.getLogger(User.class.getName());
 
     public User() {
         super();
         setObjectTypeId(BigInteger.ONE);
-        this.serverList = new ArrayList<>();
     }
 
     public User(BigInteger id) {
         super(id);
         this.id = id;
         setObjectTypeId(BigInteger.ONE);
-        this.serverList = new ArrayList<>();
     }
 
     public User(EAVObject eavObject) {
@@ -52,7 +47,6 @@ public class User extends EAVObject {
         } catch (EAVAttributeException eave) {
             log.warning(eave.getMessage());
         }
-        this.serverList = new ArrayList<>();
     }
 
     public User(String email, String login, String password, Role role, BigInteger created) {
@@ -78,7 +72,7 @@ public class User extends EAVObject {
     }
 
     public String getLogin() {
-        if (login != null){
+        if (login != null) {
             return login;
         }
         return getAttributeValue(Attributes.LOGIN_OT_USER.getAttrId());
@@ -90,7 +84,7 @@ public class User extends EAVObject {
     }
 
     public String getPassword() {
-        if (password != null){
+        if (password != null) {
             return password;
         }
         return getAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId());
@@ -102,7 +96,7 @@ public class User extends EAVObject {
     }
 
     public Role getRole() {
-        if (role != null){
+        if (role != null) {
             return role;
         }
         return Role.getByID(getAttributeListValueId(Attributes.ROLE_OT_USER.getAttrId()).intValue());
@@ -113,14 +107,6 @@ public class User extends EAVObject {
         setAttributeListValueId(Attributes.ROLE_OT_USER.getAttrId(), BigInteger.valueOf(role.getValue()));
     }
 
-    public List<Server> getServerList() {
-        return serverList;
-    }
-
-    public void setServerList(List<Server> serverList) {
-        this.serverList = serverList;
-    }
-
     public BigInteger getCreated() {
         return created;
     }
@@ -128,14 +114,5 @@ public class User extends EAVObject {
     public void setCreated(BigInteger created) {
         this.created = created;
         setReference(BigInteger.valueOf(5), created);
-    }
-
-    public boolean addServer(Server server) {
-        for (Server s : serverList) {
-            if (s.equals(server)) return false;
-        }
-        serverList.add(server);
-        server.setParentUser(this);
-        return true;
     }
 }
