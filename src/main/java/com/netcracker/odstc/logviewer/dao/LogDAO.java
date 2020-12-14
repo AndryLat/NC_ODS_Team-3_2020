@@ -113,9 +113,10 @@ public class LogDAO extends EAVObjectDAO {
         String sql = "DELETE FROM OBJECTS WHERE object_id = ?";
         jdbcTemplate.update(sql, id);
     }
-
+/* Смысл в нем, если выше есть getById?
     public Log get(BigInteger id) {
         Log log = new Log(getObject(id));
         return log;
     }
+ */
 }
