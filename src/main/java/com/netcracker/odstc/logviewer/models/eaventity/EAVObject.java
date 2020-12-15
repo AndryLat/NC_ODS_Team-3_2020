@@ -1,6 +1,7 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
+import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 
 import java.math.BigInteger;
 import java.util.Date;

@@ -11,7 +11,7 @@ public class LogMapper implements RowMapper<Log> {
 
     @Override
     public Log mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Log log = new Log(BigInteger.valueOf(rs.getLong("object_id")));
+        Log log = new Log(rs.getBigDecimal("object_id").toBigInteger());
         return log;
     }
 
