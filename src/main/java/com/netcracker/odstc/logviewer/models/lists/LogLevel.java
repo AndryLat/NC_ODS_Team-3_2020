@@ -10,8 +10,8 @@ public enum LogLevel {
     FINEST(13),
     DEBUG(14),
     TRACE(15),
-    ERROR(17),
-    FATAL(18);
+    ERROR(16),
+    FATAL(17);
 
     private int value;
 

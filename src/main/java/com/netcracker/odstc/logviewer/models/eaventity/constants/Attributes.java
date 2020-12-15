@@ -2,11 +2,12 @@ package com.netcracker.odstc.logviewer.models.eaventity.constants;
 
 import java.math.BigInteger;
 
-public enum  Attributes {
-    EMAIL_OT_USER (BigInteger.valueOf(1)),
+public enum Attributes {
+    EMAIL_OT_USER(BigInteger.valueOf(1)),
     LOGIN_OT_USER(BigInteger.valueOf(2)),
     PASSWORD_OT_USER(BigInteger.valueOf(3)),
     ROLE_OT_USER(BigInteger.valueOf(4)),
+    CREATED_OT_USER(BigInteger.valueOf(5)),
     IP_ADDRESS_OT_SERVER(BigInteger.valueOf(6)),
     LOGIN_OT_SERVER(BigInteger.valueOf(7)),
     PASSWORD_OT_SERVER(BigInteger.valueOf(8)),

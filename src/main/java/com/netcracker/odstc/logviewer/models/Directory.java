@@ -37,7 +37,7 @@ public class Directory extends EAVObject {
     }
 
     public void setActive(boolean active) {
-        setAttributeValue(getAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId()), String.valueOf(active));
+        setAttributeValue(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), String.valueOf(active));
     }
 
     public Date getLastExistenceCheck() {

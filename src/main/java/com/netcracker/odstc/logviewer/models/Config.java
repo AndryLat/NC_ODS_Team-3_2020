@@ -37,7 +37,7 @@ public class Config extends EAVObject {
     }
 
     public void setChangesPollingPeriod(long changesPollingPeriod) {
-        setAttributeValue(Attributes.ACTIVITY_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(changesPollingPeriod));
+        setAttributeValue(Attributes.CHANGES_POLLING_PERIOD_OT_CONFIG.getAttrId(), String.valueOf(changesPollingPeriod));
     }
 
     public Date getStorageLogPeriod() {

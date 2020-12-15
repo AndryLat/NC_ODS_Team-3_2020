@@ -18,16 +18,6 @@ public class User extends EAVObject {
         setObjectTypeId(BigInteger.ONE);
     }
 
-    public User(EAVObject eavObject) {
-        super();
-        if (eavObject.getObjectTypeId() != BigInteger.ONE) {
-            throw new IllegalArgumentException();
-        }
-        setObjectId(eavObject.getObjectId());
-        setAttributes(eavObject.getAttributes());
-        setReferences(eavObject.getReferences());
-    }
-
     public User(String email, String login, String password, Role role, BigInteger created) {
         this();
         setEmail(email);
@@ -70,10 +60,10 @@ public class User extends EAVObject {
     }
 
     public BigInteger getCreated() {
-        return getReference(Attributes.ROLE_OT_USER.getAttrId());
+        return getReference(Attributes.CREATED_OT_USER.getAttrId());
     }
 
     public void setCreated(BigInteger created) {
-        setReference(BigInteger.valueOf(5), created);
+        setReference(Attributes.CREATED_OT_USER.getAttrId(), created);
     }
 }
