@@ -1,4 +1,4 @@
-package com.netcracker.odstc.logviewer.models.eaventity.mappers;
+package com.netcracker.odstc.logviewer.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 

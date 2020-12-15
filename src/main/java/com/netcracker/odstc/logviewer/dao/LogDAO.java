@@ -1,15 +1,11 @@
 package com.netcracker.odstc.logviewer.dao;
 
 import com.netcracker.odstc.logviewer.mapper.LogMapper;
-import com.netcracker.odstc.logviewer.mapper.UserMapper;
 import com.netcracker.odstc.logviewer.models.Log;
-import com.netcracker.odstc.logviewer.models.LogFile;
-import com.netcracker.odstc.logviewer.models.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +17,7 @@ public class LogDAO extends EAVObjectDAO {
     }
 
     public Log getById(BigInteger id) {
-        Log log = getObject(id,Log.class);
+        Log log = getObjectById(id,Log.class);
         return log;
     }
 

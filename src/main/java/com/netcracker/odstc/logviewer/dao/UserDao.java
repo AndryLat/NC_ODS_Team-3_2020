@@ -19,7 +19,7 @@ public class UserDao extends EAVObjectDAO {
                 "        and attr.value = ? ";
         User userId = jdbcTemplate.queryForObject(sql, new UserMapper(), name);
         if(userId != null){
-            User result = getObject(userId.getObjectId(), User.class);
+            User result = getObjectById(userId.getObjectId(), User.class);
             return result;
         }
         return null;
