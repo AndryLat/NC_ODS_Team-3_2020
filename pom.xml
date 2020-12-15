@@ -70,6 +70,10 @@
             <artifactId>org.jacoco.ant</artifactId>
             <version>0.8.6</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
