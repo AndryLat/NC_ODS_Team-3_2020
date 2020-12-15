@@ -12,19 +12,16 @@ import java.util.List;
 public class JwtUser implements UserDetails {
 
     private final BigInteger id;
-    private final String email;
     private final String login;
     private final String password;
     private final String role;
     private List<GrantedAuthority> authorities;
 
     public JwtUser(BigInteger id,
-                   String email,
                    String login,
                    String password,
                    String role) {
         this.id = id;
-        this.email = email;
         this.login = login;
         this.password = password;
         this.role = role;

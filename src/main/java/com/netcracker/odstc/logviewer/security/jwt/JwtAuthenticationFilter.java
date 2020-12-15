@@ -54,13 +54,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        String Role_User = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
-        System.out.println(Role_User);
-
+        String roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
 
         String token = JWT.create()
                 .withSubject(((JwtUser) authResult.getPrincipal()).getUsername())
-                .withClaim("Role", Role_User)
+                .withClaim("Role", roleUser)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
         response.addHeader(HEADER, PREFIX + token);

@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.config;
 
-import com.netcracker.odstc.logviewer.models.lists.Role;
 import com.netcracker.odstc.logviewer.security.UserDetailsServiceImpl;
 import com.netcracker.odstc.logviewer.security.jwt.JwtAuthenticationFilter;
 import com.netcracker.odstc.logviewer.security.jwt.JwtAuthorizationFilter;
