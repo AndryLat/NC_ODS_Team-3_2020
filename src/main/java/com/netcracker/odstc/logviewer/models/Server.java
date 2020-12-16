@@ -55,11 +55,11 @@ public class Server extends EAVObject {
     }
 
     public Protocol getProtocol() {
-        return Protocol.getByID(Integer.parseInt(getAttributeValue(Attributes.PROTOCOL_OT_SERVER.getAttrId())));
+        return Protocol.getByID(getAttributeListValueId(Attributes.PROTOCOL_OT_SERVER.getAttrId()).intValue());
     }
 
     public void setProtocol(Protocol protocol) {
-        setAttributeValue(Attributes.PROTOCOL_OT_SERVER.getAttrId(), String.valueOf(protocol.getValue()));
+        setAttributeListValueId(Attributes.PROTOCOL_OT_SERVER.getAttrId(), BigInteger.valueOf(protocol.getValue()));
     }
 
     public int getPort() {
