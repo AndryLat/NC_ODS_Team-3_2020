@@ -52,7 +52,7 @@ public class ServerService {
     }
 
     private boolean isIdValid(BigInteger id){
-        return !id.equals(0) && !(id == null);
+        return id != null && !id.equals(BigInteger.valueOf(0));
     }
 
     private boolean isServerValid(Server server){

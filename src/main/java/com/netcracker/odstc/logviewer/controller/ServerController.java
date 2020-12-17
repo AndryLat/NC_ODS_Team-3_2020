@@ -46,7 +46,7 @@ public class ServerController {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
-        if (id.equals(0) || id == null){
+        if (id == null || id.equals(BigInteger.valueOf(0))){
            return new ResponseEntity("Id shouldn't be 0 or null",HttpStatus.NOT_ACCEPTABLE);
         }
         return ResponseEntity.ok(serverService.findById(id));
@@ -54,7 +54,7 @@ public class ServerController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id){
-        if (id.equals(0) || id== null){
+        if (id == null || id.equals(BigInteger.valueOf(0))){
             return new ResponseEntity("Id shouldn't be 0 or null",HttpStatus.NOT_ACCEPTABLE);
         }
         serverService.deleteById(id);
