@@ -11,10 +11,12 @@ public class Config extends EAVObject {
 
     public Config() {
         super();
+        setObjectTypeId(BigInteger.valueOf(6));
     }
 
     public Config(BigInteger objectId) {
         super(objectId);
+        setObjectTypeId(BigInteger.valueOf(6));
     }
 
     public static Config getInstance() {

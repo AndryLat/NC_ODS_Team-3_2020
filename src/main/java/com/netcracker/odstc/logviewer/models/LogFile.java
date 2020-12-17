@@ -10,10 +10,12 @@ public class LogFile extends EAVObject {
 
     public LogFile() {
         super();
+        setObjectTypeId(BigInteger.valueOf(4));
     }
 
     public LogFile(BigInteger id) {
         super(id);
+        setObjectTypeId(BigInteger.valueOf(4));
     }
 
     public LogFile(String name, int lastRow) {
@@ -23,10 +25,12 @@ public class LogFile extends EAVObject {
         setLastUpdate(new Date());
     }
 
+    @Override
     public String getName() {
         return getAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId());
     }
 
+    @Override
     public void setName(String name) {
         setAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId(), name);
     }

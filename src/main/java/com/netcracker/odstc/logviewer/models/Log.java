@@ -11,10 +11,12 @@ public class Log extends EAVObject {
 
     public Log() {
         super();
+        setObjectTypeId(BigInteger.valueOf(5));
     }
 
     public Log(BigInteger id) {
         super(id);
+        setObjectTypeId(BigInteger.valueOf(5));
     }
 
     public Log(String text, LogLevel level) {

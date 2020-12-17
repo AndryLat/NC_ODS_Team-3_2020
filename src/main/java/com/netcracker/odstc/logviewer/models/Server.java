@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.exceptions.IllegalServerStateException;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
 
 import java.math.BigInteger;
@@ -12,10 +13,12 @@ public class Server extends EAVObject {
 
     public Server() {
         super();
+        setObjectTypeId(BigInteger.TWO);
     }
 
     public Server(BigInteger id) {
         super(id);
+        setObjectTypeId(BigInteger.TWO);
     }
 
     public Server(String ip, int port, String login, String password, Protocol protocol) {
@@ -71,7 +74,14 @@ public class Server extends EAVObject {
     }
 
     public boolean isActive() {
-        return Boolean.parseBoolean(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId())));
+        switch (getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId()).intValue()) {
+            case 5:
+                return true;
+            case 6:
+                return false;
+            default:
+                throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId())));
+        }
     }
 
     public void setActive(boolean active) {
