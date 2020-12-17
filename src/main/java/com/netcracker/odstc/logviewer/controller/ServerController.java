@@ -19,12 +19,6 @@ public class ServerController {
         this.serverService = serverService;
     }
 
-/*
-    @GetMapping("/all")
-    public List<Server> findAll() {
-        return serverService.findAll();
-    }
-*/
 
     @PostMapping("/add")
     public ResponseEntity<Server> add(@RequestBody Server server) {
@@ -40,7 +34,7 @@ public class ServerController {
         if (server == null) {
             return new ResponseEntity("Server shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
         }
-        serverService.update(server);
+        serverService.save(server);
         return new ResponseEntity(HttpStatus.OK);
     }
 

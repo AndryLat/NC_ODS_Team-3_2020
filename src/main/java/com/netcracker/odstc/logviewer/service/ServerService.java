@@ -6,29 +6,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.List;
 
 
 @Component
 public class ServerService {
 
     private final EAVObjectDAO eavObjectDAO;
-    private final Class<Server> server = Server.class;
-    private final BigInteger idType = BigInteger.valueOf(2);
+    private final Class<Server> serverClass = Server.class;
 
     public ServerService(@Qualifier("EAVObjectDAO") EAVObjectDAO eavObjectDAO) {
         this.eavObjectDAO = eavObjectDAO;
     }
-/*
 
-    public List<Server> findAll(){
-        return eavObjectDAO.getObjectsByObjectTypeId(idType, server);
-    }
-*/
 
     public Server findById(BigInteger id) {
         if (isIdValid(id)) {
-            return eavObjectDAO.getObjectById(id, server);
+            return  eavObjectDAO.getObjectById(id, serverClass);
         }
         return new Server();
     }
@@ -39,11 +32,6 @@ public class ServerService {
         }
     }
 
-    public void update(Server server) {
-        if(isServerValid(server)){
-            eavObjectDAO.saveObject(server);
-        }
-    }
 
     public void deleteById(BigInteger id){
         if(isIdValid(id)){
