@@ -122,7 +122,13 @@ public class EAVObjectDAO {
         return (T) eavObject;
     }
 
-    public void saveObjects(List<EAVObject> eavObjects) {
+    public <T extends EAVObject> void saveAll(T eavObject){
+        saveObject(eavObject);
+        saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
+        saveReferences(eavObject.getObjectId(), eavObject.getReferences());
+    }
+
+    public <T extends EAVObject> void saveObjects(List<T> eavObjects) {
         for (EAVObject eavObject : eavObjects) {
             BigInteger objectId = nextObjectId(eavObject);
             jdbcTemplate.update(UPDATE_OBJECT_SQL,
@@ -134,7 +140,7 @@ public class EAVObjectDAO {
         }
     }
 
-    public void saveObject(EAVObject eavObject) {
+    public <T extends EAVObject> void saveObject(T eavObject) {
         BigInteger objectId = nextObjectId(eavObject);
 
         jdbcTemplate.update(UPDATE_OBJECT_SQL,
