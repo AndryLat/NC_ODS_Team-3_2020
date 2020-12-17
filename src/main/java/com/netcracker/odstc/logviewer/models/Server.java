@@ -71,11 +71,12 @@ public class Server extends EAVObject {
     }
 
     public boolean isActive() {
-        return Boolean.parseBoolean(getAttributeValue(Attributes.IS_ACTIVE_OT_SERVER.getAttrId()));
+        return Boolean.parseBoolean(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId())));
     }
 
     public void setActive(boolean active) {
-        setAttributeValue(Attributes.IS_ACTIVE_OT_SERVER.getAttrId(), String.valueOf(active));
+        if (active) setAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId(), BigInteger.valueOf(5));
+        else setAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId(), BigInteger.valueOf(6));
     }
 
     public Date getLastAccessByJob() {

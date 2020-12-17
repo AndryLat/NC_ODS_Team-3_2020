@@ -33,11 +33,12 @@ public class Directory extends EAVObject {
     }
 
     public boolean isActive() {
-        return Boolean.parseBoolean(getAttributeValue(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId()));
+        return Boolean.parseBoolean(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId())));
     }
 
     public void setActive(boolean active) {
-        setAttributeValue(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), String.valueOf(active));
+        if (active) setAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(7));
+        else setAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(8));
     }
 
     public Date getLastExistenceCheck() {
