@@ -1,20 +1,17 @@
 package com.netcracker.odstc.logviewer.dao;
 
+import com.netcracker.odstc.logviewer.mapper.AttributeMapper;
+import com.netcracker.odstc.logviewer.mapper.ObjectMapper;
+import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
 import com.netcracker.odstc.logviewer.models.*;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
-import com.netcracker.odstc.logviewer.mapper.AttributeMapper;
-import com.netcracker.odstc.logviewer.mapper.ObjectMapper;
-import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class EAVObjectDAO {
@@ -43,6 +40,25 @@ public class EAVObjectDAO {
             "   WHEN NOT MATCHED THEN INSERT (p.attr_id, p.object_id,p.reference)\n" +
             "    VALUES (p1.attr_id, p1.object_id,p1.reference)";
     private static final String DELETE_OBJECT = "DELETE FROM OBJECTS WHERE object_id = ?";
+    private static final String QUERY_ATTRIBUTE_BY_VALUE = "select attr_id, object_id, value\n" +
+            " from attributes attr\n" +
+            " where attr.value like ?";
+    private static final String QUERY_ATTRIBUTE_BY_DATE_VALUE = "select attr_id, object_id, value\n" +
+            " from attributes attr\n" +
+            " where attr.DATE_value like ?";
+    private static final String QUERY_ATTRIBUTE_ID_BY_VALUE = "select attr_id\n" +
+            " from attributes attributes\n" +
+            " where attr.value like ?";
+    private static final String QUERY_ATTRIBUTE_ID_BY_DATE_VALUE = "select attr_id\n" +
+            " from attributes\n" +
+            " where attributes.DATE_value like ?";
+    private static final String QUERY_ATTRIBUTE_BY_LIST_VALUE = "select attr.attr_id, attr.object_id, Lists.value\n" +
+            "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
+            "    where Lists.value like ?";
+    private static final String QUERY_ATTRIBUTE_ID_BY_LIST_VALUE = "select attr.attr_id\n" +
+            "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
+            "    where Lists.value like ?";
+
 
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -122,10 +138,46 @@ public class EAVObjectDAO {
         return (T) eavObject;
     }
 
-    public <T extends EAVObject> void saveAll(T eavObject){
+    public Map<BigInteger, Attribute> getAttributebyValue(String value) {
+        jdbcTemplate.queryForObject(QUERY_NEXT_OBJECT_ID, BigInteger.class);
+        List<BigInteger> attributeIds = jdbcTemplate.queryForList(QUERY_ATTRIBUTE_ID_BY_VALUE, BigInteger.class, value);
+        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
+        for (BigInteger attributeId : attributeIds) {
+            attributes.putAll(getAttributes(attributeId, QUERY_ATTRIBUTE_BY_VALUE));
+        }
+        return attributes;
+    }
+
+    public Map<BigInteger, Attribute> getAttributebyDateValue(Date value) {
+        jdbcTemplate.queryForObject(QUERY_NEXT_OBJECT_ID, BigInteger.class);
+        List<BigInteger> attributeIds = jdbcTemplate.queryForList(QUERY_ATTRIBUTE_ID_BY_DATE_VALUE, BigInteger.class, value);
+        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
+        for (BigInteger attributeId : attributeIds) {
+            attributes.putAll(getAttributes(attributeId, QUERY_ATTRIBUTE_BY_DATE_VALUE));
+        }
+        return attributes;
+    }
+
+    public Map<BigInteger, Attribute> getAttributebyListValue(String value) {
+        jdbcTemplate.queryForObject(QUERY_NEXT_OBJECT_ID, BigInteger.class);
+        List<BigInteger> attributeIds = jdbcTemplate.queryForList(QUERY_ATTRIBUTE_ID_BY_LIST_VALUE, BigInteger.class, value);
+        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
+        for (BigInteger attributeId : attributeIds) {
+            attributes.putAll(getAttributes(attributeId, QUERY_ATTRIBUTE_BY_LIST_VALUE));
+        }
+        return attributes;
+    }
+
+    public <T extends EAVObject> void saveObjectAttributesReferences(T eavObject) {
         saveObject(eavObject);
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
         saveReferences(eavObject.getObjectId(), eavObject.getReferences());
+    }
+
+    public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
+        for (EAVObject eavObject : eavObjects) {
+            saveObjectAttributesReferences(eavObject);
+        }
     }
 
     public <T extends EAVObject> void saveObjects(List<T> eavObjects) {
