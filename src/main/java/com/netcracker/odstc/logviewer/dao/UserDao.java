@@ -17,17 +17,16 @@ public class UserDao extends EAVObjectDAO {
                 "        from objects ob, attributes attr\n" +
                 "        where attr.attr_id = 2 and ob.object_type_id = 1 and attr.object_id = ob.object_id\n" +
                 "        and attr.value = ? ";
-        User userId = jdbcTemplate.queryForObject(sql, new UserMapper(), name);
-        if(userId != null){
+        User userId;
+        try {
+            userId = jdbcTemplate.queryForObject(sql, new UserMapper(), name);
+        } catch (Exception ex) {
+            return null;
+        }
+        if (userId != null) {
             User result = getObjectById(userId.getObjectId(), User.class);
             return result;
         }
         return null;
-    }
-
-    public void save(User user) {
-        saveObject(user);
-        saveAttributes(user.getObjectId(), user.getAttributes());
-        saveReferences(user.getObjectId(), user.getReferences());
     }
 }

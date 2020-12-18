@@ -6,7 +6,6 @@ import com.netcracker.odstc.logviewer.security.jwt.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String SIGN_UP_ENDPOINT = "/users/sign_up"; // пример
-    private static final String ADMIN_ENDPOINT = "/users/admin";
+    private static final String LOGIN_ENDPOINT = "/login"; // пример
+    private static final String ADMIN_ENDPOINT = "/user/*";
 
     UserDetailsServiceImpl userDetailsService;
 
@@ -44,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
-                .antMatchers(HttpMethod.POST, SIGN_UP_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))

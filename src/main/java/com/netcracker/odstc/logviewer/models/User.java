@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.lists.Role;
 
 import java.math.BigInteger;
@@ -28,7 +29,11 @@ public class User extends EAVObject {
     }
 
     public String getEmail() {
-        return getAttributeValue(Attributes.EMAIL_OT_USER.getAttrId());
+        try {
+            return getAttributeValue(Attributes.EMAIL_OT_USER.getAttrId());
+        } catch (EAVAttributeException exp) {
+            return null;
+        }
     }
 
     public void setEmail(String email) {
@@ -60,7 +65,11 @@ public class User extends EAVObject {
     }
 
     public BigInteger getCreated() {
-        return getReference(Attributes.CREATED_OT_USER.getAttrId());
+        try {
+            return getReference(Attributes.CREATED_OT_USER.getAttrId());
+        } catch (EAVAttributeException exp) {
+            return null;
+        }
     }
 
     public void setCreated(BigInteger created) {

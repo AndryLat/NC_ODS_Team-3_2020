@@ -17,8 +17,8 @@ import java.util.*;
 public class EAVObjectDAO {
 
     public final JdbcTemplate jdbcTemplate;
-    private static final String QUERY_OBJECT_BY_TYPE = "SELECT object_id, NAME, PARENT_ID FROM OBJECTS WHERE OBJECT_TYPE_ID  = ?";
-    private static final String QUERY_OBJECT_BY_ID = "SELECT NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?";
+    private static final String QUERY_OBJECT_BY_TYPE = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_TYPE_ID  = ?";
+    private static final String QUERY_OBJECT_BY_ID = "SELECT object_id ,NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?";
     private static final String QUERY_ATTRIBUTE_BY_ID = "SELECT ATTR_ID, VALUE, DATE_VALUE, LIST_VALUE_ID FROM ATTRIBUTES WHERE ATTR_ID = ?";
     private static final String QUERY_ATTRIBUTE_BY_OBJECT_ID = "SELECT ATTR_ID, VALUE, DATE_VALUE, LIST_VALUE_ID FROM ATTRIBUTES WHERE object_id = ?";
     private static final String QUERY_OBJECT_ATTRIBUTE_BY_REFERENCE = "SELECT ATTR_ID, OBJECT_ID FROM OBJREFERENCE WHERE REFERENCE = ?";
