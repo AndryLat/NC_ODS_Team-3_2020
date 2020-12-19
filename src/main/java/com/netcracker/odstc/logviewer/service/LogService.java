@@ -20,22 +20,26 @@ public class LogService {
         return logDAO.getObjectsByObjectTypeId(BigInteger.valueOf(5), Log.class);
     }
 
-    public List<Log> filtrateByDateLogs(Date date) {
+    public List<Log> filtrateByDateLogs(Date... dateFrom) {
         List<Log> logs = new ArrayList<>();
-        logs.add((Log) logDAO.getAttributebyDateValue(date).values());
+        for (Date date : dateFrom) {
+            for (Log log : logDAO.getLogByCreationDate(date))
+                logs.add(log);
+        }
         return logs;
     }
 
-    public List<Log> filtrateByLevelLogs(String level) {
+    public List<Log> filtrateByLevelLogs(String... levels) {
         List<Log> logs = new ArrayList<>();
-        logs.add((Log) logDAO.getAttributebyListValue(level).values());
+        for (String level : levels) {
+            for (Log log : logDAO.getLogByLevel(level))
+                logs.add(log);
+        }
         return logs;
     }
 
     public List<Log> findLogs(String value) {
-        List<Log> logs = new ArrayList<>();
-        logs.add((Log) logDAO.getAttributebyValue(value).values());
-        return logs;
+        return logDAO.getLogByText(value);
     }
 
     public List<Log> sortByDate(Date date) {
@@ -48,10 +52,6 @@ public class LogService {
         List<Log> logs = new ArrayList<>();
         logs.add((Log) logDAO.getLogByLevel(level));
         return logs;
-    }
-
-    public List<Log> sortBySource(String source) {
-        return sortByLevel(source);
     }
 
     public void save(Log log) {
