@@ -21,7 +21,7 @@ public class Config extends EAVObject {
 
     public static Config getInstance() {
         if (instance == null)
-            instance = new Config();// Можно задать перманентный ид обьекта, когда настройки будут в Базе Данных
+            instance = new Config();// TODO: Получать экземпляр из базы данных. Осталось понять как вытащить конфиг из базы...
 
         return instance;
     }

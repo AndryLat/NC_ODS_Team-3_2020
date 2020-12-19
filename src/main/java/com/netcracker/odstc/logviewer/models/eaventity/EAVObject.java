@@ -1,12 +1,12 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
-import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class EAVObject {
 
@@ -143,5 +143,18 @@ public class EAVObject {
 
     public void setObjectTypeId(BigInteger objectTypeId) {
         this.objectTypeId = objectTypeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EAVObject eavObject = (EAVObject) o;
+        return Objects.equals(objectId, eavObject.objectId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectId);
     }
 }

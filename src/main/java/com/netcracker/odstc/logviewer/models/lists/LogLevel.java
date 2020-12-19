@@ -1,17 +1,17 @@
 package com.netcracker.odstc.logviewer.models.lists;
 
 public enum LogLevel {
-    SEVERE(7),
-    WARNING(8),
-    INFO(9),
-    CONFIG(10),
-    FINE(11),
-    FINER(12),
-    FINEST(13),
-    DEBUG(14),
-    TRACE(15),
-    ERROR(16),
-    FATAL(17);
+    SEVERE(9),
+    WARNING(10),
+    INFO(11),
+    CONFIG(12),
+    FINE(13),
+    FINER(14),
+    FINEST(15),
+    DEBUG(16),
+    TRACE(17),
+    ERROR(18),
+    FATAL(19);
 
     private int value;
 
