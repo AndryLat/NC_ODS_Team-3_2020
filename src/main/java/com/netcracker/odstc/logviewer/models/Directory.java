@@ -9,6 +9,16 @@ import java.util.Date;
 
 public class Directory extends EAVObject {
 
+    private boolean isOn = true;
+
+    public boolean isOn() {
+        return isOn;
+    }
+
+    public void setOn(boolean on) {
+        isOn = on;
+    }
+
     public Directory() {
         super();
         setObjectTypeId(BigInteger.valueOf(3));

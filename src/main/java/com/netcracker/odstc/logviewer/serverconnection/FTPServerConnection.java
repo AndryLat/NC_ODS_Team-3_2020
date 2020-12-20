@@ -94,8 +94,10 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     private void validateConnection() {
-        if(!isConnected&&!connect()) {
-            throw new ServerConnectionException("Cant establish connection");
+        if(!isConnected) {
+            if(!connect()) {
+                throw new ServerConnectionException("Cant establish connection");
+            }
         }
     }
 

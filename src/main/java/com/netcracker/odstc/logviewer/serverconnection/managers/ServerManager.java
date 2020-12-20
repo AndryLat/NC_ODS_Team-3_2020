@@ -66,7 +66,16 @@ public class ServerManager implements PropertyChangeListener {
         if(evt.getPropertyName().equals("UPDATE")){
             if(Server.class.isAssignableFrom(evt.getNewValue().getClass())){
                 Server server = (Server) evt.getNewValue();
-                serverConnections.get(server.getObjectId()).setServer(server);
+                if(!server.isOn()){
+                    serverConnections.remove(server.getObjectId());
+                }
+            }
+            if(Directory.class.isAssignableFrom(evt.getNewValue().getClass())){
+                Directory directory = (Directory) evt.getNewValue();
+                ServerConnection serverConnection = serverConnections.get(directory.getParentId());
+                if(!directory.isOn()) {
+                    serverConnection.removeDirectory(directory);
+                }
             }
         }
     }

@@ -37,6 +37,17 @@ public abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
+    public void removeDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer :
+                directories) {
+            if(directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())){
+                directories.remove(directoryContainer);
+                return;
+            }
+        }
+    }
+
+    @Override
     public void disconnect() {
         server.setActive(false);
         isConnected = false;
