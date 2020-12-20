@@ -1,12 +1,6 @@
 package com.netcracker.odstc.logviewer.serverconnection.services;
 
-import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
-import com.netcracker.odstc.logviewer.models.lists.Protocol;
-import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
-import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
-import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

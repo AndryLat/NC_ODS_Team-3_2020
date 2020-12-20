@@ -82,7 +82,7 @@ public class ServerManager implements PropertyChangeListener {
             if (serverConnection == null) continue;
 
             serverConnection.setDirectories(serverContainer.getChildren());
-
+            serverConnection.revalidateDirectories();
             for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
                 directories.add((Directory) directoryContainer.getOriginal());
             }

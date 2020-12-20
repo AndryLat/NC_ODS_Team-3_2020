@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 @Repository
 public class ContainerDAO extends EAVObjectDAO {
+    @SuppressWarnings({"squid:S1192"})//Suppress duplications in sql
     private static final String ACTIVE_SERVER_DIRECTORY_FILES = "WITH active_servers AS (\n" +
             "    SELECT ATTR_ID,\n" +
             "           VALUE,\n" +
