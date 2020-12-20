@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ServerManager implements PropertyChangeListener {
 
     private ServerManager(ContainerDAO containerDAO) {//СонарЛинт ругается, но этот конструктор используется Спрингом.
         DAOPublisher.getInstance().addListener(this);
-        serverConnections = new HashMap<>();
+        serverConnections = Collections.synchronizedMap(new HashMap<>());
         this.containerDAO = containerDAO;
         iterationRemove = new HashMap<>();
     }
@@ -63,7 +64,7 @@ public class ServerManager implements PropertyChangeListener {
             BigInteger objectId = (BigInteger) evt.getOldValue();
             iterationRemove.get(objectTypeId).add(objectId);
         }
-        if(evt.getPropertyName().equals("UPDATE")){
+        if(evt.getPropertyName().equals("UPDATE")){// Если апдейт прилетает в середине итерации. Чтобы не перезаписать состояние нашим.
             if(Server.class.isAssignableFrom(evt.getNewValue().getClass())){
                 Server server = (Server) evt.getNewValue();
                 if(!server.isOn()){
