@@ -35,7 +35,7 @@ public class AOCConverter {
             }else if(objectTypeId.equals(BigInteger.valueOf(2))){
                 eavObject = new Server();
             } else {
-                throw new IllegalArgumentException();// Заменить на дженеричное
+                throw new IllegalArgumentException();
             }
             eavObject.setParentId(attributeObjectContainer.getParentId());
 

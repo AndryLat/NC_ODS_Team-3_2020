@@ -63,6 +63,12 @@ public class ServerManager implements PropertyChangeListener {
             BigInteger objectId = (BigInteger) evt.getOldValue();
             iterationRemove.get(objectTypeId).add(objectId);
         }
+        if(evt.getPropertyName().equals("UPDATE")){
+            if(Server.class.isAssignableFrom(evt.getNewValue().getClass())){
+                Server server = (Server) evt.getNewValue();
+                serverConnections.get(server.getObjectId()).setServer(server);
+            }
+        }
     }
 
     private void startPoll() {
@@ -83,8 +89,9 @@ public class ServerManager implements PropertyChangeListener {
         //Планирую новый опрос
         for (HierarchyContainer serverHierarchyContainer : serverContainers) {
             Server server = (Server) serverHierarchyContainer.getOriginal();
-            if (serverConnections.containsKey(server.getObjectId())) {//Если сервер уже есть то обновить ему директории(файлы заодно)
-                serverConnections.get(server.getObjectId()).setDirectories(serverHierarchyContainer.getChildren());
+            if (serverConnections.containsKey(server.getObjectId())) {
+                serverConnections.get(server.getObjectId()).setServer(server);// Если сервер уже есть, обновить ему данные о сервере.
+                serverConnections.get(server.getObjectId()).setDirectories(serverHierarchyContainer.getChildren());//Если сервер уже есть то обновить ему директории(файлы заодно)
                 continue;
             }
             ServerConnection serverConnection;
@@ -112,16 +119,22 @@ public class ServerManager implements PropertyChangeListener {
         List<LogFile> logFiles = new ArrayList<>();
         //Сервера
         for (ServerConnection serverConnection : serverConnections.values()) {
-            if(!iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId()))
-                servers.add(serverConnection.getServer());
+            if(iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId())) {
+                continue;
+            }
+            servers.add(serverConnection.getServer());
             //Директории
             for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
-                if(!iterationRemove.get(BigInteger.valueOf(3)).contains(directoryContainer.getOriginal().getObjectId()))
-                    directories.add((Directory) directoryContainer.getOriginal());
+                if(iterationRemove.get(BigInteger.valueOf(3)).contains(directoryContainer.getOriginal().getObjectId())) {
+                    continue;
+                }
+                directories.add((Directory) directoryContainer.getOriginal());
                 //Файлы
                 for (HierarchyContainer logFileContainer : directoryContainer.getChildren()) {
-                    if(!iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId()))
-                        logFiles.add((LogFile) logFileContainer.getOriginal());
+                    if(!iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
+                        continue;
+                    }
+                    logFiles.add((LogFile) logFileContainer.getOriginal());
                 }
             }
         }
