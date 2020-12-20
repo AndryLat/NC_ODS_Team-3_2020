@@ -68,6 +68,8 @@ public class ServerManager implements PropertyChangeListener {
                 Server server = (Server) evt.getNewValue();
                 if(!server.isOn()){
                     serverConnections.remove(server.getObjectId());
+                }else{
+                    serverConnections.get(server.getObjectId()).setServer(server);
                 }
             }
             if(Directory.class.isAssignableFrom(evt.getNewValue().getClass())){
@@ -75,6 +77,8 @@ public class ServerManager implements PropertyChangeListener {
                 ServerConnection serverConnection = serverConnections.get(directory.getParentId());
                 if(!directory.isOn()) {
                     serverConnection.removeDirectory(directory);
+                }else{
+                    serverConnection.updateDirectory(directory);
                 }
             }
         }

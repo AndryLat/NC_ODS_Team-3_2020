@@ -72,14 +72,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         }
     }
 
-    @Override
-    public List<Log> getNewLogs() {
-        server.setLastAccessByJob(new Date());
-        validateConnection();
-        return collectNewLogs(directories);
-    }
-
-    private List<Log> collectNewLogs(List<HierarchyContainer> directories) {
+    protected List<Log> collectNewLogs() {
         List<Log> result = new ArrayList<>();
         try {
             for (int i = 0; i < directories.size(); i++) {
@@ -93,7 +86,8 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private void validateConnection() {
+
+    protected void validateConnection() {
         if(!isConnected) {
             if(!connect()) {
                 throw new ServerConnectionException("Cant establish connection");

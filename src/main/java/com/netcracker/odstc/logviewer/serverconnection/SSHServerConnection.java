@@ -67,13 +67,6 @@ public class SSHServerConnection extends AbstractServerConnection {
         }
     }
 
-    @Override
-    public List<Log> getNewLogs() {
-        server.setLastAccessByJob(new Date());
-        validateConnection();
-        return collectNewLogs();
-    }
-
     private ChannelSftp getChannelSftp() {
         ChannelSftp channelSftp;
         try {
@@ -87,7 +80,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         return channelSftp;
     }
 
-    private List<Log> collectNewLogs() {
+    protected List<Log> collectNewLogs() {
         List<Log> result = new ArrayList<>();
         try {
             Channel sftp = session.openChannel("sftp");
@@ -104,7 +97,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private void validateConnection() {
+    protected void validateConnection() {
         if ((!isConnected || session == null) && !connect()) {
             throw new ServerConnectionException("Cant establish connection");
         }

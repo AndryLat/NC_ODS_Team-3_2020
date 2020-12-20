@@ -48,6 +48,27 @@ public abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
+    public void updateDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer :
+                directories) {
+            if(directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())){
+                directoryContainer.setOriginal(directory);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public List<Log> getNewLogs() {
+        server.setLastAccessByJob(new Date());
+        validateConnection();
+        return collectNewLogs();
+    }
+
+    protected abstract void validateConnection();
+    protected abstract List<Log> collectNewLogs();
+
+    @Override
     public void disconnect() {
         server.setActive(false);
         isConnected = false;
