@@ -56,21 +56,9 @@ public class ServerPollManager {
                     future.getKey().getServer().setActive(false);
                     logger.error("Thread execution error ", e);
                 }
-            }
-        }
-        return logs;
-    }
-
-    public Set<ServerConnection> getFinishedServers() {
-        Set<ServerConnection> serverConnections = new HashSet<>();
-        Iterator<Map.Entry<ServerConnection, Future<List<Log>>>> resultIterator = serverConnectionsResults.entrySet().iterator();
-        while (resultIterator.hasNext()) {
-            Map.Entry<ServerConnection, Future<List<Log>>> future = resultIterator.next();
-            if (future.getValue().isDone()) {
-                serverConnections.add(future.getKey());
                 resultIterator.remove();
             }
         }
-        return serverConnections;
+        return logs;
     }
 }

@@ -48,6 +48,7 @@ public class ServerManager implements PropertyChangeListener {
 
     //Publisher-Listener.
 
+    //Метод опроса серверов.
     public void getLogsFromAllServers() {
         // Сохраняю результат итерации
         saveResults();
@@ -55,6 +56,38 @@ public class ServerManager implements PropertyChangeListener {
         revalidateCondition();
         // Запуск итерации
         startPoll();
+    }
+    
+    //Метод проверки состояния не активных серверов.
+    public void revalidateServers(){
+        List<HierarchyContainer> servers = containerDAO.getNonactiveServers();
+        List<Server> serversToSave = new ArrayList<>();
+        for (HierarchyContainer serverContainer : servers) {
+            ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+            if (serverConnection == null) continue;
+            serverConnection.connect();
+            serverConnection.disconnect();
+            serversToSave.add(serverConnection.getServer());
+        }
+        containerDAO.saveObjects(serversToSave);
+    }
+
+    //Метод проверки состояния не активных директорий активных серверов.
+    public void revalidateActiveServersDirectories(){
+        List<HierarchyContainer> servers = containerDAO.getActiveServersWithNonactiveDirectories();
+        List<Directory> directories = new ArrayList<>();
+
+        for (HierarchyContainer serverContainer : servers) {
+            ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+            if (serverConnection == null) continue;
+
+            serverConnection.setDirectories(serverContainer.getChildren());
+
+            for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
+                directories.add((Directory) directoryContainer.getOriginal());
+            }
+        }
+        containerDAO.saveObjects(directories);
     }
 
     @Override
@@ -98,7 +131,7 @@ public class ServerManager implements PropertyChangeListener {
     }
 
     private void revalidateCondition() {
-        List<HierarchyContainer> serverContainers = containerDAO.getActiveElements();
+        List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
         logger.info("Active Servers: {}", serverContainers.size());
         //Планирую новый опрос
         for (HierarchyContainer serverHierarchyContainer : serverContainers) {
@@ -125,7 +158,6 @@ public class ServerManager implements PropertyChangeListener {
     private void saveResults() {
         //Получаю предыдущие результаты.
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
-        serverPollManager.getFinishedServers();//TODO: Зачистить менеджер потоков
         //Сохраняю новые логи
         //Сохряняю состояния серверов,директорий, файлов.
         List<Server> servers = new ArrayList<>(serverConnections.size());
@@ -160,9 +192,22 @@ public class ServerManager implements PropertyChangeListener {
     }
 
     private void clearIterationInfo() {
-        iterationRemove.clear();
-        iterationRemove.put(BigInteger.valueOf(2),new ArrayList<>());
-        iterationRemove.put(BigInteger.valueOf(3),new ArrayList<>());
-        iterationRemove.put(BigInteger.valueOf(4),new ArrayList<>());
+        iterationRemove.get(BigInteger.valueOf(2)).clear();
+        iterationRemove.get(BigInteger.valueOf(3)).clear();
+        iterationRemove.get(BigInteger.valueOf(4)).clear();
+    }
+
+    private ServerConnection wrapServerIntoConnection(HierarchyContainer serverContainer) {
+        Server server = (Server) serverContainer.getOriginal();
+        ServerConnection serverConnection;
+        if (server.getProtocol() == Protocol.FTP) {
+            serverConnection = new FTPServerConnection(server);
+        } else if (server.getProtocol() == Protocol.SSH) {
+            serverConnection = new SSHServerConnection(server);
+        } else {
+            logger.error("Cant wrap server with unknown protocol");
+            return null;
+        }
+        return serverConnection;
     }
 }

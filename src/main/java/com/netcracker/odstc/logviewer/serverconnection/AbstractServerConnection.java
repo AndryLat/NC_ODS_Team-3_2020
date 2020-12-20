@@ -46,6 +46,15 @@ public abstract class AbstractServerConnection implements ServerConnection {
             }
         }
     }
+    @Override
+    public void revalidateDirectories() {
+        for (HierarchyContainer directoryContainer : directories) {
+            Directory directory = (Directory) directoryContainer.getOriginal();
+            if (!isDirectoryValid(directory)) {
+                directory.setActive(false);
+            }
+        }
+    }
 
     @Override
     public void updateDirectory(Directory directory) {
@@ -70,7 +79,6 @@ public abstract class AbstractServerConnection implements ServerConnection {
 
     @Override
     public void disconnect() {
-        server.setActive(false);
         isConnected = false;
     }
 
