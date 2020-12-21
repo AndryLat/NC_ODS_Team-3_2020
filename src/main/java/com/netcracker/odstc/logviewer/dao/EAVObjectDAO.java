@@ -8,6 +8,7 @@ import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
+import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -175,7 +176,7 @@ public class EAVObjectDAO {
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
         saveReferences(eavObject.getObjectId(), eavObject.getReferences());
         //
-        DAOPublisher.getInstance().notifyListeners(new PropertyChangeEvent(this,"UPDATE",null,eavObject));
+        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE,this,eavObject,null));
     }
 
     public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
@@ -233,7 +234,7 @@ public class EAVObjectDAO {
         BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?",BigInteger.class,id);
         jdbcTemplate.update(DELETE_OBJECT, id);
         //Listener
-        DAOPublisher.getInstance().notifyListeners(new PropertyChangeEvent(this,"DELETE",id,objectTypeId));
+        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE,this,id,objectTypeId));
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
