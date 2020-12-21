@@ -83,6 +83,16 @@ public abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
+    public void updateDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer :
+                directories) {
+            if(directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())){
+                directoryContainer.setOriginal(directory);
+                return;
+            }
+        }
+    }
+    @Override
     public void setDirectories(List<HierarchyContainer> directories) {
         this.directories = directories;
     }

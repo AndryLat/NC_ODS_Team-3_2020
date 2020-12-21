@@ -103,6 +103,8 @@ public class ServerManager implements DAOChangeListener {
                 ServerConnection serverConnection = serverConnections.get(directory.getParentId());
                 if (!directory.isEnabled()) {
                     serverConnection.removeDirectory(directory);
+                }else {
+                    serverConnection.updateDirectory(directory);
                 }
             }
         }
