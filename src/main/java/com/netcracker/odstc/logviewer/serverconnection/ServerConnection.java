@@ -17,6 +17,12 @@ public interface ServerConnection extends Callable<List<Log>> {
 
     void setDirectories(List<HierarchyContainer> directories);
 
+    void removeDirectory(Directory directory);
+
+    void updateDirectory(Directory directory);
+
+    void revalidateDirectories();
+
     boolean connect();
 
     void disconnect();

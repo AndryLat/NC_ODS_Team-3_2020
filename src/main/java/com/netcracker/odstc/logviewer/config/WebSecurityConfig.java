@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String LOGIN_ENDPOINT = "/login"; // пример
+    private static final String LOGIN_ENDPOINT = "/login";
     private static final String ADMIN_ENDPOINT = "/user/*";
 
     UserDetailsServiceImpl userDetailsService;

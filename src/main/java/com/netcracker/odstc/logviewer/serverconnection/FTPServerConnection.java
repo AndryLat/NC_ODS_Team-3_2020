@@ -36,15 +36,15 @@ public class FTPServerConnection extends AbstractServerConnection {
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
                 logger.error("Error with connect into {}", server.getIp());
-                server.setActive(false);
+                server.setCanConnect(false);
             }
-            server.setActive(ftpClient.login(server.getLogin(), server.getPassword()));
+            server.setCanConnect(ftpClient.login(server.getLogin(), server.getPassword()));
         } catch (IOException e) {
-            server.setActive(false);
+            server.setCanConnect(false);
             logger.error("Error with connect into {}", server.getIp(), e);
         }
-        isConnected = server.isActive();
-        return server.isActive();
+        isConnected = server.isCanConnect();
+        return server.isCanConnect();
     }
 
     @Override
@@ -67,19 +67,12 @@ public class FTPServerConnection extends AbstractServerConnection {
                 ftpClient.changeToParentDirectory();
             return isActive;
         } catch (IOException e) {
-            server.setActive(false);
+            server.setCanConnect(false);
             return false;
         }
     }
 
-    @Override
-    public List<Log> getNewLogs() {
-        server.setLastAccessByJob(new Date());
-        validateConnection();
-        return collectNewLogs(directories);
-    }
-
-    private List<Log> collectNewLogs(List<HierarchyContainer> directories) {
+    protected List<Log> collectNewLogs() {
         List<Log> result = new ArrayList<>();
         try {
             for (int i = 0; i < directories.size(); i++) {
@@ -93,9 +86,12 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private void validateConnection() {
-        if(!isConnected&&!connect()) {
-            throw new ServerConnectionException("Cant establish connection");
+
+    protected void validateConnection() {
+        if (!isConnected) {
+            if (!connect()) {//I cant merge this one with enclosing one, because i dont need to connect() every time
+                throw new ServerConnectionException("Cant establish connection");
+            }
         }
     }
 
@@ -105,7 +101,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         directory.setLastExistenceCheck(new Date());
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
-                directory.setActive(false);
+                directory.setCanConnect(false);
                 return result;
             }
             for (int j = 0; j < directoryContainer.getChildren().size(); j++) {
@@ -114,7 +110,7 @@ public class FTPServerConnection extends AbstractServerConnection {
             }
         } catch (IOException e) {
             logger.error("Marking directory as unavailable", e);
-            directory.setActive(false);
+            directory.setCanConnect(false);
         }
         return result;
     }

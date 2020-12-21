@@ -32,13 +32,39 @@ public abstract class AbstractServerConnection implements ServerConnection {
         this.server = server;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
+    @Override
+    public void removeDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer : directories) {
+            if (directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())) {
+                directories.remove(directoryContainer);
+                return;
+            }
+        }
     }
 
     @Override
+    public void revalidateDirectories() {
+        for (HierarchyContainer directoryContainer : directories) {
+            Directory directory = (Directory) directoryContainer.getOriginal();
+            if (!isDirectoryValid(directory)) {
+                directory.setCanConnect(false);
+            }
+        }
+    }
+
+    @Override
+    public List<Log> getNewLogs() {
+        server.setLastAccessByJob(new Date());
+        validateConnection();
+        return collectNewLogs();
+    }
+
+    protected abstract void validateConnection();
+
+    protected abstract List<Log> collectNewLogs();
+
+    @Override
     public void disconnect() {
-        server.setActive(false);
         isConnected = false;
     }
 
@@ -47,11 +73,25 @@ public abstract class AbstractServerConnection implements ServerConnection {
         return server;
     }
 
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
     @Override
     public List<HierarchyContainer> getDirectories() {
         return directories;
     }
 
+    @Override
+    public void updateDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer :
+                directories) {
+            if(directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())){
+                directoryContainer.setOriginal(directory);
+                return;
+            }
+        }
+    }
     @Override
     public void setDirectories(List<HierarchyContainer> directories) {
         this.directories = directories;

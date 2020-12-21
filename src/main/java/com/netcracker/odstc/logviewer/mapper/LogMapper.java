@@ -3,7 +3,6 @@ package com.netcracker.odstc.logviewer.mapper;
 import com.netcracker.odstc.logviewer.models.Log;
 import org.springframework.jdbc.core.RowMapper;
 
-import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

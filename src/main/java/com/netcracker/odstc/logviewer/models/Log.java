@@ -24,7 +24,8 @@ public class Log extends EAVObject {
         setText(text);
         setLevel(level);
     }
-    public Log(String text,LogLevel level,Date creationDate,BigInteger parentId){
+
+    public Log(String text, LogLevel level, Date creationDate, BigInteger parentId) {
         this(text, level);
         setCreationDate(creationDate);
         setParentId(parentId);
@@ -43,7 +44,7 @@ public class Log extends EAVObject {
     }
 
     public void setLevel(LogLevel level) {
-        setAttributeListValueId(Attributes.LEVEL_OT_LOG.getAttrId(), level==null?null:new BigInteger(String.valueOf(level.getValue())));
+        setAttributeListValueId(Attributes.LEVEL_OT_LOG.getAttrId(), level == null ? null : new BigInteger(String.valueOf(level.getValue())));
     }
 
     public Date getCreationDate() {

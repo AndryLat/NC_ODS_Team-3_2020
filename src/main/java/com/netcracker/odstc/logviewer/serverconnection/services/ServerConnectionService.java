@@ -1,12 +1,6 @@
 package com.netcracker.odstc.logviewer.serverconnection.services;
 
-import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
-import com.netcracker.odstc.logviewer.models.lists.Protocol;
-import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
-import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
-import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,13 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServerConnectionService {
+    private static final String[] SEARCH_PATTERNS = new String[]{
+            "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"//TODO: Add second pattern
+    };
     private static ServerConnectionService instance;
     private final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
-    protected List<Pattern> logSearchPatterns; // На случай если паттернов поиска будет несколько
-
-    private static final String[] SEARCH_PATTERNS = new String[]{
-            "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"//Добавить второй шаблон
-    };//Может получатся из базы, но пока и так неплохо.
+    protected List<Pattern> logSearchPatterns; // For various patterns
 
     private ServerConnectionService() {
         logSearchPatterns = new ArrayList<>();

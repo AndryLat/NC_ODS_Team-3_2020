@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.Map;
 
-public class ReferenceMapper implements RowMapper<Map.Entry<BigInteger,BigInteger>> {
+public class ReferenceMapper implements RowMapper<Map.Entry<BigInteger, BigInteger>> {
     @Override
     public Map.Entry<BigInteger, BigInteger> mapRow(ResultSet resultSet, int i) throws SQLException {
         return new AbstractMap.SimpleEntry<>(

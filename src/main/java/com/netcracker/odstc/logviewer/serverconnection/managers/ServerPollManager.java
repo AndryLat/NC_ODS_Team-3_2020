@@ -7,11 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +19,7 @@ public class ServerPollManager {
     private static ServerPollManager instance;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     private ExecutorService service = Executors.newFixedThreadPool(4);
-    
+
     private HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private ServerPollManager() {
@@ -36,7 +34,7 @@ public class ServerPollManager {
     }
 
     public void executeExtractingLogs(ServerConnection serverConnection) {
-        if(!serverConnectionsResults.containsKey(serverConnection))
+        if (!serverConnectionsResults.containsKey(serverConnection))
             serverConnectionsResults.put(serverConnection, service.submit(serverConnection));
     }
 
@@ -49,28 +47,16 @@ public class ServerPollManager {
                 try {
                     logs.addAll(future.getValue().get());
                 } catch (InterruptedException e) {
-                    future.getKey().getServer().setActive(false);
+                    future.getKey().getServer().setCanConnect(false);
                     Thread.currentThread().interrupt();// Под сомнением
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
-                    future.getKey().getServer().setActive(false);
+                    future.getKey().getServer().setCanConnect(false);
                     logger.error("Thread execution error ", e);
                 }
-            }
-        }
-        return logs;
-    }
-
-    public Set<ServerConnection> getFinishedServers() {
-        Set<ServerConnection> serverConnections = new HashSet<>();
-        Iterator<Map.Entry<ServerConnection, Future<List<Log>>>> resultIterator = serverConnectionsResults.entrySet().iterator();
-        while (resultIterator.hasNext()) {
-            Map.Entry<ServerConnection, Future<List<Log>>> future = resultIterator.next();
-            if (future.getValue().isDone()) {
-                serverConnections.add(future.getKey());
                 resultIterator.remove();
             }
         }
-        return serverConnections;
+        return logs;
     }
 }

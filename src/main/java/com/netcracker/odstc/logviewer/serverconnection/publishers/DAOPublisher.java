@@ -3,15 +3,13 @@ package com.netcracker.odstc.logviewer.serverconnection.publishers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DAOPublisher {
     private static DAOPublisher instance;
     private final Logger logger = LogManager.getLogger(DAOPublisher.class.getName());
-    private final List<PropertyChangeListener> listeners;
+    private final List<DAOChangeListener> listeners;
 
     private DAOPublisher() {
         listeners = new ArrayList<>();
@@ -24,19 +22,19 @@ public class DAOPublisher {
         return instance;
     }
 
-    public void addListener(PropertyChangeListener propertyChangeListener) {
-        listeners.add(propertyChangeListener);
+    public void addListener(DAOChangeListener daoChangeListener) {
+        listeners.add(daoChangeListener);
     }
 
-    public void removeListener(PropertyChangeListener propertyChangeListener) {
-        listeners.remove(propertyChangeListener);
+    public void removeListener(DAOChangeListener daoChangeListener) {
+        listeners.remove(daoChangeListener);
     }
 
-    public void notifyListeners(PropertyChangeEvent propertyChangeEvent) {
-        logger.info("Got new event {}, Value: {}", propertyChangeEvent.getPropertyName(), propertyChangeEvent);
-        for (PropertyChangeListener pcl :
+    public void notifyListeners(ObjectChangeEvent objectChangeEvent) {
+        logger.info("Got new event {}, Value: {}", objectChangeEvent.getChangeType(), objectChangeEvent);
+        for (DAOChangeListener changeListener :
                 listeners) {
-            pcl.propertyChange(propertyChangeEvent);
+            changeListener.objectChanged(objectChangeEvent);
         }
     }
 }

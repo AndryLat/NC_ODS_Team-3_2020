@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HierarchyContainer {//Можно сделать интерфейсы моделей, сделать тут их имплементацию и можно будет кастовать это к любой модели
+public class HierarchyContainer {//What if we extract interfaces from models, make this container implement them and this will be like decorator pattern
     private EAVObject original;
     private HierarchyContainer parent;
     private List<HierarchyContainer> children;

@@ -21,35 +21,47 @@ public class ServerService {
 
     public Server findById(BigInteger id) {
         if (isIdValid(id)) {
-            return  eavObjectDAO.getObjectById(id, serverClass);
+            return eavObjectDAO.getObjectById(id, serverClass);
         }
         return new Server();
     }
 
-    public void save(Server server){
-        if (isServerValid(server)){
+    public void save(Server server) {
+        if (isServerValid(server)) {
             eavObjectDAO.saveObject(server);
         }
     }
 
 
-    public void deleteById(BigInteger id){
-        if(isIdValid(id)){
+    public void deleteById(BigInteger id) {
+        if (isIdValid(id)) {
             eavObjectDAO.deleteById(id);
         }
     }
 
-    private boolean isIdValid(BigInteger id){
+    private boolean isIdValid(BigInteger id) {
         return id != null && !id.equals(BigInteger.valueOf(0));
     }
 
-    private boolean isServerValid(Server server){
-        if (server == null){return false;}
-        if (server.getIp() == null || server.getIp().trim().length() == 0){ return false;}
-        if (server.getLogin() == null|| server.getLogin().trim().length() == 0){ return false;}
-        if (server.getPassword() == null || server.getPassword().trim().length() == 0) { return false;}
-        if (server.getProtocol() == null){ return false;}
-        if (server.getPort() == 0){ return false;}
+    private boolean isServerValid(Server server) {
+        if (server == null) {
+            return false;
+        }
+        if (server.getIp() == null || server.getIp().trim().length() == 0) {
+            return false;
+        }
+        if (server.getLogin() == null || server.getLogin().trim().length() == 0) {
+            return false;
+        }
+        if (server.getPassword() == null || server.getPassword().trim().length() == 0) {
+            return false;
+        }
+        if (server.getProtocol() == null) {
+            return false;
+        }
+        if (server.getPort() == 0) {
+            return false;
+        }
         return true;
     }
 }

@@ -21,9 +21,13 @@ public class Config extends EAVObject {
 
     public static Config getInstance() {
         if (instance == null)
-            instance = new Config();// TODO: Получать экземпляр из базы данных. Осталось понять как вытащить конфиг из базы...
+            instance = new Config();
 
         return instance;
+    }
+
+    public static void setInstance(Config instance) {
+        Config.instance = instance;
     }
 
     public long getActivityPollingPeriod() {

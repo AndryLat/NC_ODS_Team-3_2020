@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.*;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.HEADER;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 

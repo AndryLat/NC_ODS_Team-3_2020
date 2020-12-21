@@ -3,22 +3,30 @@ package com.netcracker.odstc.logviewer.dao;
 import com.netcracker.odstc.logviewer.mapper.AttributeMapper;
 import com.netcracker.odstc.logviewer.mapper.ObjectMapper;
 import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
-import com.netcracker.odstc.logviewer.models.*;
+import com.netcracker.odstc.logviewer.models.Config;
+import com.netcracker.odstc.logviewer.models.Directory;
+import com.netcracker.odstc.logviewer.models.Log;
+import com.netcracker.odstc.logviewer.models.LogFile;
+import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
+import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.beans.PropertyChangeEvent;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class EAVObjectDAO {
 
-    public final JdbcTemplate jdbcTemplate;
     private static final String QUERY_OBJECT_BY_TYPE = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_TYPE_ID  = ?";
     private static final String QUERY_OBJECT_BY_ID = "SELECT object_id ,NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?";
     private static final String QUERY_ATTRIBUTE_BY_ID = "SELECT ATTR_ID, VALUE, DATE_VALUE, LIST_VALUE_ID FROM ATTRIBUTES WHERE ATTR_ID = ?";
@@ -60,9 +68,10 @@ public class EAVObjectDAO {
     private static final String QUERY_ATTRIBUTE_ID_BY_LIST_VALUE = "select attr.attr_id\n" +
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
+    public final JdbcTemplate jdbcTemplate;
 
 
-    public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
+    public EAVObjectDAO(JdbcTemplate jdbcTemplate) {//TODO: Initialize Config instance when DAO is initialized
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -175,7 +184,7 @@ public class EAVObjectDAO {
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
         saveReferences(eavObject.getObjectId(), eavObject.getReferences());
         //
-        DAOPublisher.getInstance().notifyListeners(new PropertyChangeEvent(this,"UPDATE",null,eavObject));
+        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE, this, eavObject, null));
     }
 
     public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
@@ -230,10 +239,10 @@ public class EAVObjectDAO {
     }
 
     public void deleteById(BigInteger id) {
-        BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?",BigInteger.class,id);
+        BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
         jdbcTemplate.update(DELETE_OBJECT, id);
         //Listener
-        DAOPublisher.getInstance().notifyListeners(new PropertyChangeEvent(this,"DELETE",id,objectTypeId));
+        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId));
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {

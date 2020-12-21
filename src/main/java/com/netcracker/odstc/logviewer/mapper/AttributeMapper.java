@@ -11,11 +11,11 @@ import java.util.Map;
 
 public class AttributeMapper implements RowMapper<Map.Entry<BigInteger, Attribute>> {
     @Override
-    public Map.Entry<BigInteger,Attribute> mapRow(ResultSet resultSet, int i) throws SQLException {
+    public Map.Entry<BigInteger, Attribute> mapRow(ResultSet resultSet, int i) throws SQLException {
 
         Object listValueObject = resultSet.getObject("LIST_VALUE_ID");
         BigInteger listValueId = null;
-        if(listValueObject!=null){
+        if (listValueObject != null) {
             listValueId = resultSet.getBigDecimal("LIST_VALUE_ID").toBigInteger();
         }
 
