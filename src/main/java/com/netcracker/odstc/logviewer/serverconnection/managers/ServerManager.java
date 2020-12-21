@@ -89,10 +89,10 @@ public class ServerManager implements DAOChangeListener {
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
             iterationRemove.get(objectTypeId).add(objectId);
         }
-        if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {// Если апдейт прилетает в середине итерации. Чтобы не перезаписать состояние нашим.
+        if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
             if (Server.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
                 Server server = (Server) objectChangeEvent.getObject();
-                if (!server.isOn()) {//Лайт - объекты перезапись. Если объект изменился - запросить состояние
+                if (!server.isEnabled()) {
                     serverConnections.remove(server.getObjectId());
                 } else {
                     serverConnections.get(server.getObjectId()).setServer(server);
@@ -101,7 +101,7 @@ public class ServerManager implements DAOChangeListener {
             if (Directory.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
                 Directory directory = (Directory) objectChangeEvent.getObject();
                 ServerConnection serverConnection = serverConnections.get(directory.getParentId());
-                if (!directory.isOn()) {
+                if (!directory.isEnabled()) {
                     serverConnection.removeDirectory(directory);
                 }
             }
@@ -112,7 +112,7 @@ public class ServerManager implements DAOChangeListener {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
-            if (serverConnection.getServer().isActive()) {
+            if (serverConnection.getServer().isCanConnect()) {
                 serverPollManager.executeExtractingLogs(serverConnection);
             } else {
                 serverConnectionIterator.remove();

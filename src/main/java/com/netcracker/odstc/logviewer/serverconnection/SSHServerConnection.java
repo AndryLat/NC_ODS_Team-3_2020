@@ -1,6 +1,11 @@
 package com.netcracker.odstc.logviewer.serverconnection;
 
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
@@ -11,7 +16,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 public class SSHServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
@@ -35,14 +43,14 @@ public class SSHServerConnection extends AbstractServerConnection {
             session.setPassword(server.getPassword());
             session.setTimeout(500);
             session.connect();
-            server.setActive(session.isConnected());
+            server.setCanConnect(session.isConnected());
         } catch (JSchException e) {
             logger.error("Error with connection to {}", server.getName(), e);
-            server.setActive(false);
-            throw new ServerConnectionException(e.getMessage(),e);
+            server.setCanConnect(false);
+            throw new ServerConnectionException(e.getMessage(), e);
         }
-        isConnected = server.isActive();
-        return server.isActive();
+        isConnected = server.isCanConnect();
+        return server.isCanConnect();
     }
 
     @Override
@@ -58,11 +66,11 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             ChannelSftp channelSftp = getChannelSftp();
             if (channelSftp.ls(directory.getPath()).isEmpty()) {
-                directory.setActive(false);
+                directory.setCanConnect(false);
             }
             return true;
         } catch (SftpException e) {
-            server.setActive(false);
+            server.setCanConnect(false);
             return false;
         }
     }
@@ -114,8 +122,8 @@ public class SSHServerConnection extends AbstractServerConnection {
                 result.addAll(tryExtractLogsFromFile(channelSftp, logFile));
             }
         } catch (SftpException e) {
-            logger.info("Mark directory {} as unavailable",directory.getName(), e);
-            directory.setActive(false);
+            logger.info("Mark directory {} as unavailable", directory.getName(), e);
+            directory.setCanConnect(false);
         }
         channelSftp.cd("/");
         return result;

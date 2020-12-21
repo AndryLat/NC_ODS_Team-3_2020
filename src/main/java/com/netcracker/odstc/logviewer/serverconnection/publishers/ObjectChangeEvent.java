@@ -45,7 +45,7 @@ public class ObjectChangeEvent {
         this.argument = argument;
     }
 
-    public enum ChangeType{
+    public enum ChangeType {
         DELETE,
         UPDATE
     }

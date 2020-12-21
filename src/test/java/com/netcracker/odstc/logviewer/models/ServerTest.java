@@ -69,11 +69,11 @@ class ServerTest {
 
     @Test
     void testSetGetIsActive() {
-        serverUnderTest.setActive(false);
-        final boolean resultFalse = serverUnderTest.isActive();
+        serverUnderTest.setEnabled(false);
+        final boolean resultFalse = serverUnderTest.isEnabled();
         assertFalse(resultFalse);
-        serverUnderTest.setActive(true);
-        final boolean resultTrue = serverUnderTest.isActive();
+        serverUnderTest.setEnabled(true);
+        final boolean resultTrue = serverUnderTest.isEnabled();
         assertTrue(resultTrue);
     }
 

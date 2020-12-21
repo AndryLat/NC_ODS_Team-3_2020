@@ -17,11 +17,11 @@ public class LogDAO extends EAVObjectDAO {
     }
 
     public Log getById(BigInteger id) {
-        Log log = getObjectById(id,Log.class);
+        Log log = getObjectById(id, Log.class);
         return log;
     }
 
-    public List<Log> getLogByText (String text) {
+    public List<Log> getLogByText(String text) {
         String sql = "select \n" +
                 "       fcl.value          as fcl_value\n" +
                 "from objects ob\n" +
@@ -37,7 +37,7 @@ public class LogDAO extends EAVObjectDAO {
         return jdbcTemplate.query(sql, new LogMapper(), text);
     }
 
-    public List<Log> getLogByLevel (String level) {
+    public List<Log> getLogByLevel(String level) {
         String sql = "select lll.value          as log_level_value\n" +
                 "from objects ob\n" +
                 "left join attributes fcl on fcl.object_id = ob.object_id\n" +
@@ -52,7 +52,7 @@ public class LogDAO extends EAVObjectDAO {
         return jdbcTemplate.query(sql, new LogMapper(), level);
     }
 
-    public List<Log> getLogByCreationDate (Date creationDate) {
+    public List<Log> getLogByCreationDate(Date creationDate) {
         String sql = "select lt.date_value as  log_timestamp_value\n" +
                 "from objects ob\n" +
                 "left join attributes fcl on fcl.object_id = ob.object_id\n" +

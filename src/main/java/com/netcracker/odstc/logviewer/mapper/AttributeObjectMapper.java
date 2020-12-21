@@ -25,7 +25,7 @@ public class AttributeObjectMapper implements RowMapper<AttributeObjectContainer
         attributeObjectContainer.setName(resultSet.getString("NAME"));
 
         Object listValueObject = resultSet.getObject("LIST_VALUE_ID");
-        if(listValueObject!=null){
+        if (listValueObject != null) {
             attributeObjectContainer.setListValueId(resultSet.getBigDecimal("LIST_VALUE_ID").toBigInteger());
         }
         attributeObjectContainer.setAttrId(resultSet.getBigDecimal("ATTR_ID").toBigInteger());

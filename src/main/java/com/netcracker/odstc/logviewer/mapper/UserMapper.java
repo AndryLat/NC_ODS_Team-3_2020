@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.mapper;
 
 import com.netcracker.odstc.logviewer.models.User;
 import org.springframework.jdbc.core.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

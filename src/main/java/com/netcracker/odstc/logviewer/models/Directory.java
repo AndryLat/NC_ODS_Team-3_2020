@@ -9,16 +9,6 @@ import java.util.Date;
 
 public class Directory extends EAVObject {
 
-    private boolean isOn = true;
-
-    public boolean isOn() {
-        return isOn;
-    }
-
-    public void setOn(boolean on) {
-        isOn = on;
-    }
-
     public Directory() {
         super();
         setObjectTypeId(BigInteger.valueOf(3));
@@ -32,7 +22,7 @@ public class Directory extends EAVObject {
     public Directory(String path) {
         super();
         setPath(path);
-        setActive(true);
+        setEnabled(true);
         setLastExistenceCheck(new Date());
         setLastAccessByUser(new Date());
     }
@@ -45,20 +35,40 @@ public class Directory extends EAVObject {
         setAttributeValue(Attributes.PATH_OT_DIRECTORY.getAttrId(), path);
     }
 
-    public boolean isActive() {
-        switch (getAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId()).intValue()) {
-            case 7:
+    public boolean isEnabled() {
+        switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId()).intValue()) {
+            case 9:
                 return true;
-            case 8:
+            case 10:
                 return false;
             default:
-                throw new IllegalDirectoryStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId())));
+                throw new IllegalDirectoryStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId())));
         }
     }
 
-    public void setActive(boolean active) {
-        if (active) setAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(7));
-        else setAttributeListValueId(Attributes.IS_ACTIVE_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(8));
+    public void setEnabled(boolean active) {
+        if (active)
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(9));
+        else
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(10));
+    }
+
+    public boolean isCanConnect() {
+        switch (getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId()).intValue()) {
+            case 11:
+                return true;
+            case 12:
+                return false;
+            default:
+                throw new IllegalDirectoryStateException(String.valueOf(getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId())));
+        }
+    }
+
+    public void setCanConnect(boolean active) {
+        if (active)
+            setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(11));
+        else
+            setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(12));
     }
 
     public Date getLastExistenceCheck() {

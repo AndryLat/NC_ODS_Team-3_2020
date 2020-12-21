@@ -19,8 +19,6 @@ public interface ServerConnection extends Callable<List<Log>> {
 
     void removeDirectory(Directory directory);
 
-    void updateDirectory(Directory directory);
-
     void revalidateDirectories();
 
     boolean connect();

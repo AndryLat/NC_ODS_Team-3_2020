@@ -25,9 +25,9 @@ public class WebConfig {
     private String password;
 
     @Bean
-    public JdbcTemplate getJdbcTemplate(){
+    public JdbcTemplate getJdbcTemplate() {
 
-        return  new JdbcTemplate(getDataSource());
+        return new JdbcTemplate(getDataSource());
 
     }
 

@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.security.jwt;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netcracker.odstc.logviewer.models.User;
@@ -9,8 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.auth0.jwt.JWT;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.*;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.EXPIRATION_TIME;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.HEADER;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
 
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

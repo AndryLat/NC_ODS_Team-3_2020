@@ -24,8 +24,9 @@ public class LogFile extends EAVObject {
         setLastRow(lastRow);
         setLastUpdate(new Date());
     }
-    public LogFile(String name,int lastRow,BigInteger parentId){
-        this(name,lastRow);
+
+    public LogFile(String name, int lastRow, BigInteger parentId) {
+        this(name, lastRow);
         setParentId(parentId);
     }
 

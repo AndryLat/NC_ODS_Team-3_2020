@@ -15,14 +15,14 @@ import java.util.Map;
 
 public class AOCConverter {
 
-    public Map<BigInteger,HierarchyContainer> convertAOCtoHC(List<AttributeObjectContainer> attributeObjectContainerList) {
+    public Map<BigInteger, HierarchyContainer> convertAOCtoHC(List<AttributeObjectContainer> attributeObjectContainerList) {
 
-        Map<BigInteger,HierarchyContainer> eavObjectList = new HashMap<>(attributeObjectContainerList.size());
-        for (AttributeObjectContainer attributeObjectContainer: attributeObjectContainerList) {
+        Map<BigInteger, HierarchyContainer> eavObjectList = new HashMap<>(attributeObjectContainerList.size());
+        for (AttributeObjectContainer attributeObjectContainer : attributeObjectContainerList) {
 
             BigInteger objectId = attributeObjectContainer.getObjectId();
             if (eavObjectList.containsKey(objectId)) {
-                appendAttribute(attributeObjectContainer,eavObjectList.get(objectId).getOriginal());
+                appendAttribute(attributeObjectContainer, eavObjectList.get(objectId).getOriginal());
                 continue;
             }
             BigInteger objectTypeId = attributeObjectContainer.getObjectTypeId();
@@ -32,7 +32,7 @@ public class AOCConverter {
                 eavObject = new Directory();
             } else if (objectTypeId.equals(BigInteger.valueOf(4))) {
                 eavObject = new LogFile();
-            }else if(objectTypeId.equals(BigInteger.valueOf(2))){
+            } else if (objectTypeId.equals(BigInteger.valueOf(2))) {
                 eavObject = new Server();
             } else {
                 throw new IllegalArgumentException();
@@ -60,18 +60,18 @@ public class AOCConverter {
                 parent.addChildren(eavObject.getValue());
             }
         }
-        Iterator<Map.Entry<BigInteger,HierarchyContainer>> hierarchyIterator = eavObjectList.entrySet().iterator();
-        while (hierarchyIterator.hasNext()){
+        Iterator<Map.Entry<BigInteger, HierarchyContainer>> hierarchyIterator = eavObjectList.entrySet().iterator();
+        while (hierarchyIterator.hasNext()) {
             HierarchyContainer hierarchyContainer = hierarchyIterator.next().getValue();
-            if(hierarchyContainer.getParent()!=null){
+            if (hierarchyContainer.getParent() != null) {
                 hierarchyIterator.remove();
             }
         }
     }
 
     private void appendAttribute(AttributeObjectContainer attributeObjectContainer, EAVObject eavObject) {
-        eavObject.setAttributeValue(attributeObjectContainer.getAttrId(),attributeObjectContainer.getValue());
-        eavObject.setAttributeDateValue(attributeObjectContainer.getAttrId(),attributeObjectContainer.getDateValue());
-        eavObject.setAttributeListValueId(attributeObjectContainer.getAttrId(),attributeObjectContainer.getListValueId());
+        eavObject.setAttributeValue(attributeObjectContainer.getAttrId(), attributeObjectContainer.getValue());
+        eavObject.setAttributeDateValue(attributeObjectContainer.getAttrId(), attributeObjectContainer.getDateValue());
+        eavObject.setAttributeListValueId(attributeObjectContainer.getAttrId(), attributeObjectContainer.getListValueId());
     }
 }

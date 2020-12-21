@@ -8,22 +8,22 @@ class LogLevelTest {
 
     @Test
     void testGetValue() {
-        assertEquals(9, LogLevel.SEVERE.getValue());
-        assertEquals(10, LogLevel.WARNING.getValue());
-        assertEquals(11, LogLevel.INFO.getValue());
-        assertEquals(12, LogLevel.CONFIG.getValue());
-        assertEquals(13, LogLevel.FINE.getValue());
-        assertEquals(14, LogLevel.FINER.getValue());
-        assertEquals(15, LogLevel.FINEST.getValue());
-        assertEquals(16, LogLevel.DEBUG.getValue());
-        assertEquals(17, LogLevel.TRACE.getValue());
-        assertEquals(18, LogLevel.ERROR.getValue());
-        assertEquals(19, LogLevel.FATAL.getValue());
+        assertEquals(13, LogLevel.SEVERE.getValue());
+        assertEquals(14, LogLevel.WARNING.getValue());
+        assertEquals(15, LogLevel.INFO.getValue());
+        assertEquals(16, LogLevel.CONFIG.getValue());
+        assertEquals(17, LogLevel.FINE.getValue());
+        assertEquals(18, LogLevel.FINER.getValue());
+        assertEquals(19, LogLevel.FINEST.getValue());
+        assertEquals(20, LogLevel.DEBUG.getValue());
+        assertEquals(21, LogLevel.TRACE.getValue());
+        assertEquals(22, LogLevel.ERROR.getValue());
+        assertEquals(23, LogLevel.FATAL.getValue());
     }
 
     @Test
     void testGetByID() {
-        assertEquals(LogLevel.ERROR, LogLevel.getByID(18));
+        assertEquals(LogLevel.ERROR, LogLevel.getByID(22));
         assertThrows(IllegalArgumentException.class, () -> LogLevel.getByID(42));
     }
 

@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 @Repository
 public class ContainerDAO extends EAVObjectDAO {
     @SuppressWarnings({"squid:S1192"})//Suppress duplications in sql
@@ -28,7 +29,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "    WHERE OBJECT_TYPE_ID = 2 --SERVER\n" +
             "      AND NOT EXISTS(SELECT OBJECT_ID\n" +
             "                     FROM ATTRIBUTES nonactive\n" +
-            "                     WHERE LIST_VALUE_ID = 6\n" +
+            "                     WHERE (LIST_VALUE_ID = 6 OR LIST_VALUE_ID=8)\n" +
             "                       AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = nonactive.OBJECT_ID)) -- IS ACTIVE)\n" +
             "),\n" +
             "     active_directories AS (\n" +
@@ -45,7 +46,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "         WHERE OBJECT_TYPE_ID = 3                                  --DIRECTORY\n" +
             "           AND NOT EXISTS(SELECT OBJECT_ID\n" +
             "                          FROM ATTRIBUTES nonactive\n" +
-            "                          WHERE LIST_VALUE_ID = 8\n" +
+            "                          WHERE (LIST_VALUE_ID = 10 OR LIST_VALUE_ID=12)\n" +
             "                            AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR\n" +
             "                                 PARENT_ID = nonactive.OBJECT_ID)) -- IS ACTIVE\n" +
             "           AND PARENT_ID IN (SELECT OBJECT_ID FROM active_servers)) -- PARENT SERVER IS ACTIVE\n" +
@@ -80,17 +81,20 @@ public class ContainerDAO extends EAVObjectDAO {
             "           VALUE,\n" +
             "           DATE_VALUE,\n" +
             "           LIST_VALUE_ID,\n" +
-            "           directory.OBJECT_ID,\n" +
+            "           server.OBJECT_ID,\n" +
             "           PARENT_ID,\n" +
             "           OBJECT_TYPE_ID,\n" +
             "           NAME\n" +
-            "    FROM OBJECTS directory\n" +
-            "             LEFT JOIN ATTRIBUTES A2 on directory.OBJECT_ID = A2.OBJECT_ID\n" +
+            "    FROM OBJECTS server\n" +
+            "             LEFT JOIN ATTRIBUTES A2 on server.OBJECT_ID = A2.OBJECT_ID\n" +
             "    WHERE OBJECT_TYPE_ID = 2 --SERVER\n" +
-            "      AND NOT EXISTS(SELECT OBJECT_ID\n" +
+            "      AND EXISTS(SELECT OBJECT_ID\n" +
             "                     FROM ATTRIBUTES active\n" +
-            "                     WHERE LIST_VALUE_ID = 5\n" +
-            "                       AND (active.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = active.OBJECT_ID)) -- IS ACTIVE)\n" +
+            "                     WHERE (LIST_VALUE_ID = 8)\n" +
+            "                       AND (active.OBJECT_ID = server.OBJECT_ID OR PARENT_ID = active.OBJECT_ID)MINUS\n" +
+            "                 SELECT OBJECT_ID\n" +
+            "                 FROM ATTRIBUTES\n" +
+            "                 WHERE LIST_VALUE_ID = 6) -- NON ACTIVE BUT ENABLED\n" +
             "),\n" +
             "     directories AS (\n" +
             "         SELECT ATTR_ID,\n" +
@@ -123,17 +127,21 @@ public class ContainerDAO extends EAVObjectDAO {
             "           VALUE,\n" +
             "           DATE_VALUE,\n" +
             "           LIST_VALUE_ID,\n" +
-            "           directory.OBJECT_ID,\n" +
+            "           server.OBJECT_ID,\n" +
             "           PARENT_ID,\n" +
             "           OBJECT_TYPE_ID,\n" +
             "           NAME\n" +
-            "    FROM OBJECTS directory\n" +
-            "             LEFT JOIN ATTRIBUTES A2 on directory.OBJECT_ID = A2.OBJECT_ID\n" +
+            "    FROM OBJECTS server\n" +
+            "             LEFT JOIN ATTRIBUTES A2 on server.OBJECT_ID = A2.OBJECT_ID\n" +
             "    WHERE OBJECT_TYPE_ID = 2 --SERVER\n" +
-            "      AND NOT EXISTS(SELECT OBJECT_ID\n" +
-            "                     FROM ATTRIBUTES active\n" +
-            "                     WHERE LIST_VALUE_ID = 6\n" +
-            "                       AND (active.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = active.OBJECT_ID)) -- IS ACTIVE)\n" +
+            "      AND EXISTS(SELECT OBJECT_ID\n" +
+            "                 FROM ATTRIBUTES active\n" +
+            "                 WHERE LIST_VALUE_ID = 7\n" +
+            "                   AND (active.OBJECT_ID = server.OBJECT_ID OR PARENT_ID = active.OBJECT_ID)\n" +
+            "                 MINUS\n" +
+            "                 SELECT OBJECT_ID\n" +
+            "                 FROM ATTRIBUTES\n" +
+            "                 WHERE LIST_VALUE_ID = 6) -- IS ACTIVE AND ENABLED\n" +
             "),\n" +
             "     nonactive_directories AS (\n" +
             "         SELECT ATTR_ID,\n" +
@@ -146,12 +154,16 @@ public class ContainerDAO extends EAVObjectDAO {
             "                NAME\n" +
             "         FROM OBJECTS directory\n" +
             "                  LEFT JOIN ATTRIBUTES A2 on directory.OBJECT_ID = A2.OBJECT_ID\n" +
-            "         WHERE OBJECT_TYPE_ID = 3                               --DIRECTORY\n" +
+            "         WHERE OBJECT_TYPE_ID = 3                   --DIRECTORY\n" +
             "           AND NOT EXISTS(SELECT OBJECT_ID\n" +
             "                          FROM ATTRIBUTES active\n" +
-            "                          WHERE LIST_VALUE_ID = 7\n" +
+            "                          WHERE LIST_VALUE_ID = 11\n" +
             "                            AND (active.OBJECT_ID = directory.OBJECT_ID OR\n" +
-            "                                 PARENT_ID = active.OBJECT_ID)) -- IS ACTIVE\n" +
+            "                                 PARENT_ID = active.OBJECT_ID)\n" +
+            "                          MINUS\n" +
+            "                          SELECT OBJECT_ID\n" +
+            "                          FROM ATTRIBUTES\n" +
+            "                          WHERE LIST_VALUE_ID = 10) -- IS ACTIVE\n" +
             "           AND PARENT_ID IN (SELECT OBJECT_ID FROM active_servers)) -- PARENT SERVER IS NONACTIVE\n" +
             "SELECT ATTR_ID,\n" +
             "       VALUE,\n" +
@@ -165,30 +177,33 @@ public class ContainerDAO extends EAVObjectDAO {
             "UNION ALL\n" +
             "SELECT *\n" +
             "FROM active_servers";
+    private final AOCConverter aocConverter;
 
     public ContainerDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
+        aocConverter = new AOCConverter();
     }
 
-    public List<HierarchyContainer> getActiveServersWithChildren(){
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVER_DIRECTORY_FILES,new AttributeObjectMapper());
+    public List<HierarchyContainer> getActiveServersWithChildren() {
+        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVER_DIRECTORY_FILES, new AttributeObjectMapper());
 
-        Map<BigInteger,HierarchyContainer> hierarchyContainerMap = new AOCConverter().convertAOCtoHC(eavObjectsContainers);
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
 
-    public List<HierarchyContainer> getNonactiveServers(){
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(NONACTIVE_SERVERS,new AttributeObjectMapper());
+    public List<HierarchyContainer> getNonactiveServers() {
+        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(NONACTIVE_SERVERS, new AttributeObjectMapper());
 
-        Map<BigInteger,HierarchyContainer> hierarchyContainerMap = new AOCConverter().convertAOCtoHC(eavObjectsContainers);
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
-    public List<HierarchyContainer> getActiveServersWithNonactiveDirectories(){
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVERS_NONACTIVE_DIRECTORY,new AttributeObjectMapper());
 
-        Map<BigInteger,HierarchyContainer> hierarchyContainerMap = new AOCConverter().convertAOCtoHC(eavObjectsContainers);
+    public List<HierarchyContainer> getActiveServersWithNonactiveDirectories() {
+        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVERS_NONACTIVE_DIRECTORY, new AttributeObjectMapper());
+
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }

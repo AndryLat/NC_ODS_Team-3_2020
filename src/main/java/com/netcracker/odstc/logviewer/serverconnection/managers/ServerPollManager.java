@@ -19,7 +19,7 @@ public class ServerPollManager {
     private static ServerPollManager instance;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     private ExecutorService service = Executors.newFixedThreadPool(4);
-    
+
     private HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private ServerPollManager() {
@@ -34,7 +34,7 @@ public class ServerPollManager {
     }
 
     public void executeExtractingLogs(ServerConnection serverConnection) {
-        if(!serverConnectionsResults.containsKey(serverConnection))
+        if (!serverConnectionsResults.containsKey(serverConnection))
             serverConnectionsResults.put(serverConnection, service.submit(serverConnection));
     }
 
@@ -47,11 +47,11 @@ public class ServerPollManager {
                 try {
                     logs.addAll(future.getValue().get());
                 } catch (InterruptedException e) {
-                    future.getKey().getServer().setActive(false);
+                    future.getKey().getServer().setCanConnect(false);
                     Thread.currentThread().interrupt();// Под сомнением
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
-                    future.getKey().getServer().setActive(false);
+                    future.getKey().getServer().setCanConnect(false);
                     logger.error("Thread execution error ", e);
                 }
                 resultIterator.remove();

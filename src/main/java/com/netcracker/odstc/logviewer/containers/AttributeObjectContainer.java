@@ -77,5 +77,5 @@ public class AttributeObjectContainer {
     public void setListValueId(BigInteger listValueId) {
         this.listValueId = listValueId;
     }
-    // Можно сделать геттер на объект и атрибут.
+    // Can be added: getEAVObject getAttribute
 }

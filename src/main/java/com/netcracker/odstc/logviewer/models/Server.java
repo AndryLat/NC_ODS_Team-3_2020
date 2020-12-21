@@ -9,17 +9,6 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class Server extends EAVObject {
-
-    private boolean isOn = true;
-
-    public boolean isOn() {
-        return isOn;
-    }
-
-    public void setOn(boolean on) {
-        isOn = on;
-    }
-
     public Server() {
         super();
         setObjectTypeId(BigInteger.TWO);
@@ -37,7 +26,7 @@ public class Server extends EAVObject {
         setPassword(password);
         setProtocol(protocol);
         setPort(port);
-        setActive(true);
+        setEnabled(true);
         setLastAccessByUser(new Date());
         setLastAccessByJob(new Date());
     }
@@ -82,21 +71,42 @@ public class Server extends EAVObject {
         setAttributeValue(Attributes.PORT_OT_SERVER.getAttrId(), String.valueOf(port));
     }
 
-    public boolean isActive() {
-        switch (getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId()).intValue()) {
+    public boolean isEnabled() {
+        switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId()).intValue()) {
             case 5:
                 return true;
             case 6:
                 return false;
             default:
-                throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId())));
+                throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId())));
         }
     }
 
-    public void setActive(boolean active) {
-        if (active) setAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId(), BigInteger.valueOf(5));
-        else setAttributeListValueId(Attributes.IS_ACTIVE_OT_SERVER.getAttrId(), BigInteger.valueOf(6));
+    public void setEnabled(boolean active) {
+        if (active)
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(5));
+        else
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(6));
     }
+
+    public boolean isCanConnect() {
+        switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId()).intValue()) {
+            case 7:
+                return true;
+            case 8:
+                return false;
+            default:
+                throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId())));
+        }
+    }
+
+    public void setCanConnect(boolean active) {
+        if (active)
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(7));
+        else
+            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(8));
+    }
+
 
     public Date getLastAccessByJob() {
         return getAttributeDateValue(Attributes.LAST_ACCESS_BY_JOB_OT_SERVER.getAttrId());

@@ -1,17 +1,17 @@
 package com.netcracker.odstc.logviewer.models.lists;
 
 public enum LogLevel {
-    SEVERE(9),
-    WARNING(10),
-    INFO(11),
-    CONFIG(12),
-    FINE(13),
-    FINER(14),
-    FINEST(15),
-    DEBUG(16),
-    TRACE(17),
-    ERROR(18),
-    FATAL(19);
+    SEVERE(13),
+    WARNING(14),
+    INFO(15),
+    CONFIG(16),
+    FINE(17),
+    FINER(18),
+    FINEST(19),
+    DEBUG(20),
+    TRACE(21),
+    ERROR(22),
+    FATAL(23);
 
     private int value;
 
@@ -28,10 +28,6 @@ public enum LogLevel {
         throw new IllegalArgumentException(String.valueOf(id));
     }
 
-    public int getValue() {
-        return value;
-    }
-
     public static boolean contains(String value) {
         for (LogLevel level : LogLevel.values()) {
             if (level.name().equals(value)) {
@@ -39,5 +35,9 @@ public enum LogLevel {
             }
         }
         return false;
+    }
+
+    public int getValue() {
+        return value;
     }
 }

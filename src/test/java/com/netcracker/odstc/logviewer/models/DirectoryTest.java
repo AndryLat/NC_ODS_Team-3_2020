@@ -40,11 +40,11 @@ class DirectoryTest {
 
     @Test
     void testSetGetIsActive() {
-        directoryUnderTest.setActive(false);
-        final boolean resultFalse = directoryUnderTest.isActive();
+        directoryUnderTest.setEnabled(false);
+        final boolean resultFalse = directoryUnderTest.isEnabled();
         assertFalse(resultFalse);
-        directoryUnderTest.setActive(true);
-        final boolean resultTrue = directoryUnderTest.isActive();
+        directoryUnderTest.setEnabled(true);
+        final boolean resultTrue = directoryUnderTest.isEnabled();
         assertTrue(resultTrue);
     }
 

@@ -13,13 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServerConnectionService {
-    private static ServerConnectionService instance;
-    private final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
-    protected List<Pattern> logSearchPatterns; // For various patterns
-
     private static final String[] SEARCH_PATTERNS = new String[]{
             "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"//TODO: Add second pattern
     };
+    private static ServerConnectionService instance;
+    private final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
+    protected List<Pattern> logSearchPatterns; // For various patterns
 
     private ServerConnectionService() {
         logSearchPatterns = new ArrayList<>();

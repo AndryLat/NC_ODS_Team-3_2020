@@ -17,7 +17,7 @@ public class EAVObject {
     private Map<BigInteger, Attribute> attributes;
     private Map<BigInteger, BigInteger> references;
 
-    public EAVObject(){
+    public EAVObject() {
         attributes = new HashMap<>();
         references = new HashMap<>();
     }
@@ -26,7 +26,8 @@ public class EAVObject {
         this();
         this.objectId = objectId;
     }
-    public EAVObject(BigInteger objectId, BigInteger parentId, BigInteger objectTypeId,String name){
+
+    public EAVObject(BigInteger objectId, BigInteger parentId, BigInteger objectTypeId, String name) {
         this(objectId);
         this.parentId = parentId;
         this.objectTypeId = objectTypeId;
@@ -37,7 +38,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setValue(value);
         } else {
-            attributes.put(attrId,new Attribute(value));
+            attributes.put(attrId, new Attribute(value));
         }
     }
 
@@ -45,7 +46,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setDateValue(dateValue);
         } else {
-            attributes.put(attrId,new Attribute(dateValue));
+            attributes.put(attrId, new Attribute(dateValue));
         }
     }
 
@@ -53,7 +54,7 @@ public class EAVObject {
         if (attributes.containsKey(attrId)) {
             attributes.get(attrId).setListValueId(listValueId);
         } else {
-            attributes.put(attrId,new Attribute(listValueId));
+            attributes.put(attrId, new Attribute(listValueId));
         }
     }
 
@@ -85,7 +86,7 @@ public class EAVObject {
         if (references.containsKey(attrId)) {
             references.replace(attrId, reference);
         } else {
-            references.put(attrId,reference);
+            references.put(attrId, reference);
         }
     }
 
