@@ -105,9 +105,11 @@ public class SSHServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    protected void validateConnection() {
-        if ((!isConnected || session == null) && !connect()) {
-            throw new ServerConnectionException("Cant establish connection");
+    protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
+        if ((!isConnected || session == null)) {
+            if(!connect()) {
+                throw new ServerConnectionException("Cant establish connection");
+            }
         }
     }
 
