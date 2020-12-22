@@ -23,7 +23,7 @@ import java.util.Properties;
 
 public class SSHServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(SSHServerConnection.class.getName());
-    private JSch jSchClient;
+    private final JSch jSchClient;
     private Session session;
 
     public SSHServerConnection(Server server) {
@@ -107,7 +107,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
         if ((!isConnected || session == null)) {
-            if(!connect()) {
+            if (!connect()) {
                 throw new ServerConnectionException("Cant establish connection");
             }
         }

@@ -18,9 +18,9 @@ import java.util.concurrent.Future;
 public class ServerPollManager {
     private static ServerPollManager instance;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
-    private ExecutorService service = Executors.newFixedThreadPool(4);
+    private final ExecutorService service = Executors.newFixedThreadPool(4);
 
-    private HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
+    private final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private ServerPollManager() {
         serverConnectionsResults = new HashMap<>();

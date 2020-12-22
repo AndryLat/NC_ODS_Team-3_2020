@@ -23,6 +23,7 @@ public class Directory extends EAVObject {
         super();
         setPath(path);
         setEnabled(true);
+        setCanConnect(true);
         setLastExistenceCheck(new Date());
         setLastAccessByUser(new Date());
     }

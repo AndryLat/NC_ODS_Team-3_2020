@@ -44,11 +44,10 @@ public class ServerManager implements DAOChangeListener {
     }
 
     public void getLogsFromAllServers() {
-        // Сохраняю результат итерации
-        saveResults();
-        // Запрашиваю из базы текущее состояние... Сам же записав его на предыдущем этапе. Интересно.
-        revalidateCondition();
-        // Запуск итерации
+        savePollResults();
+
+        updateActiveServersFromDB();
+
         startPoll();
     }
 
@@ -63,16 +62,16 @@ public class ServerManager implements DAOChangeListener {
             serversToSave.add(serverConnection.getServer());
         }
         containerDAO.saveObjects(serversToSave);
+        revalidateActiveServersDirectories();
     }
 
-    public void revalidateActiveServersDirectories() {
+    private void revalidateActiveServersDirectories() {
         List<HierarchyContainer> servers = containerDAO.getActiveServersWithNonactiveDirectories();
         List<Directory> directories = new ArrayList<>();
 
         for (HierarchyContainer serverContainer : servers) {
             ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
             if (serverConnection == null) continue;
-
             serverConnection.setDirectories(serverContainer.getChildren());
             serverConnection.revalidateDirectories();
             for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
@@ -91,22 +90,32 @@ public class ServerManager implements DAOChangeListener {
         }
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
             if (Server.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
-                Server server = (Server) objectChangeEvent.getObject();
-                if (!server.isEnabled()) {
-                    serverConnections.remove(server.getObjectId());
-                } else {
-                    serverConnections.get(server.getObjectId()).setServer(server);
-                }
+                serverChanged(objectChangeEvent);
             }
             if (Directory.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
-                Directory directory = (Directory) objectChangeEvent.getObject();
-                ServerConnection serverConnection = serverConnections.get(directory.getParentId());
-                if (!directory.isEnabled()) {
-                    serverConnection.removeDirectory(directory);
-                }else {
-                    serverConnection.updateDirectory(directory);
-                }
+                directoryChanged(objectChangeEvent);
             }
+        }
+    }
+
+    private void directoryChanged(ObjectChangeEvent objectChangeEvent) {
+        Directory directory = (Directory) objectChangeEvent.getObject();
+        ServerConnection serverConnection = serverConnections.get(directory.getParentId());
+        if (!directory.isEnabled()) {
+            serverConnection.removeDirectory(directory);
+        } else {
+            serverConnection.updateDirectory(directory);
+        }
+    }
+
+    private void serverChanged(ObjectChangeEvent objectChangeEvent) {
+        Server server = (Server) objectChangeEvent.getObject();
+        if (!server.isEnabled()) {
+            serverConnections.remove(server.getObjectId());
+        } else {
+            ServerConnection serverConnection = serverConnections.get(server.getObjectId());
+            if (serverConnection != null)
+                serverConnection.setServer(server);
         }
     }
 
@@ -122,32 +131,24 @@ public class ServerManager implements DAOChangeListener {
         }
     }
 
-    private void revalidateCondition() {
+    private void updateActiveServersFromDB() {
         List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
         logger.info("Active Servers: {}", serverContainers.size());
-        //Планирую новый опрос
-        for (HierarchyContainer serverHierarchyContainer : serverContainers) {
-            Server server = (Server) serverHierarchyContainer.getOriginal();
+        for (HierarchyContainer serverContainer : serverContainers) {
+            Server server = (Server) serverContainer.getOriginal();
             if (serverConnections.containsKey(server.getObjectId())) {
-                serverConnections.get(server.getObjectId()).setServer(server);// Если сервер уже есть, обновить ему данные о сервере.
-                serverConnections.get(server.getObjectId()).setDirectories(serverHierarchyContainer.getChildren());//Если сервер уже есть то обновить ему директории(файлы заодно)
-                continue;
-            }
-            ServerConnection serverConnection;
-            if (server.getProtocol() == Protocol.FTP) {
-                serverConnection = new FTPServerConnection(server);
-            } else if (server.getProtocol() == Protocol.SSH) {
-                serverConnection = new SSHServerConnection(server);
+                serverConnections.get(server.getObjectId()).setServer(server);
+                serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
             } else {
-                logger.error("Cant wrap server with unknown protocol");
-                continue;
+                ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+                if (serverConnection == null) continue;
+                serverConnection.setDirectories(serverContainer.getChildren());
+                serverConnections.put(server.getObjectId(), serverConnection);
             }
-            serverConnection.setDirectories(serverHierarchyContainer.getChildren());
-            serverConnections.put(server.getObjectId(), serverConnection);
         }
     }
 
-    private void saveResults() {
+    private void savePollResults() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
         List<Server> servers = new ArrayList<>(serverConnections.size());
         List<Directory> directories = new ArrayList<>();

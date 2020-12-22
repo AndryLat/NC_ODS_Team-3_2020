@@ -4,6 +4,7 @@ import com.netcracker.odstc.logviewer.containers.AttributeObjectContainer;
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.containers.converters.AOCConverter;
 import com.netcracker.odstc.logviewer.mapper.AttributeObjectMapper;
+import com.netcracker.odstc.logviewer.models.Server;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +31,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "      AND NOT EXISTS(SELECT OBJECT_ID\n" +
             "                     FROM ATTRIBUTES nonactive\n" +
             "                     WHERE (LIST_VALUE_ID = 6 OR LIST_VALUE_ID=8)\n" +
-            "                       AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = nonactive.OBJECT_ID)) -- IS ACTIVE)\n" +
+            "                       AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = nonactive.OBJECT_ID)) -- IS ACTIVE\n" +
             "),\n" +
             "     active_directories AS (\n" +
             "         SELECT ATTR_ID,\n" +
@@ -50,6 +51,19 @@ public class ContainerDAO extends EAVObjectDAO {
             "                            AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR\n" +
             "                                 PARENT_ID = nonactive.OBJECT_ID)) -- IS ACTIVE\n" +
             "           AND PARENT_ID IN (SELECT OBJECT_ID FROM active_servers)) -- PARENT SERVER IS ACTIVE\n" +
+            "SELECT *\n" +
+            "FROM active_servers\n" +
+            "UNION ALL\n" +
+            "SELECT ATTR_ID,\n" +
+            "       VALUE,\n" +
+            "       DATE_VALUE,\n" +
+            "       LIST_VALUE_ID,\n" +
+            "       OBJECT_ID,\n" +
+            "       PARENT_ID,\n" +
+            "       OBJECT_TYPE_ID,\n" +
+            "       NAME\n" +
+            "FROM active_directories\n" +
+            "UNION ALL\n" +
             "SELECT ATTR_ID,\n" +
             "       VALUE,\n" +
             "       DATE_VALUE,\n" +
@@ -61,20 +75,8 @@ public class ContainerDAO extends EAVObjectDAO {
             "FROM OBJECTS logfile\n" +
             "         LEFT JOIN ATTRIBUTES A2 on logfile.OBJECT_ID = A2.OBJECT_ID\n" +
             "WHERE OBJECT_TYPE_ID = 4                                                                  --LOGFILE\n" +
-            "  AND EXISTS(SELECT OBJECT_ID FROM active_directories WHERE OBJECT_ID = logfile.PARENT_ID)--PARENT IS ACTIVE\n" +
-            "UNION\n" +
-            "SELECT ATTR_ID,\n" +
-            "       VALUE,\n" +
-            "       DATE_VALUE,\n" +
-            "       LIST_VALUE_ID,\n" +
-            "       OBJECT_ID,\n" +
-            "       PARENT_ID,\n" +
-            "       OBJECT_TYPE_ID,\n" +
-            "       NAME\n" +
-            "FROM active_directories\n" +
-            "UNION\n" +
-            "SELECT *\n" +
-            "FROM active_servers";//TODO: Сделать сортировку
+            "  AND EXISTS(SELECT OBJECT_ID FROM active_directories WHERE OBJECT_ID = logfile.PARENT_ID)--PARENT IS ACTIVE";
+    //TODO: Make sorted by USER_LAST_ACCESS. This cant be done on DB side, because we work with attributes, not objects
 
     private static final String NONACTIVE_SERVERS = "WITH nonactive_servers AS (\n" +
             "    SELECT ATTR_ID,\n" +
@@ -185,26 +187,43 @@ public class ContainerDAO extends EAVObjectDAO {
     }
 
     public List<HierarchyContainer> getActiveServersWithChildren() {
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVER_DIRECTORY_FILES, new AttributeObjectMapper());
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(ACTIVE_SERVER_DIRECTORY_FILES);
 
-        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
+        validateServerContainer(hierarchyContainerMap);
+        validateChildrenNotEmpty(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
 
     public List<HierarchyContainer> getNonactiveServers() {
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(NONACTIVE_SERVERS, new AttributeObjectMapper());
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(NONACTIVE_SERVERS);
 
-        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
+        validateServerContainer(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
 
     public List<HierarchyContainer> getActiveServersWithNonactiveDirectories() {
-        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(ACTIVE_SERVERS_NONACTIVE_DIRECTORY, new AttributeObjectMapper());
+        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(ACTIVE_SERVERS_NONACTIVE_DIRECTORY);
 
-        Map<BigInteger, HierarchyContainer> hierarchyContainerMap = aocConverter.convertAOCtoHC(eavObjectsContainers);
+        validateServerContainer(hierarchyContainerMap);
+        validateChildrenNotEmpty(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
+    }
+
+    private Map<BigInteger, HierarchyContainer> getHierarchyContainerFromQuery(String query) {
+        List<AttributeObjectContainer> eavObjectsContainers = jdbcTemplate.query(query, new AttributeObjectMapper());
+
+        return aocConverter.convertAOCtoHC(eavObjectsContainers);
+    }
+
+    private void validateServerContainer(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
+        hierarchyContainerMap.entrySet().removeIf(serverContainer ->
+                !Server.class.isAssignableFrom(serverContainer.getValue().getOriginal().getClass()));
+    }
+
+    private void validateChildrenNotEmpty(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
+        hierarchyContainerMap.entrySet().removeIf(serverContainer -> serverContainer.getValue().getChildren().isEmpty());
     }
 }

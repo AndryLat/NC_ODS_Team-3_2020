@@ -45,9 +45,18 @@ public class ObjectChangeEvent {
         this.argument = argument;
     }
 
+    @Override
+    public String toString() {
+        return "ObjectChangeEvent{" +
+                "changeType=" + changeType +
+                ", source=" + source +
+                ", object=" + object +
+                ", argument=" + argument +
+                '}';
+    }
+
     public enum ChangeType {
         DELETE,
         UPDATE
     }
-
 }

@@ -27,6 +27,7 @@ public class Server extends EAVObject {
         setProtocol(protocol);
         setPort(port);
         setEnabled(true);
+        setCanConnect(true);
         setLastAccessByUser(new Date());
         setLastAccessByJob(new Date());
     }
@@ -106,7 +107,6 @@ public class Server extends EAVObject {
         else
             setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(8));
     }
-
 
     public Date getLastAccessByJob() {
         return getAttributeDateValue(Attributes.LAST_ACCESS_BY_JOB_OT_SERVER.getAttrId());

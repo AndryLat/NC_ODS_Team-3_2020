@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.serverconnection.publishers;
 
+import com.netcracker.odstc.logviewer.dao.ContainerDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,8 +33,11 @@ public class DAOPublisher {
 
     public void notifyListeners(ObjectChangeEvent objectChangeEvent) {
         logger.info("Got new event {}, Value: {}", objectChangeEvent.getChangeType(), objectChangeEvent);
-        for (DAOChangeListener changeListener :
-                listeners) {
+        if (ContainerDAO.class.isAssignableFrom(objectChangeEvent.getSource().getClass())) {
+            logger.info("Ignoring event from ContainerDAO {}", objectChangeEvent);
+            return;
+        }
+        for (DAOChangeListener changeListener : listeners) {
             changeListener.objectChanged(objectChangeEvent);
         }
     }
