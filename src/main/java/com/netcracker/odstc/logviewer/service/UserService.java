@@ -3,6 +3,9 @@ package com.netcracker.odstc.logviewer.service;
 import com.netcracker.odstc.logviewer.dao.UserDao;
 import com.netcracker.odstc.logviewer.models.User;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -19,6 +22,11 @@ public class UserService {
 
     public List<User> getUsers() {
         return userDao.getObjectsByObjectTypeId(BigInteger.ONE, User.class);
+    }
+
+    public Page<User> getUsers(Pageable page) {
+        return new PageImpl<User>(userDao.getUsers(page),
+                page,userDao.getUserCount());
     }
 
     public User findById(BigInteger id) {
