@@ -2,21 +2,15 @@ package com.netcracker.odstc.logviewer.controller;
 
 import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -31,8 +25,10 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getUsers() {
-        return ResponseEntity.ok(userService.getUsers());
+    public Page<User> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+                               @RequestParam(value = "page_size", defaultValue = "2") int pageSize) {
+        PageRequest pageable = PageRequest.of(page, pageSize);
+        return userService.getUsers(pageable);
     }
 
     @PostMapping("/create")
