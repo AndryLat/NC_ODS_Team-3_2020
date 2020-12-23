@@ -91,7 +91,7 @@ public class Server extends EAVObject {
     }
 
     public boolean isCanConnect() {
-        switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId()).intValue()) {
+        switch (getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_SERVER.getAttrId()).intValue()) {
             case 7:
                 return true;
             case 8:
@@ -103,9 +103,9 @@ public class Server extends EAVObject {
 
     public void setCanConnect(boolean active) {
         if (active)
-            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(7));
+            setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_SERVER.getAttrId(), BigInteger.valueOf(7));
         else
-            setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(8));
+            setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_SERVER.getAttrId(), BigInteger.valueOf(8));
     }
 
     public Date getLastAccessByJob() {
