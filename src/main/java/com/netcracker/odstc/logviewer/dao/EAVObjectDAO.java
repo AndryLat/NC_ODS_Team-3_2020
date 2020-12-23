@@ -71,7 +71,7 @@ public class EAVObjectDAO {
     public final JdbcTemplate jdbcTemplate;
 
 
-    public EAVObjectDAO(JdbcTemplate jdbcTemplate) {//TODO: Initialize Config instance when DAO is initialized
+    public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.serverconnection.managers;
 
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.dao.ContainerDAO;
+import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
@@ -24,6 +25,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ServerManager implements DAOChangeListener {
@@ -34,13 +38,35 @@ public class ServerManager implements DAOChangeListener {
 
     private final ServerPollManager serverPollManager;
 
+    private final ScheduledExecutorService executorService;
+
     @SuppressWarnings({"squid:S1144"})//Suppress unused private constructor
     private ServerManager(ContainerDAO containerDAO) {
+        executorService = Executors.newSingleThreadScheduledExecutor();
         serverPollManager = ServerPollManager.getInstance();
         DAOPublisher.getInstance().addListener(this);
         serverConnections = Collections.synchronizedMap(new HashMap<>());
         this.containerDAO = containerDAO;
         iterationRemove = new HashMap<>();
+
+        iterationRemove.put(BigInteger.valueOf(2), new ArrayList<>());
+        iterationRemove.put(BigInteger.valueOf(3), new ArrayList<>());
+        iterationRemove.put(BigInteger.valueOf(4), new ArrayList<>());
+
+        startRunnables();
+    }
+
+    private void startRunnables() {
+        //TODO: Remove from this place
+        Config configInstance = containerDAO.getObjectById(BigInteger.ZERO, Config.class);
+        Config.setInstance(configInstance);
+
+        logger.info("Starting Polling runnable");
+        executorService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.info("Polling runnable started");
+        logger.info("Starting activity check runnable");
+        executorService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.info("Activity check runnable started");
     }
 
     public void getLogsFromAllServers() {
