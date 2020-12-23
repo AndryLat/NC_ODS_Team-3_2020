@@ -16,7 +16,7 @@ class ConfigTest {
 
     @BeforeEach
     void setUp() {
-        configUnderTest = Config.getInstance();
+        configUnderTest = new Config();
     }
 
     @Test
@@ -68,6 +68,7 @@ class ConfigTest {
 
     @Test
     void testGetInstance() {
+        Config.setInstance(new Config());
         final Config result = Config.getInstance();
         assertEquals(configUnderTest, result);
     }
