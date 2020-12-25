@@ -111,6 +111,8 @@ public class ServerManager implements DAOChangeListener {
     public void objectChanged(ObjectChangeEvent objectChangeEvent) {
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
             BigInteger objectTypeId = (BigInteger) objectChangeEvent.getArgument();
+            if(objectTypeId.equals(BigInteger.valueOf(1))||objectTypeId.equals(BigInteger.valueOf(5)))
+                return;
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
             iterationRemove.get(objectTypeId).add(objectId);
         }
