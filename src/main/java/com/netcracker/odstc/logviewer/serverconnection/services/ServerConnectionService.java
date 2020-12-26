@@ -8,6 +8,7 @@ import com.netcracker.odstc.logviewer.models.lists.Protocol;
 import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,7 +77,12 @@ public class ServerConnectionService {
 
     public boolean isServerAvailable(Server server) {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
-        boolean isServerAvailable = serverConnection.connect();
+        boolean isServerAvailable = false;
+        try {
+            isServerAvailable = serverConnection.connect();
+        }catch (ServerConnectionException e){
+            logger.error("Error with check connection",e);
+        }
         if (isServerAvailable) {
             serverConnection.disconnect();
         }
@@ -85,8 +91,19 @@ public class ServerConnectionService {
 
     public boolean isDirectoryAvailable(Server server, Directory directory) {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
-        boolean isDirectoryAvailable = serverConnection.isDirectoryValid(directory);
-        serverConnection.disconnect();
+        boolean isDirectoryAvailable = false;
+        boolean isServerAvailable = false;
+        try {
+            isServerAvailable = serverConnection.connect();
+            if(isServerAvailable) {
+                isDirectoryAvailable = serverConnection.isDirectoryValid(directory);
+            }
+        }catch (ServerConnectionException e){
+            logger.error("Error with check connection",e);
+        }
+        if (isServerAvailable) {
+            serverConnection.disconnect();
+        }
         return isDirectoryAvailable;
     }
 
