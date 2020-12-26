@@ -1,5 +1,7 @@
 package com.netcracker.odstc.logviewer.serverconnection.services;
 
+import com.netcracker.odstc.logviewer.models.Directory;
+import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,5 +67,15 @@ public class ServerConnectionService {
             }
         }
         return null;
+    }
+
+    //TODO:
+    public boolean isServerAvailable(Server server){
+        return true;
+    }
+
+    //TODO:
+    public boolean isDirectoryAvailable(Server server, Directory directory){
+        return true;
     }
 }

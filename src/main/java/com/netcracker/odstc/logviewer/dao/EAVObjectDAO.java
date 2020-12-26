@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +101,10 @@ public class EAVObjectDAO {
             attributes.put(attribute.getKey(), attribute.getValue());
         }
         return attributes;
+    }
+
+    public <T extends EAVObject> List<T> getObjectsByParentId(BigInteger bigInteger, Class<T> clazz){
+        return Collections.emptyList();
     }
 
     public <T extends EAVObject> List<T> getObjectsByObjectTypeId(BigInteger objectTypeId, Class<T> clazz) {
