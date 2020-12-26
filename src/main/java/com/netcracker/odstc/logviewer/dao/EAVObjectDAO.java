@@ -57,16 +57,10 @@ public class EAVObjectDAO {
     private static final String QUERY_ATTRIBUTE_BY_DATE_VALUE = "select attr_id, object_id, value\n" +
             " from attributes attr\n" +
             " where attr.DATE_value like ?";
-    private static final String QUERY_ATTRIBUTE_ID_BY_DATE_VALUE = "select attr_id\n" +
-            " from attributes\n" +
-            " where attributes.DATE_value like ?";
     private static final String QUERY_ATTRIBUTE_BY_LIST_VALUE = "select attr.attr_id, attr.object_id, Lists.value\n" +
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
-    private static final String QUERY_ATTRIBUTE_ID_BY_LIST_VALUE = "select attr.attr_id\n" +
-            "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
-            "    where Lists.value like ?";
-    public final JdbcTemplate jdbcTemplate;
+    protected final JdbcTemplate jdbcTemplate;
 
 
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
@@ -93,34 +87,18 @@ public class EAVObjectDAO {
                 attributeId);
 
         HashMap<BigInteger, Attribute> attributes = new HashMap<>();
-        for (Map.Entry<BigInteger, Attribute> attribute :
-                objectAttributes) {
+        for (Map.Entry<BigInteger, Attribute> attribute : objectAttributes) {
             attributes.put(attribute.getKey(), attribute.getValue());
         }
         return attributes;
     }
 
     public <T extends EAVObject> List<T> getObjectsByParentId(BigInteger bigInteger, Class<T> clazz) {
-        return getObjectsBySmth(bigInteger, clazz, QUERY_OBJECT_PARENT_ID);
-    }
-
-    private <T extends EAVObject> List<T> getObjectsBySmth(BigInteger bigInteger, Class<T> clazz, String qwery) {
-        List<EAVObject> objectIds = jdbcTemplate.query(qwery, new ObjectMapper(), bigInteger);
-        List<EAVObject> eavObjects = new ArrayList<>();
-        EAVObject eavObject;
-        for (int i = 0; i < objectIds.size(); i++) {
-            eavObject = createEAVObject(objectIds.get(i).getObjectId(), clazz);
-            eavObject.setName(objectIds.get(i).getName());
-            eavObject.setParentId(objectIds.get(i).getParentId());
-            eavObjects.add(eavObject);
-            eavObject.setAttributes(getAttributes(objectIds.get(i).getObjectId(), QUERY_ATTRIBUTE_BY_OBJECT_ID));
-            eavObject.setReferences(getReference(objectIds.get(i).getObjectId()));
-        }
-        return (List<T>) eavObjects;
+        return getObjectsByQuery(bigInteger, clazz, QUERY_OBJECT_PARENT_ID);
     }
 
     public <T extends EAVObject> List<T> getObjectsByObjectTypeId(BigInteger objectTypeId, Class<T> clazz) {
-        return getObjectsBySmth(objectTypeId, clazz, QUERY_OBJECT_BY_TYPE);
+        return getObjectsByQuery(objectTypeId, clazz, QUERY_OBJECT_BY_TYPE);
     }
 
     public <T extends EAVObject> T getObjectByIdAttrByIds(BigInteger id, Class<T> clazz, List<BigInteger> attributeIds) {
@@ -141,6 +119,21 @@ public class EAVObjectDAO {
 
     }
 
+    private <T extends EAVObject> List<T> getObjectsByQuery(BigInteger id, Class<T> clazz, String query) {
+        List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
+        List<EAVObject> eavObjects = new ArrayList<>();
+        EAVObject eavObject;
+        for (int i = 0; i < objectIds.size(); i++) {
+            eavObject = createEAVObject(objectIds.get(i).getObjectId(), clazz);
+            eavObject.setName(objectIds.get(i).getName());
+            eavObject.setParentId(objectIds.get(i).getParentId());
+            eavObjects.add(eavObject);
+            eavObject.setAttributes(getAttributes(objectIds.get(i).getObjectId(), QUERY_ATTRIBUTE_BY_OBJECT_ID));
+            eavObject.setReferences(getReference(objectIds.get(i).getObjectId()));
+        }
+        return (List<T>) eavObjects;
+    }
+
     public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
         EAVObject eavObject = createEAVObject(objectId, clazz);
         EAVObject columns = jdbcTemplate.queryForObject(QUERY_OBJECT_BY_ID, new ObjectMapper(), objectId);
@@ -155,32 +148,21 @@ public class EAVObjectDAO {
         return (T) eavObject;
     }
 
-    public Map<BigInteger, Attribute> getAttributebyValue(String value) {
+    public <T extends EAVObject> List<T> getAttributeByValue(String value) {
         return getAttribute(value, QUERY_ATTRIBUTE_BY_VALUE);
     }
 
-    public Map<BigInteger, Attribute> getAttributebyDateValue(Date value) {
-        jdbcTemplate.queryForObject(QUERY_NEXT_OBJECT_ID, BigInteger.class);
-        List<BigInteger> attributeIds = jdbcTemplate.queryForList(QUERY_ATTRIBUTE_ID_BY_DATE_VALUE, BigInteger.class, value);
-        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
-        for (BigInteger attributeId : attributeIds) {
-            attributes.putAll(getAttributes(attributeId, QUERY_ATTRIBUTE_BY_DATE_VALUE));
-        }
-        return attributes;
+    public <T extends EAVObject> List<T> getAttributeByDateValue(Date dateValue) {
+        return getAttribute(dateValue, QUERY_ATTRIBUTE_BY_DATE_VALUE);
     }
 
-    public Map<BigInteger, Attribute> getAttributebyListValue(String value) {
-        return getAttribute(value, QUERY_ATTRIBUTE_ID_BY_LIST_VALUE);
+    public <T extends EAVObject> List<T> getAttributeByListValue(String listValue) {
+        return getAttribute(listValue, QUERY_ATTRIBUTE_BY_LIST_VALUE);
     }
 
-    private Map<BigInteger, Attribute> getAttribute(String value, String qwery) {
-        jdbcTemplate.queryForObject(QUERY_NEXT_OBJECT_ID, BigInteger.class);
-        List<BigInteger> attributeIds = jdbcTemplate.queryForList(qwery, BigInteger.class, value);
-        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
-        for (BigInteger attributeId : attributeIds) {
-            attributes.putAll(getAttributes(attributeId, QUERY_ATTRIBUTE_BY_LIST_VALUE));
-        }
-        return attributes;
+    private <T extends EAVObject> List<T> getAttribute(Object value, String query) {
+        List<EAVObject> attributes = jdbcTemplate.query(query, new ObjectMapper(), value);
+        return (List<T>) attributes;
     }
 
     public <T extends EAVObject> void saveObjectAttributesReferences(T eavObject) {
@@ -219,8 +201,7 @@ public class EAVObjectDAO {
     }
 
     public void saveAttributes(BigInteger objectId, Map<BigInteger, Attribute> attributes) {
-        for (Map.Entry<BigInteger, Attribute> attribute :
-                attributes.entrySet()) {
+        for (Map.Entry<BigInteger, Attribute> attribute : attributes.entrySet()) {
             jdbcTemplate.update(UPDATE_ATTRIBUTE_SQL,
                     objectId,
                     attribute.getKey(),
@@ -231,8 +212,7 @@ public class EAVObjectDAO {
     }
 
     public void saveReferences(BigInteger objectId, Map<BigInteger, BigInteger> references) {
-        for (Map.Entry<BigInteger, BigInteger> reference :
-                references.entrySet()) {
+        for (Map.Entry<BigInteger, BigInteger> reference : references.entrySet()) {
             jdbcTemplate.update(UPDATE_REFERENCE_SQL,
                     reference.getValue(),
                     reference.getKey(),
