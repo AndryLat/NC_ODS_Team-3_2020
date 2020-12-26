@@ -40,9 +40,10 @@ public class ServerController {
 
 
     @GetMapping("/all")
-    public List<Server> allServer(Principal principal){
+    public ResponseEntity<List<Server>> allServer(Principal principal){
         User user = userService.findByName(principal.getName());
-        return eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
+        List<Server> listServer= eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
+        return ResponseEntity.ok(listServer);
     }
 
     @PostMapping("/add")
@@ -81,8 +82,11 @@ public class ServerController {
     }
 
     @PostMapping("/testConnection")
-    public boolean testConnection(@RequestBody Server server){
-        return ServerConnectionService.getInstance().isServerAvailable(server);
+    public ResponseEntity<Boolean> testConnection(@RequestBody Server server){
+        if(server == null){
+            return new ResponseEntity("Server shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
+        }
+        return  ResponseEntity.ok(ServerConnectionService.getInstance().isServerAvailable(server));
     }
 }
 
