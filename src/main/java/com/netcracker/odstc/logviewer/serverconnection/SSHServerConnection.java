@@ -61,6 +61,7 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean isDirectoryValid(Directory directory) {
+        validateConnection();
         if (!super.isDirectoryValid(directory))
             return false;
         try {

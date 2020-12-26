@@ -7,13 +7,11 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.models.lists.Protocol;
-import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
-import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOChangeListener;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
+import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -37,12 +35,16 @@ public class ServerManager implements DAOChangeListener {
     private final Map<BigInteger, ServerConnection> serverConnections;
 
     private final ServerPollManager serverPollManager;
+    private final ServerConnectionService serverConnectionService;
 
     private final ScheduledExecutorService executorService;
 
     @SuppressWarnings({"squid:S1144"})//Suppress unused private constructor
     private ServerManager(ContainerDAO containerDAO) {
         executorService = Executors.newSingleThreadScheduledExecutor();
+        serverConnectionService = ServerConnectionService.getInstance();
+
+
         serverPollManager = ServerPollManager.getInstance();
         DAOPublisher.getInstance().addListener(this);
         serverConnections = Collections.synchronizedMap(new HashMap<>());
@@ -57,7 +59,7 @@ public class ServerManager implements DAOChangeListener {
     }
 
     private void startRunnables() {
-        //TODO: Remove from this place
+        //TODO: Remove from this place or not?
         Config configInstance = containerDAO.getObjectById(BigInteger.ZERO, Config.class);
         Config.setInstance(configInstance);
 
@@ -81,7 +83,7 @@ public class ServerManager implements DAOChangeListener {
         List<HierarchyContainer> servers = containerDAO.getNonactiveServers();
         List<Server> serversToSave = new ArrayList<>();
         for (HierarchyContainer serverContainer : servers) {
-            ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
             if (serverConnection == null) continue;
             serverConnection.connect();
             serverConnection.disconnect();
@@ -96,7 +98,7 @@ public class ServerManager implements DAOChangeListener {
         List<Directory> directories = new ArrayList<>();
 
         for (HierarchyContainer serverContainer : servers) {
-            ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
             if (serverConnection == null) continue;
             serverConnection.setDirectories(serverContainer.getChildren());
             serverConnection.revalidateDirectories();
@@ -111,7 +113,7 @@ public class ServerManager implements DAOChangeListener {
     public void objectChanged(ObjectChangeEvent objectChangeEvent) {
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
             BigInteger objectTypeId = (BigInteger) objectChangeEvent.getArgument();
-            if(objectTypeId.equals(BigInteger.valueOf(1))||objectTypeId.equals(BigInteger.valueOf(5)))
+            if (objectTypeId.equals(BigInteger.valueOf(1)) || objectTypeId.equals(BigInteger.valueOf(5)))
                 return;
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
             iterationRemove.get(objectTypeId).add(objectId);
@@ -168,7 +170,7 @@ public class ServerManager implements DAOChangeListener {
                 serverConnections.get(server.getObjectId()).setServer(server);
                 serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
             } else {
-                ServerConnection serverConnection = wrapServerIntoConnection(serverContainer);
+                ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
                 if (serverConnection == null) continue;
                 serverConnection.setDirectories(serverContainer.getChildren());
                 serverConnections.put(server.getObjectId(), serverConnection);
@@ -210,19 +212,5 @@ public class ServerManager implements DAOChangeListener {
         iterationRemove.get(BigInteger.valueOf(2)).clear();
         iterationRemove.get(BigInteger.valueOf(3)).clear();
         iterationRemove.get(BigInteger.valueOf(4)).clear();
-    }
-
-    private ServerConnection wrapServerIntoConnection(HierarchyContainer serverContainer) {
-        Server server = (Server) serverContainer.getOriginal();
-        ServerConnection serverConnection;
-        if (server.getProtocol() == Protocol.FTP) {
-            serverConnection = new FTPServerConnection(server);
-        } else if (server.getProtocol() == Protocol.SSH) {
-            serverConnection = new SSHServerConnection(server);
-        } else {
-            logger.error("Cant wrap server with unknown protocol");
-            return null;
-        }
-        return serverConnection;
     }
 }

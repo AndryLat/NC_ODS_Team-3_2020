@@ -1,8 +1,13 @@
 package com.netcracker.odstc.logviewer.serverconnection.services;
 
+import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
+import com.netcracker.odstc.logviewer.models.lists.Protocol;
+import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,13 +74,37 @@ public class ServerConnectionService {
         return null;
     }
 
-    //TODO:
-    public boolean isServerAvailable(Server server){
-        return true;
+    public boolean isServerAvailable(Server server) {
+        ServerConnection serverConnection = wrapServerIntoConnection(server);
+        boolean isServerAvailable = serverConnection.connect();
+        if (isServerAvailable) {
+            serverConnection.disconnect();
+        }
+        return isServerAvailable;
     }
 
-    //TODO:
-    public boolean isDirectoryAvailable(Server server, Directory directory){
-        return true;
+    public boolean isDirectoryAvailable(Server server, Directory directory) {
+        ServerConnection serverConnection = wrapServerIntoConnection(server);
+        boolean isDirectoryAvailable = serverConnection.isDirectoryValid(directory);
+        serverConnection.disconnect();
+        return isDirectoryAvailable;
+    }
+
+    public ServerConnection wrapServerIntoConnection(HierarchyContainer serverContainer) {
+        Server server = (Server) serverContainer.getOriginal();
+        return wrapServerIntoConnection(server);
+    }
+
+    public ServerConnection wrapServerIntoConnection(Server server) {
+        ServerConnection serverConnection;
+        if (server.getProtocol() == Protocol.FTP) {
+            serverConnection = new FTPServerConnection(server);
+        } else if (server.getProtocol() == Protocol.SSH) {
+            serverConnection = new SSHServerConnection(server);
+        } else {
+            logger.error("Cant wrap server with unknown protocol");
+            return null;
+        }
+        return serverConnection;
     }
 }
