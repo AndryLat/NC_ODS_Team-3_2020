@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
-public abstract class AbstractServerConnection implements ServerConnection {
+abstract class AbstractServerConnection implements ServerConnection {
     private final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
@@ -43,32 +43,6 @@ public abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
-    public void revalidateDirectories() {
-        for (HierarchyContainer directoryContainer : directories) {
-            Directory directory = (Directory) directoryContainer.getOriginal();
-            if (!isDirectoryValid(directory)) {
-                directory.setCanConnect(false);
-            }
-        }
-    }
-
-    @Override
-    public List<Log> getNewLogs() {
-        server.setLastAccessByJob(new Date());
-        validateConnection();
-        return collectNewLogs();
-    }
-
-    protected abstract void validateConnection();
-
-    protected abstract List<Log> collectNewLogs();
-
-    @Override
-    public void disconnect() {
-        isConnected = false;
-    }
-
-    @Override
     public Server getServer() {
         return server;
     }
@@ -89,8 +63,7 @@ public abstract class AbstractServerConnection implements ServerConnection {
 
     @Override
     public void updateDirectory(Directory directory) {
-        for (HierarchyContainer directoryContainer :
-                directories) {
+        for (HierarchyContainer directoryContainer : directories) {
             if (directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())) {
                 directoryContainer.setOriginal(directory);
                 return;
@@ -98,7 +71,31 @@ public abstract class AbstractServerConnection implements ServerConnection {
         }
     }
 
+    @Override
+    public void revalidateDirectories() {
+        validateConnection();
+        for (HierarchyContainer directoryContainer : directories) {
+            Directory directory = (Directory) directoryContainer.getOriginal();
+            if (!isDirectoryValid(directory)) {
+                directory.setCanConnect(false);
+            }
+        }
+    }
+
+    @Override
+    public List<Log> getNewLogs() {
+        validateConnection();
+        server.setLastAccessByJob(new Date());
+        return collectNewLogs();
+    }
+
+    @Override
+    public void disconnect() {
+        isConnected = false;
+    }
+
     public boolean isDirectoryValid(Directory directory) {
+        validateConnection();
         Config appConfiguration = Config.getInstance();
         directory.setLastExistenceCheck(new Date());
         return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
@@ -153,6 +150,10 @@ public abstract class AbstractServerConnection implements ServerConnection {
         scanner.close();
         return result;
     }
+
+    protected abstract void validateConnection();
+
+    protected abstract List<Log> collectNewLogs();
 
     @Override
     public boolean equals(Object o) {

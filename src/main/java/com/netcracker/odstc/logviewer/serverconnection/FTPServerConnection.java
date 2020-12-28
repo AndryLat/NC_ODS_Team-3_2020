@@ -30,7 +30,7 @@ public class FTPServerConnection extends AbstractServerConnection {
     public boolean connect() {
         logger.debug("Making connection to {}", server.getName());
         try {
-            ftpClient.setConnectTimeout(5000);
+            ftpClient.setConnectTimeout(500);
             ftpClient.connect(server.getIp(), server.getPort());
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -59,7 +59,6 @@ public class FTPServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean isDirectoryValid(Directory directory) {
-        validateConnection();
         if (!super.isDirectoryValid(directory))
             return false;
         try {
@@ -87,7 +86,6 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-
     protected void validateConnection() {
         if (!isConnected) {
             if (!connect()) {//I cant merge this one with enclosing one, because i dont need to connect() every time
@@ -97,6 +95,9 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     private List<Log> tryExtractLogsFromDirectory(HierarchyContainer directoryContainer) {
+        if (directories.isEmpty()) {
+            throw new ServerConnectionException("Server have empty list of active directories. Mark as cant be connected.");
+        }
         List<Log> result = new ArrayList<>();
         Directory directory = (Directory) directoryContainer.getOriginal();
         directory.setLastExistenceCheck(new Date());
@@ -113,6 +114,7 @@ public class FTPServerConnection extends AbstractServerConnection {
             logger.error("Marking directory as unavailable", e);
             directory.setCanConnect(false);
         }
+        directories.clear();
         return result;
     }
 

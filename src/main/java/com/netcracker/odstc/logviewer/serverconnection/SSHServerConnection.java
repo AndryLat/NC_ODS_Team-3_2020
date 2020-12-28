@@ -61,7 +61,6 @@ public class SSHServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean isDirectoryValid(Directory directory) {
-        validateConnection();
         if (!super.isDirectoryValid(directory))
             return false;
         try {
@@ -76,6 +75,33 @@ public class SSHServerConnection extends AbstractServerConnection {
         }
     }
 
+    protected List<Log> collectNewLogs() {
+        if (directories.isEmpty()) {
+            throw new ServerConnectionException("Server have empty list of active directories. Mark as cant be connected.");
+        }
+        List<Log> result = new ArrayList<>();
+        try {
+            ChannelSftp channelSftp = getChannelSftp();
+            for (int i = 0; i < directories.size(); i++) {
+                HierarchyContainer directory = directories.get(i);
+                result.addAll(tryExtractLogsFromDirectory(channelSftp, directory));
+            }
+            channelSftp.disconnect();
+        } catch (SftpException e) {
+            throw new ServerConnectionException("Error in polling time", e);
+        }
+        directories.clear();
+        return result;
+    }
+
+    protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
+        if ((!isConnected || session == null)) {
+            if (!connect()) {
+                throw new ServerConnectionException("Cant establish connection");
+            }
+        }
+    }
+
     private ChannelSftp getChannelSftp() {
         ChannelSftp channelSftp;
         try {
@@ -87,31 +113,6 @@ public class SSHServerConnection extends AbstractServerConnection {
             throw new ServerConnectionException("Error with creating SFTP ", e);
         }
         return channelSftp;
-    }
-
-    protected List<Log> collectNewLogs() {
-        List<Log> result = new ArrayList<>();
-        try {
-            Channel sftp = session.openChannel("sftp");
-            sftp.connect();
-            ChannelSftp channelSftp = (ChannelSftp) sftp;
-            for (int i = 0; i < directories.size(); i++) {
-                HierarchyContainer directory = directories.get(i);
-                result.addAll(tryExtractLogsFromDirectory(channelSftp, directory));
-            }
-            channelSftp.disconnect();
-        } catch (JSchException | SftpException e) {
-            throw new ServerConnectionException("Error in polling time", e);
-        }
-        return result;
-    }
-
-    protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
-        if ((!isConnected || session == null)) {
-            if (!connect()) {
-                throw new ServerConnectionException("Cant establish connection");
-            }
-        }
     }
 
     private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, HierarchyContainer directoryContainer) throws SftpException {

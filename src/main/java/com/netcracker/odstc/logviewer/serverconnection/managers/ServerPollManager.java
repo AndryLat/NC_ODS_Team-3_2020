@@ -48,7 +48,7 @@ public class ServerPollManager {
                     logs.addAll(future.getValue().get());
                 } catch (InterruptedException e) {
                     future.getKey().getServer().setCanConnect(false);
-                    Thread.currentThread().interrupt();// Под сомнением
+                    Thread.currentThread().interrupt();// Suspicious
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
                     future.getKey().getServer().setCanConnect(false);

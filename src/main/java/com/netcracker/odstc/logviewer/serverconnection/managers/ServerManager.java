@@ -58,57 +58,6 @@ public class ServerManager implements DAOChangeListener {
         startRunnables();
     }
 
-    private void startRunnables() {
-        //TODO: Remove from this place or not?
-        Config configInstance = containerDAO.getObjectById(BigInteger.ZERO, Config.class);
-        Config.setInstance(configInstance);
-
-        logger.info("Starting Polling runnable");
-        executorService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
-        logger.info("Polling runnable started");
-        logger.info("Starting activity check runnable");
-        executorService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
-        logger.info("Activity check runnable started");
-    }
-
-    public void getLogsFromAllServers() {
-        savePollResults();
-
-        updateActiveServersFromDB();
-
-        startPoll();
-    }
-
-    public void revalidateServers() {
-        List<HierarchyContainer> servers = containerDAO.getNonactiveServers();
-        List<Server> serversToSave = new ArrayList<>();
-        for (HierarchyContainer serverContainer : servers) {
-            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
-            if (serverConnection == null) continue;
-            serverConnection.connect();
-            serverConnection.disconnect();
-            serversToSave.add(serverConnection.getServer());
-        }
-        containerDAO.saveObjects(serversToSave);
-        revalidateActiveServersDirectories();
-    }
-
-    private void revalidateActiveServersDirectories() {
-        List<HierarchyContainer> servers = containerDAO.getActiveServersWithNonactiveDirectories();
-        List<Directory> directories = new ArrayList<>();
-
-        for (HierarchyContainer serverContainer : servers) {
-            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
-            if (serverConnection == null) continue;
-            serverConnection.setDirectories(serverContainer.getChildren());
-            serverConnection.revalidateDirectories();
-            for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
-                directories.add((Directory) directoryContainer.getOriginal());
-            }
-        }
-        containerDAO.saveObjects(directories);
-    }
-
     @Override
     public void objectChanged(ObjectChangeEvent objectChangeEvent) {
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
@@ -128,21 +77,69 @@ public class ServerManager implements DAOChangeListener {
         }
     }
 
+    private void startRunnables() {
+        Config configInstance = containerDAO.getObjectById(BigInteger.ZERO, Config.class);
+        Config.setInstance(configInstance);
+
+        logger.info("Starting Polling runnable");
+        executorService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.info("Polling runnable started");
+        logger.info("Starting activity check runnable");
+        executorService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
+        logger.info("Activity check runnable started");
+    }
+
+    private void getLogsFromAllServers() {
+        savePollResults();
+        updateActiveServersFromDB();
+        startPoll();
+    }
+
+    private void revalidateServers() {
+        List<HierarchyContainer> servers = containerDAO.getNonactiveServers();
+        List<Server> serversToSave = new ArrayList<>();
+        for (HierarchyContainer serverContainer : servers) {
+            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
+            if (serverConnection == null) continue;
+            serverConnection.connect();
+            serverConnection.disconnect();
+            serversToSave.add(serverConnection.getServer());
+        }
+        containerDAO.saveObjectsAttributesReferences(serversToSave);
+        revalidateActiveServersDirectories();
+    }
+
+    private void revalidateActiveServersDirectories() {
+        List<HierarchyContainer> servers = containerDAO.getActiveServersWithNonactiveDirectories();
+        List<Directory> directories = new ArrayList<>();
+
+        for (HierarchyContainer serverContainer : servers) {
+            ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
+            if (serverConnection == null) continue;
+            serverConnection.setDirectories(serverContainer.getChildren());
+            serverConnection.revalidateDirectories();
+            for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
+                directories.add((Directory) directoryContainer.getOriginal());
+            }
+        }
+        containerDAO.saveObjectsAttributesReferences(directories);
+    }
+
     private void directoryChanged(ObjectChangeEvent objectChangeEvent) {
         Directory directory = (Directory) objectChangeEvent.getObject();
+        if (!serverConnections.containsKey(directory.getParentId()))
+            return;
         ServerConnection serverConnection = serverConnections.get(directory.getParentId());
-        if (!directory.isEnabled()) {
-            serverConnection.removeDirectory(directory);
-        } else {
+        if (directory.isEnabled()) {
             serverConnection.updateDirectory(directory);
         }
     }
 
     private void serverChanged(ObjectChangeEvent objectChangeEvent) {
         Server server = (Server) objectChangeEvent.getObject();
-        if (!server.isEnabled()) {
+        if (!server.isEnabled() && serverConnections.containsKey(server.getObjectId())) {
             serverConnections.remove(server.getObjectId());
-        } else {
+        } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
             if (serverConnection != null)
                 serverConnection.setServer(server);
@@ -163,7 +160,8 @@ public class ServerManager implements DAOChangeListener {
 
     private void updateActiveServersFromDB() {
         List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
-        logger.info("Active Servers: {}", serverContainers.size());
+        logger.info("Active Servers in DB: {}", serverContainers.size());
+        logger.info("Active Servers in Poll: {}", serverConnections.size());
         for (HierarchyContainer serverContainer : serverContainers) {
             Server server = (Server) serverContainer.getOriginal();
             if (serverConnections.containsKey(server.getObjectId())) {
@@ -183,8 +181,10 @@ public class ServerManager implements DAOChangeListener {
         List<Server> servers = new ArrayList<>(serverConnections.size());
         List<Directory> directories = new ArrayList<>();
         List<LogFile> logFiles = new ArrayList<>();
-        for (ServerConnection serverConnection : serverConnections.values()) {
+        for (Iterator<ServerConnection> iterator = serverConnections.values().iterator(); iterator.hasNext(); ) {
+            ServerConnection serverConnection = iterator.next();
             if (iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId())) {
+                iterator.remove();
                 continue;
             }
             servers.add(serverConnection.getServer());
@@ -194,7 +194,7 @@ public class ServerManager implements DAOChangeListener {
                 }
                 directories.add((Directory) directoryContainer.getOriginal());
                 for (HierarchyContainer logFileContainer : directoryContainer.getChildren()) {
-                    if (!iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
+                    if (iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
                         continue;
                     }
                     logFiles.add((LogFile) logFileContainer.getOriginal());

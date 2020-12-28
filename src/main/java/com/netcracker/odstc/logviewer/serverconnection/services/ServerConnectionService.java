@@ -80,8 +80,8 @@ public class ServerConnectionService {
         boolean isServerAvailable = false;
         try {
             isServerAvailable = serverConnection.connect();
-        }catch (ServerConnectionException e){
-            logger.error("Error with check connection",e);
+        } catch (ServerConnectionException e) {
+            logger.error("Error with check connection", e);
         }
         if (isServerAvailable) {
             serverConnection.disconnect();
@@ -95,11 +95,11 @@ public class ServerConnectionService {
         boolean isServerAvailable = false;
         try {
             isServerAvailable = serverConnection.connect();
-            if(isServerAvailable) {
+            if (isServerAvailable) {
                 isDirectoryAvailable = serverConnection.isDirectoryValid(directory);
             }
-        }catch (ServerConnectionException e){
-            logger.error("Error with check connection",e);
+        } catch (ServerConnectionException e) {
+            logger.error("Error with check connection", e);
         }
         if (isServerAvailable) {
             serverConnection.disconnect();
