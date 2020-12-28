@@ -114,11 +114,13 @@ public class EAVObjectDAO {
         EAVObject eavObject = createEAVObject(objectId, clazz);
         try{
             EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
-            eavObject.setName(columns.getName());
-            eavObject.setParentId(columns.getParentId());
-            eavObject.setObjectTypeId(columns.getObjectTypeId());
-            eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
-            eavObject.setReferences(getReference(objectId));
+            if (columns != null) {
+                eavObject.setName(columns.getName());
+                eavObject.setParentId(columns.getParentId());
+                eavObject.setObjectTypeId(columns.getObjectTypeId());
+                eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
+                eavObject.setReferences(getReference(objectId));
+            }
         }catch (EAVAttributeException e){
             logger.error("Object id cant be find in DataBase or its corrupted by object type id", e);
         }
