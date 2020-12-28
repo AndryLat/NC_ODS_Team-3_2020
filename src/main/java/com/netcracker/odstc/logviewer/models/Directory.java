@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.models.exceptions.IllegalDirectoryStateException;
 
 import java.math.BigInteger;
@@ -11,7 +12,7 @@ public class Directory extends EAVObject {
 
     public Directory() {
         super();
-        setObjectTypeId(BigInteger.valueOf(3));
+        setObjectTypeId(ObjectTypes.DIRECTORY.getObjectTypeID());
     }
 
     public Directory(BigInteger id) {
@@ -54,7 +55,7 @@ public class Directory extends EAVObject {
             setAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(10));
     }
 
-    public boolean isCanConnect() {
+    public boolean isConnectable() {
         switch (getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId()).intValue()) {
             case 11:
                 return true;

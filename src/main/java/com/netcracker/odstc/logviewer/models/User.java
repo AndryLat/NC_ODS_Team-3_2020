@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.lists.Role;
 
@@ -11,12 +12,12 @@ public class User extends EAVObject {
 
     public User() {
         super();
-        setObjectTypeId(BigInteger.ONE);
+        setObjectTypeId(ObjectTypes.USER.getObjectTypeID());
     }
 
     public User(BigInteger id) {
         super(id);
-        setObjectTypeId(BigInteger.ONE);
+        setObjectTypeId(ObjectTypes.USER.getObjectTypeID());
     }
 
     public User(String email, String login, String password, Role role, BigInteger created) {

@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 
 import java.math.BigInteger;
@@ -11,7 +12,7 @@ public class Log extends EAVObject {
 
     public Log() {
         super();
-        setObjectTypeId(BigInteger.valueOf(5));
+        setObjectTypeId(ObjectTypes.LOG.getObjectTypeID());
     }
 
     public Log(BigInteger id) {

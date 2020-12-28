@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.models;
 
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -16,7 +17,7 @@ public class Config extends EAVObject {
 
     public Config(BigInteger objectId) {
         super(objectId);
-        setObjectTypeId(BigInteger.valueOf(6));
+        setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 
     public static Config getInstance() {
