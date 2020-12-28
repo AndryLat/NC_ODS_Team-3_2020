@@ -19,7 +19,7 @@ import java.util.List;
 
 public class FTPServerConnection extends AbstractServerConnection {
     private final Logger logger = LogManager.getLogger(FTPServerConnection.class.getName());
-    private FTPClient ftpClient;
+    private final FTPClient ftpClient;
 
     public FTPServerConnection(Server server) {
         super(server);

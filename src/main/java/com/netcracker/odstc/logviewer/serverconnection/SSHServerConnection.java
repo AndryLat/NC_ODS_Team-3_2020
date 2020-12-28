@@ -90,7 +90,6 @@ public class SSHServerConnection extends AbstractServerConnection {
         } catch (SftpException e) {
             throw new ServerConnectionException("Error in polling time", e);
         }
-        directories.clear();
         return result;
     }
 

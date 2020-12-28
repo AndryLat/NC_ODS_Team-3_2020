@@ -5,6 +5,7 @@ import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,8 +23,15 @@ public class ServerPollManager {
 
     private final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
+    private final Map<BigInteger,ServerConnection> finishedServers;
+
     private ServerPollManager() {
         serverConnectionsResults = new HashMap<>();
+        finishedServers = new HashMap<>();
+    }
+
+    public Map<BigInteger, ServerConnection> getFinishedServers() {
+        return finishedServers;
     }
 
     public static ServerPollManager getInstance() {
@@ -48,12 +56,13 @@ public class ServerPollManager {
                     logs.addAll(future.getValue().get());
                 } catch (InterruptedException e) {
                     future.getKey().getServer().setCanConnect(false);
-                    Thread.currentThread().interrupt();// Suspicious
+                    Thread.currentThread().interrupt();
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
                     future.getKey().getServer().setCanConnect(false);
                     logger.error("Thread execution error ", e);
                 }
+                finishedServers.put(future.getKey().getServer().getObjectId(),future.getKey());
                 resultIterator.remove();
             }
         }
