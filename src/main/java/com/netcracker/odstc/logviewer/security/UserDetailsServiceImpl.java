@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-
     private UserDao userDao;
 
     @Autowired
@@ -24,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        User user = userDao.getByName(name);
+        User user = userDao.getByLogin(name);
         if (user == null) {
             throw new UsernameNotFoundException("User with login:" + name + " was not found.");
         }

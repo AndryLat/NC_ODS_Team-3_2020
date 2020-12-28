@@ -5,10 +5,14 @@ import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.models.lists.Role;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigInteger;
 
 public class User extends EAVObject {
+
+    private final Logger logger = LogManager.getLogger(User.class.getName());
 
     public User() {
         super();
@@ -33,6 +37,7 @@ public class User extends EAVObject {
         try {
             return getAttributeValue(Attributes.EMAIL_OT_USER.getAttrId());
         } catch (EAVAttributeException exp) {
+            logger.error("Accessing non existing reference email", exp);
             return null;
         }
     }
@@ -69,6 +74,7 @@ public class User extends EAVObject {
         try {
             return getReference(Attributes.CREATED_OT_USER.getAttrId());
         } catch (EAVAttributeException exp) {
+            logger.error("Accessing non existing reference created", exp);
             return null;
         }
     }

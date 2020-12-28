@@ -9,8 +9,8 @@ import java.sql.SQLException;
 public class UserMapper implements RowMapper<User> {
 
     @Override
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        User user = new User(rs.getBigDecimal("object_id").toBigInteger());
+    public User mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+        User user = new User(resultSet.getBigDecimal("object_id").toBigInteger());
         return user;
     }
 }

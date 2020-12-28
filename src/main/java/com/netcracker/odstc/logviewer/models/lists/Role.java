@@ -11,9 +11,9 @@ public enum Role {
     }
 
     public static Role getByID(int id) {
-        for (Role r : values()) {
-            if (r.value == id) {
-                return r;
+        for (Role role : values()) {
+            if (role.value == id) {
+                return role;
             }
         }
         throw new IllegalArgumentException(String.valueOf(id));

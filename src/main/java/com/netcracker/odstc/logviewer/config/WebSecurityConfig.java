@@ -18,9 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String LOGIN_ENDPOINT = "/login";
+    private static final String USER_RESET_ENDPOINT = "/user/resetPassword**";
+    private static final String USER_CHANGE_PASSWORD_ENDPOINT = "/user/changePassword**";
     private static final String ADMIN_ENDPOINT = "/user/*";
 
-    UserDetailsServiceImpl userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
@@ -42,8 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
+                .antMatchers(LOGIN_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT).permitAll()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
-                .antMatchers(LOGIN_ENDPOINT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))

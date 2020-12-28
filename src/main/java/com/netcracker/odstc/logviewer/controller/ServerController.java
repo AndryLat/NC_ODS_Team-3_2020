@@ -41,7 +41,7 @@ public class ServerController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Server>> allServer(Principal principal){
-        User user = userService.findByName(principal.getName());
+        User user = userService.findByLogin(principal.getName());
         List<Server> listServer= eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
         return ResponseEntity.ok(listServer);
     }

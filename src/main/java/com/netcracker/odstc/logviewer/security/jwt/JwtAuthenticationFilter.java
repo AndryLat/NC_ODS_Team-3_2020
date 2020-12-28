@@ -45,8 +45,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     )
             );
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.error("Failed attempt Authentication:", e);
+            throw new RuntimeException("Failed attempt Authentication:", e);
         }
     }
 
@@ -56,7 +56,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        String roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
+        String roleUser;
+        try {
+            roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
+        } catch (Exception exp) {
+            logger.error("User authorities authentication error:", exp);
+            throw new RuntimeException("User authorities authentication error:", exp);
+        }
+
 
         String token = JWT.create()
                 .withSubject(((JwtUser) authResult.getPrincipal()).getUsername())
