@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HierarchyContainer {//What if we extract interfaces from models, make this container implement them and this will be like decorator pattern
+public class HierarchyContainer {
     private EAVObject original;
     private HierarchyContainer parent;
     private List<HierarchyContainer> children;
@@ -18,19 +18,6 @@ public class HierarchyContainer {//What if we extract interfaces from models, ma
 
     public HierarchyContainer() {
         children = new ArrayList<>();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HierarchyContainer that = (HierarchyContainer) o;
-        return Objects.equals(original.getObjectId(), that.original.getObjectId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(original.getObjectId());
     }
 
     public void addChildren(HierarchyContainer eavObject) {
@@ -60,4 +47,18 @@ public class HierarchyContainer {//What if we extract interfaces from models, ma
     public void setChildren(List<HierarchyContainer> children) {
         this.children = children;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HierarchyContainer that = (HierarchyContainer) o;
+        return Objects.equals(original.getObjectId(), that.original.getObjectId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(original.getObjectId());
+    }
+
 }

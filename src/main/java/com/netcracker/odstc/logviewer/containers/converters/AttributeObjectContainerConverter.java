@@ -6,6 +6,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -13,9 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class AOCConverter {
+public class AttributeObjectContainerConverter {
 
-    public Map<BigInteger, HierarchyContainer> convertAOCtoHC(List<AttributeObjectContainer> attributeObjectContainerList) {
+    public Map<BigInteger, HierarchyContainer> convertAttributeObjectContainerToHierarchyContainer(List<AttributeObjectContainer> attributeObjectContainerList) {
 
         Map<BigInteger, HierarchyContainer> eavObjectList = new HashMap<>(attributeObjectContainerList.size());
         for (AttributeObjectContainer attributeObjectContainer : attributeObjectContainerList) {
@@ -28,14 +29,14 @@ public class AOCConverter {
             BigInteger objectTypeId = attributeObjectContainer.getObjectTypeId();
 
             EAVObject eavObject;
-            if (objectTypeId.equals(BigInteger.valueOf(3))) {
+            if (objectTypeId.equals(ObjectTypes.DIRECTORY.getObjectTypeID())) {
                 eavObject = new Directory();
-            } else if (objectTypeId.equals(BigInteger.valueOf(4))) {
+            } else if (objectTypeId.equals(ObjectTypes.LOGFILE.getObjectTypeID())) {
                 eavObject = new LogFile();
-            } else if (objectTypeId.equals(BigInteger.valueOf(2))) {
+            } else if (objectTypeId.equals(ObjectTypes.SERVER.getObjectTypeID())) {
                 eavObject = new Server();
             } else {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Object class invalid for containing hierarchy.");
             }
             eavObject.setParentId(attributeObjectContainer.getParentId());
 
@@ -70,8 +71,9 @@ public class AOCConverter {
     }
 
     private void appendAttribute(AttributeObjectContainer attributeObjectContainer, EAVObject eavObject) {
-        eavObject.setAttributeValue(attributeObjectContainer.getAttrId(), attributeObjectContainer.getValue());
-        eavObject.setAttributeDateValue(attributeObjectContainer.getAttrId(), attributeObjectContainer.getDateValue());
-        eavObject.setAttributeListValueId(attributeObjectContainer.getAttrId(), attributeObjectContainer.getListValueId());
+        BigInteger attrId = attributeObjectContainer.getAttrId();
+        eavObject.setAttributeValue(attrId, attributeObjectContainer.getValue());
+        eavObject.setAttributeDateValue(attrId, attributeObjectContainer.getDateValue());
+        eavObject.setAttributeListValueId(attrId, attributeObjectContainer.getListValueId());
     }
 }

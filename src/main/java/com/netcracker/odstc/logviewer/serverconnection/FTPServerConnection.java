@@ -30,7 +30,7 @@ public class FTPServerConnection extends AbstractServerConnection {
     public boolean connect() {
         logger.debug("Making connection to {}", server.getName());
         try {
-            ftpClient.setConnectTimeout(500);
+            ftpClient.setConnectTimeout(CONNECT_TIMEOUT);
             ftpClient.connect(server.getIp(), server.getPort());
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -77,7 +77,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         try {
             for (int i = 0; i < directories.size(); i++) {
                 HierarchyContainer directory = directories.get(i);
-                result.addAll(tryExtractLogsFromDirectory(directory));
+                result.addAll(extractLogsFromDirectory(directory));
                 ftpClient.changeToParentDirectory();
             }
         } catch (IOException e) {
@@ -89,12 +89,12 @@ public class FTPServerConnection extends AbstractServerConnection {
     protected void validateConnection() {
         if (!isConnected) {
             if (!connect()) {//I cant merge this one with enclosing one, because i dont need to connect() every time
-                throw new ServerConnectionException("Cant establish connection");
+                throw new ServerConnectionException("Cant establish connection with " + server.getIp());
             }
         }
     }
 
-    private List<Log> tryExtractLogsFromDirectory(HierarchyContainer directoryContainer) {
+    private List<Log> extractLogsFromDirectory(HierarchyContainer directoryContainer) {
         if (directories.isEmpty()) {
             throw new ServerConnectionException("Server have empty list of active directories. Mark as cant be connected.");
         }
@@ -106,9 +106,9 @@ public class FTPServerConnection extends AbstractServerConnection {
                 directory.setCanConnect(false);
                 return result;
             }
-            for (int j = 0; j < directoryContainer.getChildren().size(); j++) {
-                LogFile logFile = (LogFile) directoryContainer.getChildren().get(j).getOriginal();
-                result.addAll(tryExtractLogsFromFile(logFile));
+            for (int i = 0; i < directoryContainer.getChildren().size(); i++) {
+                LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
+                result.addAll(extractLogsFromFile(logFile));
             }
         } catch (IOException e) {
             logger.error("Marking directory as unavailable", e);
@@ -118,13 +118,14 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private List<Log> tryExtractLogsFromFile(LogFile logFile) {
+    private List<Log> extractLogsFromFile(LogFile logFile) {
         logFile.setLastUpdate(new Date());
         List<Log> result = new ArrayList<>();
         try {
-            InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName());
-            result.addAll(extractLogsFromStream(inputStream, logFile));
-            ftpClient.completePendingCommand();
+            try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
+                result.addAll(extractLogsFromStream(inputStream, logFile));
+                ftpClient.completePendingCommand();
+            }
         } catch (IOException e) {
             logger.error("Error with reading file from", e);//TODO: Сделать Error - record
         }

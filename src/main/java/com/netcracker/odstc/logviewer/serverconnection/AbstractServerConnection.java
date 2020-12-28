@@ -6,11 +6,11 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +20,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 abstract class AbstractServerConnection implements ServerConnection {
+    protected static final int CONNECT_TIMEOUT = 500;
     private final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
@@ -108,47 +109,52 @@ abstract class AbstractServerConnection implements ServerConnection {
 
     protected List<Log> extractLogsFromStream(InputStream inputStream, LogFile logFile) {
         List<Log> result = new ArrayList<>();
-        Scanner scanner = new Scanner(inputStream);
+        try (Scanner scanner = new Scanner(inputStream)) {
 
-        int count = logFile.getLastRow();
-        int localCount = 0;
-        Log lastLog = null;
-        while (scanner.hasNextLine()) {
-            if (localCount < count) {
-                scanner.nextLine();
-            } else {
-                String line = scanner.nextLine();
+            int count = logFile.getLastRow();
+            int localCount = 0;
+            Log lastLog = null;
+            while (scanner.hasNextLine()) {
+                if (localCount < count) {
+                    scanner.nextLine();
+                } else {
+                    String line = scanner.nextLine();
 
-                Matcher matcher = serverConnectionService.getLogMatcher(line);
+                    Log log = convertLineToLog(logFile, lastLog, line);
+                    if (log == null) continue;
 
-                boolean isLogEntry = matcher != null;
-                if (!isLogEntry) {
-                    if (lastLog != null) {
-                        lastLog.setText(lastLog.getText() + "\n" + line);
-                    }
-                    continue;
+                    lastLog = log;
+                    result.add(log);
+                    count++;
                 }
-
-                Log log = new Log(line,
-                        serverConnectionService.formatLogLevel(matcher.group(2)),
-                        serverConnectionService.formatDate(matcher.group(1)),
-                        logFile.getObjectId());
-
-
-                lastLog = log;
-                result.add(log);
-                count++;
+                localCount++;
             }
-            localCount++;
+            logFile.setLastRow(count);
         }
-        logFile.setLastRow(count);
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-        scanner.close();
         return result;
+    }
+
+    private Log convertLineToLog(LogFile logFile, Log lastLog, String line) {
+        Matcher matcher = checkMatcher(lastLog, line);
+        if (matcher == null) return null;
+
+        LogLevel logLevel = serverConnectionService.formatLogLevel(matcher.group(2));
+        Date creationDate = serverConnectionService.formatDate(matcher.group(1));
+
+        return new Log(line, logLevel, creationDate, logFile.getObjectId());
+    }
+
+    private Matcher checkMatcher(Log lastLog, String line) {
+        Matcher matcher = serverConnectionService.getLogMatcher(line);
+
+        boolean isLogEntry = matcher != null;
+        if (!isLogEntry) {
+            if (lastLog != null) {
+                lastLog.setText(lastLog.getText() + "\n" + line);
+            }
+            return null;
+        }
+        return matcher;
     }
 
     protected abstract void validateConnection();

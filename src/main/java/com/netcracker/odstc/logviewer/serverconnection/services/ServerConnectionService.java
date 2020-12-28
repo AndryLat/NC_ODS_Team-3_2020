@@ -14,25 +14,18 @@ import org.apache.logging.log4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServerConnectionService {
-    private static final String[] SEARCH_PATTERNS = new String[]{
-            "(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$"//TODO: Add second pattern
+    private static final Pattern[] SEARCH_PATTERNS = new Pattern[]{
+            Pattern.compile("(\\d+\\.\\d+\\.\\d{4}\\s\\d+:\\d+:\\d+\\.\\d+)\\s([A-Z]+)?.*$")
     };
     private static ServerConnectionService instance;
     private final Logger logger = LogManager.getLogger(ServerConnectionService.class.getName());
-    protected List<Pattern> logSearchPatterns; // For various patterns
 
     private ServerConnectionService() {
-        logSearchPatterns = new ArrayList<>();
-        for (String pattern : SEARCH_PATTERNS) {
-            logSearchPatterns.add(Pattern.compile(pattern));
-        }
     }
 
     public static ServerConnectionService getInstance() {
@@ -66,7 +59,7 @@ public class ServerConnectionService {
     public Matcher getLogMatcher(String line) {
         Matcher matcher;
         for (Pattern pattern :
-                logSearchPatterns) {
+                SEARCH_PATTERNS) {
             matcher = pattern.matcher(line);
             if (matcher.find()) {
                 return matcher;

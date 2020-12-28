@@ -16,9 +16,7 @@ public class AttributeObjectMapper implements RowMapper<AttributeObjectContainer
         attributeObjectContainer.setObjectTypeId(resultSet.getBigDecimal("OBJECT_TYPE_ID").toBigInteger());
 
         Object parent = resultSet.getObject("PARENT_ID");
-        if (parent == null) {
-            attributeObjectContainer.setParentId(null);
-        } else {
+        if (parent != null) {
             attributeObjectContainer.setParentId(resultSet.getBigDecimal("PARENT_ID").toBigInteger());
         }
 

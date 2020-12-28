@@ -16,6 +16,15 @@ public enum ObjectTypes {
         objectTypeID = valueArg;
     }
 
+    public static ObjectTypes getObjectTypesByObjectTypeId(BigInteger objectTypeID) {
+        for (ObjectTypes objectType : values()) {
+            if (objectType.objectTypeID == objectTypeID) {
+                return objectType;
+            }
+        }
+        throw new IllegalArgumentException("ObjectTypes do not contain value with id: " + String.valueOf(objectTypeID));
+    }
+
     public BigInteger getObjectTypeID() {
         return objectTypeID;
     }

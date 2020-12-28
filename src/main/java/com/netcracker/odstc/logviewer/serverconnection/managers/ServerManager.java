@@ -7,6 +7,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOChangeListener;
@@ -34,7 +35,7 @@ public class ServerManager implements DAOChangeListener {
 
     private final ContainerDAO containerDAO;
 
-    private final Map<BigInteger, List<BigInteger>> iterationRemove;
+    private final Map<ObjectTypes, List<BigInteger>> iterationRemove;
     private final Map<BigInteger, ServerConnection> serverConnections;
 
     private final ServerPollManager serverPollManager;
@@ -42,7 +43,8 @@ public class ServerManager implements DAOChangeListener {
 
     private final ScheduledExecutorService executorService;
 
-    @SuppressWarnings({"squid:S1144"})//Suppress unused private constructor: Spring will use this constructor, even if it private
+    @SuppressWarnings({"squid:S1144"})
+//Suppress unused private constructor: Spring will use this constructor, even if it private
     private ServerManager(ContainerDAO containerDAO) {
         executorService = Executors.newSingleThreadScheduledExecutor();
         serverConnectionService = ServerConnectionService.getInstance();
@@ -53,9 +55,9 @@ public class ServerManager implements DAOChangeListener {
         this.containerDAO = containerDAO;
         iterationRemove = new HashMap<>();
 
-        iterationRemove.put(BigInteger.valueOf(2), new ArrayList<>());
-        iterationRemove.put(BigInteger.valueOf(3), new ArrayList<>());
-        iterationRemove.put(BigInteger.valueOf(4), new ArrayList<>());
+        iterationRemove.put(ObjectTypes.SERVER, new ArrayList<>());
+        iterationRemove.put(ObjectTypes.DIRECTORY, new ArrayList<>());
+        iterationRemove.put(ObjectTypes.LOGFILE, new ArrayList<>());
 
         startRunnables();
     }
@@ -67,7 +69,7 @@ public class ServerManager implements DAOChangeListener {
             if (objectTypeId.equals(BigInteger.valueOf(1)) || objectTypeId.equals(BigInteger.valueOf(5)))
                 return;
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
-            iterationRemove.get(objectTypeId).add(objectId);
+            iterationRemove.get(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId)).add(objectId);
         }
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
             if (Server.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
@@ -106,7 +108,7 @@ public class ServerManager implements DAOChangeListener {
             try {
                 serverConnection.connect();
                 serverConnection.disconnect();
-            }catch (ServerConnectionException e){
+            } catch (ServerConnectionException e) {
                 logger.error(e);
             }
             serversToSave.add(serverConnection.getServer());
@@ -181,19 +183,19 @@ public class ServerManager implements DAOChangeListener {
     private void excludeRemoved() {
         for (Iterator<ServerConnection> iterator = serverPollManager.getFinishedServers().values().iterator(); iterator.hasNext(); ) {
             ServerConnection serverConnection = iterator.next();
-            if (iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId())) {
+            if (iterationRemove.get(ObjectTypes.SERVER).contains(serverConnection.getServer().getObjectId())) {
                 iterator.remove();
                 continue;
             }
             for (Iterator<HierarchyContainer> iter = serverConnection.getDirectories().iterator(); iter.hasNext(); ) {
                 HierarchyContainer directoryContainer = iter.next();
-                if (iterationRemove.get(BigInteger.valueOf(3)).contains(directoryContainer.getOriginal().getObjectId())) {
+                if (iterationRemove.get(ObjectTypes.DIRECTORY).contains(directoryContainer.getOriginal().getObjectId())) {
                     iter.remove();
                     continue;
                 }
                 for (Iterator<HierarchyContainer> it = directoryContainer.getChildren().iterator(); it.hasNext(); ) {
                     HierarchyContainer logFileContainer = it.next();
-                    if (iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
+                    if (iterationRemove.get(ObjectTypes.LOGFILE).contains(logFileContainer.getOriginal().getObjectId())) {
                         it.remove();
                     }
                 }
@@ -235,8 +237,8 @@ public class ServerManager implements DAOChangeListener {
     }
 
     private void clearIterationInfo() {
-        iterationRemove.get(BigInteger.valueOf(2)).clear();
-        iterationRemove.get(BigInteger.valueOf(3)).clear();
-        iterationRemove.get(BigInteger.valueOf(4)).clear();
+        iterationRemove.get(ObjectTypes.SERVER).clear();
+        iterationRemove.get(ObjectTypes.DIRECTORY).clear();
+        iterationRemove.get(ObjectTypes.LOGFILE).clear();
     }
 }

@@ -15,6 +15,7 @@ import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnecti
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,7 +42,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             session = jSchClient.getSession(server.getLogin(), server.getIp(), server.getPort());
             session.setPassword(server.getPassword());
-            session.setTimeout(500);
+            session.setTimeout(CONNECT_TIMEOUT);
             session.connect();
             server.setCanConnect(session.isConnected());
         } catch (JSchException e) {
@@ -84,7 +85,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             ChannelSftp channelSftp = getChannelSftp();
             for (int i = 0; i < directories.size(); i++) {
                 HierarchyContainer directory = directories.get(i);
-                result.addAll(tryExtractLogsFromDirectory(channelSftp, directory));
+                result.addAll(extractLogsFromDirectory(channelSftp, directory));
             }
             channelSftp.disconnect();
         } catch (SftpException e) {
@@ -96,7 +97,7 @@ public class SSHServerConnection extends AbstractServerConnection {
     protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
         if ((!isConnected || session == null)) {
             if (!connect()) {
-                throw new ServerConnectionException("Cant establish connection");
+                throw new ServerConnectionException("Cant establish connection with " + server.getIp());
             }
         }
     }
@@ -114,15 +115,15 @@ public class SSHServerConnection extends AbstractServerConnection {
         return channelSftp;
     }
 
-    private List<Log> tryExtractLogsFromDirectory(ChannelSftp channelSftp, HierarchyContainer directoryContainer) throws SftpException {
+    private List<Log> extractLogsFromDirectory(ChannelSftp channelSftp, HierarchyContainer directoryContainer) throws SftpException {
         Directory directory = (Directory) directoryContainer.getOriginal();
         List<Log> result = new ArrayList<>();
         directory.setLastExistenceCheck(new Date());
         try {
             channelSftp.cd("/" + directory.getPath());
-            for (int j = 0; j < directoryContainer.getChildren().size(); j++) {
-                LogFile logFile = (LogFile) directoryContainer.getChildren().get(j).getOriginal();
-                result.addAll(tryExtractLogsFromFile(channelSftp, logFile));
+            for (int i = 0; i < directoryContainer.getChildren().size(); i++) {
+                LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
+                result.addAll(extractLogsFromFile(channelSftp, logFile));
             }
         } catch (SftpException e) {
             logger.info("Mark directory {} as unavailable", directory.getName(), e);
@@ -132,13 +133,14 @@ public class SSHServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    private List<Log> tryExtractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
+    private List<Log> extractLogsFromFile(ChannelSftp channelSftp, LogFile logFile) {
         logFile.setLastUpdate(new Date());
         List<Log> result = new ArrayList<>();
         try {
-            InputStream inputStream = channelSftp.get(logFile.getName());
-            result.addAll(extractLogsFromStream(inputStream, logFile));
-        } catch (SftpException e) {
+            try (InputStream inputStream = channelSftp.get(logFile.getName())) {
+                result.addAll(extractLogsFromStream(inputStream, logFile));
+            }
+        } catch (SftpException | IOException e) {
             logger.error("Error with reading file", e);
         }
         return result;

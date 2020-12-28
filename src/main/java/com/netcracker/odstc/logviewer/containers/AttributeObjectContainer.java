@@ -77,5 +77,4 @@ public class AttributeObjectContainer {
     public void setListValueId(BigInteger listValueId) {
         this.listValueId = listValueId;
     }
-    // Can be added: getEAVObject getAttribute
 }

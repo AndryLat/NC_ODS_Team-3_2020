@@ -23,15 +23,11 @@ public class ServerPollManager {
 
     private final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
-    private final Map<BigInteger,ServerConnection> finishedServers;
+    private final Map<BigInteger, ServerConnection> finishedServers;
 
     private ServerPollManager() {
         serverConnectionsResults = new HashMap<>();
         finishedServers = new HashMap<>();
-    }
-
-    public Map<BigInteger, ServerConnection> getFinishedServers() {
-        return finishedServers;
     }
 
     public static ServerPollManager getInstance() {
@@ -39,6 +35,10 @@ public class ServerPollManager {
             instance = new ServerPollManager();
         }
         return instance;
+    }
+
+    public Map<BigInteger, ServerConnection> getFinishedServers() {
+        return finishedServers;
     }
 
     public void executeExtractingLogs(ServerConnection serverConnection) {
@@ -62,7 +62,7 @@ public class ServerPollManager {
                     future.getKey().getServer().setCanConnect(false);
                     logger.error("Thread execution error ", e);
                 }
-                finishedServers.put(future.getKey().getServer().getObjectId(),future.getKey());
+                finishedServers.put(future.getKey().getServer().getObjectId(), future.getKey());
                 resultIterator.remove();
             }
         }
