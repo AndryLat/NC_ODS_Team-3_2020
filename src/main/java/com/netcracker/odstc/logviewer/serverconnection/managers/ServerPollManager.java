@@ -21,7 +21,7 @@ public class ServerPollManager {
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     private final ExecutorService service = Executors.newFixedThreadPool(4);
 
-    private final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
+    public final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
 
     private final Map<BigInteger, ServerConnection> finishedServers;
 
@@ -67,5 +67,9 @@ public class ServerPollManager {
             }
         }
         return logs;
+    }
+
+    public boolean isFinished(){
+        return serverConnectionsResults.isEmpty();
     }
 }

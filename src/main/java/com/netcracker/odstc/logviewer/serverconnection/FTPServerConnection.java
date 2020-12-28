@@ -95,9 +95,6 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     private List<Log> extractLogsFromDirectory(HierarchyContainer directoryContainer) {
-        if (directories.isEmpty()) {
-            throw new ServerConnectionException("Server have empty list of active directories. Mark as cant be connected.");
-        }
         List<Log> result = new ArrayList<>();
         Directory directory = (Directory) directoryContainer.getOriginal();
         directory.setLastExistenceCheck(new Date());
@@ -114,7 +111,6 @@ public class FTPServerConnection extends AbstractServerConnection {
             logger.error("Marking directory as unavailable", e);
             directory.setConnectable(false);
         }
-        directories.clear();
         return result;
     }
 
