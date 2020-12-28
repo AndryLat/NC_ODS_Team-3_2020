@@ -119,7 +119,7 @@ abstract class AbstractServerConnection implements ServerConnection {
             } else {
                 String line = scanner.nextLine();
 
-                Matcher matcher = serverConnectionService.getLogMatcher(line);//TODO: Запоминать если логер подошел
+                Matcher matcher = serverConnectionService.getLogMatcher(line);
 
                 boolean isLogEntry = matcher != null;
                 if (!isLogEntry) {

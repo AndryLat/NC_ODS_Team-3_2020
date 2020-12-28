@@ -8,6 +8,7 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
+import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOChangeListener;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
@@ -29,8 +30,10 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class ServerManager implements DAOChangeListener {
-    private final ContainerDAO containerDAO;
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
+
+    private final ContainerDAO containerDAO;
+
     private final Map<BigInteger, List<BigInteger>> iterationRemove;
     private final Map<BigInteger, ServerConnection> serverConnections;
 
@@ -39,11 +42,10 @@ public class ServerManager implements DAOChangeListener {
 
     private final ScheduledExecutorService executorService;
 
-    @SuppressWarnings({"squid:S1144"})//Suppress unused private constructor
+    @SuppressWarnings({"squid:S1144"})//Suppress unused private constructor: Spring will use this constructor, even if it private
     private ServerManager(ContainerDAO containerDAO) {
         executorService = Executors.newSingleThreadScheduledExecutor();
         serverConnectionService = ServerConnectionService.getInstance();
-
 
         serverPollManager = ServerPollManager.getInstance();
         DAOPublisher.getInstance().addListener(this);
@@ -101,8 +103,12 @@ public class ServerManager implements DAOChangeListener {
         for (HierarchyContainer serverContainer : servers) {
             ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
             if (serverConnection == null) continue;
-            serverConnection.connect();
-            serverConnection.disconnect();
+            try {
+                serverConnection.connect();
+                serverConnection.disconnect();
+            }catch (ServerConnectionException e){
+                logger.error(e);
+            }
             serversToSave.add(serverConnection.getServer());
         }
         containerDAO.saveObjectsAttributesReferences(serversToSave);
@@ -117,7 +123,11 @@ public class ServerManager implements DAOChangeListener {
             ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
             if (serverConnection == null) continue;
             serverConnection.setDirectories(serverContainer.getChildren());
-            serverConnection.revalidateDirectories();
+            try {
+                serverConnection.revalidateDirectories();
+            } catch (ServerConnectionException e) {
+                logger.error(e);
+            }
             for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
                 directories.add((Directory) directoryContainer.getOriginal());
             }
@@ -146,6 +156,72 @@ public class ServerManager implements DAOChangeListener {
         }
     }
 
+    private void savePollResults() {
+        List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
+        excludeRemoved();
+        List<Server> servers = new ArrayList<>(serverPollManager.getFinishedServers().size());
+        List<Directory> directories = new ArrayList<>();
+        List<LogFile> logFiles = new ArrayList<>();
+        for (ServerConnection serverConnection : serverPollManager.getFinishedServers().values()) {
+            servers.add(serverConnection.getServer());
+            for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
+                directories.add((Directory) directoryContainer.getOriginal());
+                for (HierarchyContainer logFileContainer : directoryContainer.getChildren()) {
+                    logFiles.add((LogFile) logFileContainer.getOriginal());
+                }
+            }
+        }
+        clearIterationInfo();
+        containerDAO.saveObjectsAttributesReferences(result);
+        containerDAO.saveObjectsAttributesReferences(servers);
+        containerDAO.saveObjectsAttributesReferences(directories);
+        containerDAO.saveObjectsAttributesReferences(logFiles);
+    }
+
+    private void excludeRemoved() {
+        for (Iterator<ServerConnection> iterator = serverPollManager.getFinishedServers().values().iterator(); iterator.hasNext(); ) {
+            ServerConnection serverConnection = iterator.next();
+            if (iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId())) {
+                iterator.remove();
+                continue;
+            }
+            for (Iterator<HierarchyContainer> iter = serverConnection.getDirectories().iterator(); iter.hasNext(); ) {
+                HierarchyContainer directoryContainer = iter.next();
+                if (iterationRemove.get(BigInteger.valueOf(3)).contains(directoryContainer.getOriginal().getObjectId())) {
+                    iter.remove();
+                    continue;
+                }
+                for (Iterator<HierarchyContainer> it = directoryContainer.getChildren().iterator(); it.hasNext(); ) {
+                    HierarchyContainer logFileContainer = it.next();
+                    if (iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+        clearIterationInfo();
+    }
+
+    private void updateActiveServersFromDB() {
+        List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
+        logger.info("Active Servers in DB: {}", serverContainers.size());
+        logger.info("Active Servers in Poll: {}", serverConnections.size());
+        for (HierarchyContainer serverContainer : serverContainers) {
+            Server server = (Server) serverContainer.getOriginal();
+            if (serverPollManager.getFinishedServers().containsKey(server.getObjectId())) {
+                serverConnections.get(server.getObjectId()).setServer(server);
+                serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
+            } else {
+                ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
+                if (serverConnection == null) continue;
+                serverConnection.setDirectories(serverContainer.getChildren());
+                serverConnections.put(server.getObjectId(), serverConnection);
+            }
+        }
+        serverPollManager.getFinishedServers().clear();
+    }
+
+
     private void startPoll() {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();
         while (serverConnectionIterator.hasNext()) {
@@ -156,56 +232,6 @@ public class ServerManager implements DAOChangeListener {
                 serverConnectionIterator.remove();
             }
         }
-    }
-
-    private void updateActiveServersFromDB() {
-        List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
-        logger.info("Active Servers in DB: {}", serverContainers.size());
-        logger.info("Active Servers in Poll: {}", serverConnections.size());
-        for (HierarchyContainer serverContainer : serverContainers) {
-            Server server = (Server) serverContainer.getOriginal();
-            if (serverConnections.containsKey(server.getObjectId())) {
-                serverConnections.get(server.getObjectId()).setServer(server);
-                serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
-            } else {
-                ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
-                if (serverConnection == null) continue;
-                serverConnection.setDirectories(serverContainer.getChildren());
-                serverConnections.put(server.getObjectId(), serverConnection);
-            }
-        }
-    }
-
-    private void savePollResults() {
-        List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
-        List<Server> servers = new ArrayList<>(serverConnections.size());
-        List<Directory> directories = new ArrayList<>();
-        List<LogFile> logFiles = new ArrayList<>();
-        for (Iterator<ServerConnection> iterator = serverConnections.values().iterator(); iterator.hasNext(); ) {
-            ServerConnection serverConnection = iterator.next();
-            if (iterationRemove.get(BigInteger.valueOf(2)).contains(serverConnection.getServer().getObjectId())) {
-                iterator.remove();
-                continue;
-            }
-            servers.add(serverConnection.getServer());
-            for (HierarchyContainer directoryContainer : serverConnection.getDirectories()) {
-                if (iterationRemove.get(BigInteger.valueOf(3)).contains(directoryContainer.getOriginal().getObjectId())) {
-                    continue;
-                }
-                directories.add((Directory) directoryContainer.getOriginal());
-                for (HierarchyContainer logFileContainer : directoryContainer.getChildren()) {
-                    if (iterationRemove.get(BigInteger.valueOf(4)).contains(logFileContainer.getOriginal().getObjectId())) {
-                        continue;
-                    }
-                    logFiles.add((LogFile) logFileContainer.getOriginal());
-                }
-            }
-        }
-        clearIterationInfo();
-        containerDAO.saveObjectsAttributesReferences(result);
-        containerDAO.saveObjectsAttributesReferences(servers);
-        containerDAO.saveObjectsAttributesReferences(directories);
-        containerDAO.saveObjectsAttributesReferences(logFiles);
     }
 
     private void clearIterationInfo() {
