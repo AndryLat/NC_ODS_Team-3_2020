@@ -10,7 +10,7 @@ public enum ObjectTypes {
     LOG(BigInteger.valueOf(5)),
     CONFIG(BigInteger.valueOf(6));
 
-    private BigInteger objectTypeID;
+    private final BigInteger objectTypeID;
 
     ObjectTypes(BigInteger valueArg) {
         objectTypeID = valueArg;
@@ -18,11 +18,11 @@ public enum ObjectTypes {
 
     public static ObjectTypes getObjectTypesByObjectTypeId(BigInteger objectTypeID) {
         for (ObjectTypes objectType : values()) {
-            if (objectType.objectTypeID == objectTypeID) {
+            if (objectType.objectTypeID.equals(objectTypeID)) {
                 return objectType;
             }
         }
-        throw new IllegalArgumentException("ObjectTypes do not contain value with id: " + String.valueOf(objectTypeID));
+        throw new IllegalArgumentException("ObjectTypes do not contain value with id: " + objectTypeID);
     }
 
     public BigInteger getObjectTypeID() {

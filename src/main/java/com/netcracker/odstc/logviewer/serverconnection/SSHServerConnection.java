@@ -44,14 +44,14 @@ public class SSHServerConnection extends AbstractServerConnection {
             session.setPassword(server.getPassword());
             session.setTimeout(CONNECT_TIMEOUT);
             session.connect();
-            server.setCanConnect(session.isConnected());
+            server.setConnectable(session.isConnected());
         } catch (JSchException e) {
             logger.error("Error with connection to {}", server.getName(), e);
-            server.setCanConnect(false);
+            server.setConnectable(false);
             throw new ServerConnectionException(e.getMessage(), e);
         }
-        isConnected = server.isCanConnect();
-        return server.isCanConnect();
+        isConnected = server.isConnectable();
+        return server.isConnectable();
     }
 
     @Override
@@ -67,11 +67,11 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             ChannelSftp channelSftp = getChannelSftp();
             if (channelSftp.ls(directory.getPath()).isEmpty()) {
-                directory.setCanConnect(false);
+                directory.setConnectable(false);
             }
             return true;
         } catch (SftpException e) {
-            server.setCanConnect(false);
+            server.setConnectable(false);
             return false;
         }
     }
@@ -127,7 +127,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             }
         } catch (SftpException e) {
             logger.info("Mark directory {} as unavailable", directory.getName(), e);
-            directory.setCanConnect(false);
+            directory.setConnectable(false);
         }
         channelSftp.cd("/");
         return result;

@@ -55,11 +55,11 @@ public class ServerPollManager {
                 try {
                     logs.addAll(future.getValue().get());
                 } catch (InterruptedException e) {
-                    future.getKey().getServer().setCanConnect(false);
+                    future.getKey().getServer().setConnectable(false);
                     Thread.currentThread().interrupt();
                     logger.error("Thread is interrupted ", e);
                 } catch (ExecutionException e) {
-                    future.getKey().getServer().setCanConnect(false);
+                    future.getKey().getServer().setConnectable(false);
                     logger.error("Thread execution error ", e);
                 }
                 finishedServers.put(future.getKey().getServer().getObjectId(), future.getKey());

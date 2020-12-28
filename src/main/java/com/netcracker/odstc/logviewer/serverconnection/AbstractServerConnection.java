@@ -78,7 +78,7 @@ abstract class AbstractServerConnection implements ServerConnection {
         for (HierarchyContainer directoryContainer : directories) {
             Directory directory = (Directory) directoryContainer.getOriginal();
             if (!isDirectoryValid(directory)) {
-                directory.setCanConnect(false);
+                directory.setConnectable(false);
             }
         }
     }

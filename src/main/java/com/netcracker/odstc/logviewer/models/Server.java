@@ -28,7 +28,7 @@ public class Server extends EAVObject {
         setProtocol(protocol);
         setPort(port);
         setEnabled(true);
-        setCanConnect(true);
+        setConnectable(true);
         setLastAccessByUser(new Date());
         setLastAccessByJob(new Date());
     }
@@ -75,9 +75,9 @@ public class Server extends EAVObject {
 
     public boolean isEnabled() {
         switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId()).intValue()) {
-            case 5:
+            case 5: //listValueID for true
                 return true;
-            case 6:
+            case 6: //listValueID for false
                 return false;
             default:
                 throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId())));
@@ -91,18 +91,18 @@ public class Server extends EAVObject {
             setAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId(), BigInteger.valueOf(6));
     }
 
-    public boolean isCanConnect() {
+    public boolean isConnectable() {
         switch (getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_SERVER.getAttrId()).intValue()) {
-            case 7:
+            case 7: //listValueID for true
                 return true;
-            case 8:
+            case 8: //listValueID for false
                 return false;
             default:
                 throw new IllegalServerStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_SERVER.getAttrId())));
         }
     }
 
-    public void setCanConnect(boolean active) {
+    public void setConnectable(boolean active) {
         if (active)
             setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_SERVER.getAttrId(), BigInteger.valueOf(7));
         else

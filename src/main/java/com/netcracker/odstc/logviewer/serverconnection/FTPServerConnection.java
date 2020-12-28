@@ -36,15 +36,15 @@ public class FTPServerConnection extends AbstractServerConnection {
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
                 logger.error("Error with connect into {}", server.getIp());
-                server.setCanConnect(false);
+                server.setConnectable(false);
             }
-            server.setCanConnect(ftpClient.login(server.getLogin(), server.getPassword()));
+            server.setConnectable(ftpClient.login(server.getLogin(), server.getPassword()));
         } catch (IOException e) {
-            server.setCanConnect(false);
+            server.setConnectable(false);
             logger.error("Error with connect into {}", server.getIp(), e);
         }
-        isConnected = server.isCanConnect();
-        return server.isCanConnect();
+        isConnected = server.isConnectable();
+        return server.isConnectable();
     }
 
     @Override
@@ -67,7 +67,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 ftpClient.changeToParentDirectory();
             return isActive;
         } catch (IOException e) {
-            server.setCanConnect(false);
+            server.setConnectable(false);
             return false;
         }
     }
@@ -103,7 +103,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         directory.setLastExistenceCheck(new Date());
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
-                directory.setCanConnect(false);
+                directory.setConnectable(false);
                 return result;
             }
             for (int i = 0; i < directoryContainer.getChildren().size(); i++) {
@@ -112,7 +112,7 @@ public class FTPServerConnection extends AbstractServerConnection {
             }
         } catch (IOException e) {
             logger.error("Marking directory as unavailable", e);
-            directory.setCanConnect(false);
+            directory.setConnectable(false);
         }
         directories.clear();
         return result;

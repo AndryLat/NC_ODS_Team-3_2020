@@ -24,7 +24,7 @@ public class Directory extends EAVObject {
         super();
         setPath(path);
         setEnabled(true);
-        setCanConnect(true);
+        setConnectable(true);
         setLastExistenceCheck(new Date());
         setLastAccessByUser(new Date());
     }
@@ -39,9 +39,9 @@ public class Directory extends EAVObject {
 
     public boolean isEnabled() {
         switch (getAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId()).intValue()) {
-            case 9:
+            case 9: //listValueID for true
                 return true;
-            case 10:
+            case 10: //listValueID for false
                 return false;
             default:
                 throw new IllegalDirectoryStateException(String.valueOf(getAttributeListValueId(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId())));
@@ -57,16 +57,16 @@ public class Directory extends EAVObject {
 
     public boolean isConnectable() {
         switch (getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId()).intValue()) {
-            case 11:
+            case 11: //listValueID for true
                 return true;
-            case 12:
+            case 12: //listValueID for false
                 return false;
             default:
                 throw new IllegalDirectoryStateException(String.valueOf(getAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId())));
         }
     }
 
-    public void setCanConnect(boolean active) {
+    public void setConnectable(boolean active) {
         if (active)
             setAttributeListValueId(Attributes.IS_CAN_CONNECT_OT_DIRECTORY.getAttrId(), BigInteger.valueOf(11));
         else

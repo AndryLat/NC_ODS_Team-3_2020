@@ -228,7 +228,7 @@ public class ServerManager implements DAOChangeListener {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
-            if (serverConnection.getServer().isCanConnect()) {
+            if (serverConnection.getServer().isConnectable()) {
                 serverPollManager.executeExtractingLogs(serverConnection);
             } else {
                 serverConnectionIterator.remove();
