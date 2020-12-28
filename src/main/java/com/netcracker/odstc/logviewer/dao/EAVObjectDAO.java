@@ -3,12 +3,6 @@ package com.netcracker.odstc.logviewer.dao;
 import com.netcracker.odstc.logviewer.mapper.AttributeMapper;
 import com.netcracker.odstc.logviewer.mapper.ObjectMapper;
 import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
-import com.netcracker.odstc.logviewer.models.Config;
-import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.Log;
-import com.netcracker.odstc.logviewer.models.LogFile;
-import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
@@ -19,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -112,17 +107,13 @@ public class EAVObjectDAO {
 
     public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
         EAVObject eavObject = createEAVObject(objectId, clazz);
-        try{
-            EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
-            if (columns != null) {
-                eavObject.setName(columns.getName());
-                eavObject.setParentId(columns.getParentId());
-                eavObject.setObjectTypeId(columns.getObjectTypeId());
-                eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
-                eavObject.setReferences(getReference(objectId));
-            }
-        }catch (EAVAttributeException e){
-            logger.error("Object id cant be find in DataBase or its corrupted by object type id", e);
+        EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
+        if (columns != null) {
+            eavObject.setName(columns.getName());
+            eavObject.setParentId(columns.getParentId());
+            eavObject.setObjectTypeId(columns.getObjectTypeId());
+            eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
+            eavObject.setReferences(getReference(objectId));
         }
         return (T) eavObject;
     }
@@ -195,21 +186,17 @@ public class EAVObjectDAO {
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
-        EAVObject eavObject;
-        if (Log.class.isAssignableFrom(clazz)) {
-            eavObject = new Log(objectId);
-        } else if (LogFile.class.isAssignableFrom(clazz)) {
-            eavObject = new LogFile(objectId);
-        } else if (Directory.class.isAssignableFrom(clazz)) {
-            eavObject = new Directory(objectId);
-        } else if (Server.class.isAssignableFrom(clazz)) {
-            eavObject = new Server(objectId);
-        } else if (User.class.isAssignableFrom(clazz)) {
-            eavObject = new User(objectId);
-        } else if (Config.class.isAssignableFrom(clazz)) {
-            eavObject = new Config(objectId);
-        } else {
-            throw new EAVAttributeException("No such object");
+        EAVObject eavObject = new EAVObject();
+        try {
+            eavObject = clazz.getConstructor(BigInteger.class).newInstance(objectId);
+        } catch (InstantiationException e) {
+            logger.error(e.getMessage());
+        } catch (IllegalAccessException k) {
+            logger.error("No access", k);
+        } catch (InvocationTargetException j) {
+            logger.error(j.getMessage());
+        } catch (NoSuchMethodException m) {
+            logger.error("No such method", m);
         }
         return (T) eavObject;
     }
