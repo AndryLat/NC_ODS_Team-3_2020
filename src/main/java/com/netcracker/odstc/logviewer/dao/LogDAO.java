@@ -29,11 +29,12 @@ public class LogDAO extends EAVObjectDAO {
                 "left join attributes ll on ll.object_id = ob.object_id\n" +
                 "left join Lists lll on lll.attr_id = 22 /* Log level */ and lll.list_value_id = ll.list_value_id\n" +
                 "left join attributes lt on lt.object_id = ob.object_id\n" +
-                "where fcl.value  = ?\n" +
+                "where fcl.value  like '%?%'\n" +
                 "and ob.object_type_id = 5\n" +
                 "and fcl.attr_id = 21 /* Full content of log */\n" +
                 "and ll.attr_id = 22 /* Log level */\n" +
-                "and lt.attr_id = 23 /* Log timestamp */;";
+                "and lt.attr_id = 23 /* Log timestamp */\n" +
+                "order by fcl_value";
         return jdbcTemplate.query(sql, new LogMapper(), text);
     }
 
@@ -44,11 +45,12 @@ public class LogDAO extends EAVObjectDAO {
                 "left join attributes ll on ll.object_id = ob.object_id\n" +
                 "left join Lists lll on lll.attr_id = 22 /* Log level */ and lll.list_value_id = ll.list_value_id\n" +
                 "left join attributes lt on lt.object_id = ob.object_id\n" +
-                "where lll.value = ?\n" +
+                "where lll.value like '%?%'\n" +
                 "and ob.object_type_id = 5\n" +
                 "and fcl.attr_id = 21 /* Full content of log */\n" +
                 "and ll.attr_id = 22 /* Log level */\n" +
-                "and lt.attr_id = 23 /* Log timestamp */;   ";
+                "and lt.attr_id = 23 /* Log timestamp */ \n" +
+                "order by log_level_value";
         return jdbcTemplate.query(sql, new LogMapper(), level);
     }
 
@@ -59,11 +61,12 @@ public class LogDAO extends EAVObjectDAO {
                 "left join attributes ll on ll.object_id = ob.object_id\n" +
                 "left join Lists lll on lll.attr_id = 22 /* Log level */ and lll.list_value_id = ll.list_value_id\n" +
                 "left join attributes lt on lt.object_id = ob.object_id\n" +
-                "where lt.date_value = ?\n" +
+                "where lt.date_value like '%?%'\n" +
                 "and ob.object_type_id = 5\n" +
                 "and fcl.attr_id = 21 /* Full content of log */\n" +
                 "and ll.attr_id = 22 /* Log level */\n" +
-                "and lt.attr_id = 23 /* Log timestamp */;";
+                "and lt.attr_id = 23 /* Log timestamp */\n" +
+                "order by log_timestamp_value";
         return jdbcTemplate.query(sql, new LogMapper(), creationDate);
     }
 
@@ -80,8 +83,7 @@ public class LogDAO extends EAVObjectDAO {
                 "where ob.object_type_id = 5\n" +
                 "and fcl.attr_id = 21 /* Full content of log */\n" +
                 "and ll.attr_id = 22 /* Log level */\n" +
-                "and lt.attr_id = 23 /* Log timestamp */\n" +
-                ";";
+                "and lt.attr_id = 23 /* Log timestamp */";
         return jdbcTemplate.query(sql, new LogMapper());
     }
 
