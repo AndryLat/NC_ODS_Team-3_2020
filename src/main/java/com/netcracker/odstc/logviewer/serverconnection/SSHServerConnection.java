@@ -37,6 +37,26 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
+    public List<LogFile> getLogFilesFromDirectory(Directory directory) {
+        validateConnection();
+        List<LogFile> logFiles = new ArrayList<>();
+        ChannelSftp channelSftp = getChannelSftp();
+
+        try {
+            List files = channelSftp.ls(directory.getPath());
+            for (Object file : files) {
+                String fileName = ((ChannelSftp.LsEntry) file).getFilename();
+                LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
+                logFiles.add(logFile);
+            }
+        } catch (SftpException e) {
+            logger.error("Exception when trying get list of files", e);
+            throw new ServerConnectionException("Cant list files from SSH due to error", e);
+        }
+        return logFiles;
+    }
+
+    @Override
     public boolean connect() {
         logger.debug("Making connection to {}", server.getName());
         try {
@@ -92,14 +112,6 @@ public class SSHServerConnection extends AbstractServerConnection {
             throw new ServerConnectionException("Error in polling time", e);
         }
         return result;
-    }
-
-    protected void validateConnection() {//I cant merge this one with enclosing one, because i dont need to connect() every time
-        if ((!isConnected || session == null)) {
-            if (!connect()) {
-                throw new ServerConnectionException("Cant establish connection with " + server.getIp());
-            }
-        }
     }
 
     private ChannelSftp getChannelSftp() {

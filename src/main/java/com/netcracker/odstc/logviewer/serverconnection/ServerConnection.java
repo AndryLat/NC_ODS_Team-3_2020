@@ -3,6 +3,7 @@ package com.netcracker.odstc.logviewer.serverconnection;
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
+import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface ServerConnection extends Callable<List<Log>> {
     void setDirectories(List<HierarchyContainer> directories);
 
     void removeDirectory(Directory directory);
+
+    List<LogFile> getLogFilesFromDirectory(Directory directory);
 
     void updateDirectory(Directory directory);
 

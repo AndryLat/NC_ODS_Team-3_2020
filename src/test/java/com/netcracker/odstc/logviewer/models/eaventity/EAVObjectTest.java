@@ -56,7 +56,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setAttributeValue() {
+    void setGetAttributeValue() {
         String value = "Omega";
         eavObject1.setAttributeValue(BigInteger.valueOf(1),value);
 
@@ -64,7 +64,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setAttributeDateValue() {
+    void setGetAttributeDateValue() {
         Date date = new Date(23);
 
         eavObject1.setAttributeDateValue(BigInteger.valueOf(2),date);
@@ -73,7 +73,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setAttributeListValueId() {
+    void setGetAttributeListValueId() {
         BigInteger listValueId = BigInteger.valueOf(3);
 
         eavObject1.setAttributeListValueId(BigInteger.valueOf(3),listValueId);
@@ -82,7 +82,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setReference() {
+    void setGetReference() {
         BigInteger referenceId = BigInteger.valueOf(25);
 
         eavObject1.setReference(BigInteger.valueOf(4),referenceId);
@@ -91,7 +91,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setAttributes() {
+    void setGetAttributes() {
         Map<BigInteger,Attribute> attributeMap = new HashMap<>();
         String value = "Omega";
         attributeMap.put(BigInteger.valueOf(1),new Attribute(value));
@@ -111,7 +111,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setReferences() {
+    void setGetReferences() {
         Map<BigInteger,BigInteger> references = new HashMap<>();
 
         BigInteger reference1 = BigInteger.valueOf(45);
@@ -139,7 +139,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setObjectTypeId() {
+    void GetObjectTypeId() {
         BigInteger objectTypeId = BigInteger.valueOf(12);
 
         eavObject1.setParentId(objectTypeId);
@@ -162,7 +162,7 @@ class EAVObjectTest {
         assertThrows(EAVAttributeException.class,()->eavObject1.getAttributeListValueId(attrId));
     }
     @Test
-    void setExistedAttributes(){
+    void GetExistedAttributes(){
         EAVObject eavObjectWithAttributes = new EAVObject();
         Map<BigInteger,Attribute> attributeMap = new HashMap<>();
         attributeMap.put(BigInteger.valueOf(1),new Attribute("Omega"));
@@ -183,7 +183,7 @@ class EAVObjectTest {
         assertEquals(listValueId,eavObjectWithAttributes.getAttributeListValueId(BigInteger.valueOf(3)));
     }
     @Test
-    void costructObjectWithSetters(){
+    void createObjectWithSetters(){
         EAVObject eavObject = new EAVObject();
         BigInteger objectId = BigInteger.valueOf(1);
         eavObject.setObjectId(objectId);

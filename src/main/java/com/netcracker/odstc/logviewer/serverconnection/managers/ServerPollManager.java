@@ -18,11 +18,9 @@ import java.util.concurrent.Future;
 
 public class ServerPollManager {
     private static ServerPollManager instance;
+    public final Map<ServerConnection, Future<List<Log>>> serverConnectionsResults;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     private final ExecutorService service = Executors.newFixedThreadPool(4);
-
-    public final HashMap<ServerConnection, Future<List<Log>>> serverConnectionsResults;
-
     private final Map<BigInteger, ServerConnection> finishedServers;
 
     private ServerPollManager() {
@@ -69,7 +67,7 @@ public class ServerPollManager {
         return logs;
     }
 
-    public boolean isFinished(){
+    public boolean isFinished() {
         return serverConnectionsResults.isEmpty();
     }
 }

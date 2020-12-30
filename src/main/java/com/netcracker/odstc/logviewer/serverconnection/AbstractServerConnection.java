@@ -7,9 +7,8 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
+import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import java.util.regex.Matcher;
 
 abstract class AbstractServerConnection implements ServerConnection {
     protected static final int CONNECT_TIMEOUT = 500;
-    private final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
     protected List<HierarchyContainer> directories;
@@ -31,16 +29,6 @@ abstract class AbstractServerConnection implements ServerConnection {
         isConnected = false;
         serverConnectionService = ServerConnectionService.getInstance();
         this.server = server;
-    }
-
-    @Override
-    public void removeDirectory(Directory directory) {
-        for (HierarchyContainer directoryContainer : directories) {
-            if (directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())) {
-                directories.remove(directoryContainer);
-                return;
-            }
-        }
     }
 
     @Override
@@ -60,6 +48,16 @@ abstract class AbstractServerConnection implements ServerConnection {
     @Override
     public void setDirectories(List<HierarchyContainer> directories) {
         this.directories = directories;
+    }
+
+    @Override
+    public void removeDirectory(Directory directory) {
+        for (HierarchyContainer directoryContainer : directories) {
+            if (directoryContainer.getOriginal().getObjectId().equals(directory.getObjectId())) {
+                directories.remove(directoryContainer);
+                return;
+            }
+        }
     }
 
     @Override
@@ -84,13 +82,6 @@ abstract class AbstractServerConnection implements ServerConnection {
     }
 
     @Override
-    public List<Log> getNewLogs() {
-        validateConnection();
-        server.setLastAccessByJob(new Date());
-        return collectNewLogs();
-    }
-
-    @Override
     public void disconnect() {
         isConnected = false;
     }
@@ -100,6 +91,13 @@ abstract class AbstractServerConnection implements ServerConnection {
         Config appConfiguration = Config.getInstance();
         directory.setLastExistenceCheck(new Date());
         return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
+    }
+
+    @Override
+    public List<Log> getNewLogs() {
+        validateConnection();
+        server.setLastAccessByJob(new Date());
+        return collectNewLogs();
     }
 
     @Override
@@ -134,6 +132,15 @@ abstract class AbstractServerConnection implements ServerConnection {
         return result;
     }
 
+    protected void validateConnection() {
+        if (isConnected || connect()) {
+            return;
+        }
+        throw new ServerConnectionException("Cant establish connection with " + server.getIp());
+    }
+
+    protected abstract List<Log> collectNewLogs();
+
     private Log convertLineToLog(LogFile logFile, Log lastLog, String line) {
         Matcher matcher = checkMatcher(lastLog, line);
         if (matcher == null) return null;
@@ -156,10 +163,6 @@ abstract class AbstractServerConnection implements ServerConnection {
         }
         return matcher;
     }
-
-    protected abstract void validateConnection();
-
-    protected abstract List<Log> collectNewLogs();
 
     @Override
     public boolean equals(Object o) {

@@ -23,8 +23,6 @@ class AttributeTest {
 
     @Test
     void constructors(){
-        Attribute attribute1 = new Attribute();
-
         Attribute attribute2 = new Attribute(value);
         Attribute attribute3 = new Attribute(dateValue);
         Attribute attribute4 = new Attribute(listValueId);

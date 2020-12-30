@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.serverconnection.services;
 
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.models.Directory;
+import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.models.lists.Protocol;
@@ -12,10 +13,10 @@ import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnecti
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,6 +100,13 @@ public class ServerConnectionService {
             serverConnection.disconnect();
         }
         return isDirectoryAvailable;
+    }
+
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) {
+        ServerConnection serverConnection = wrapServerIntoConnection(server);
+        List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory);
+        serverConnection.disconnect();
+        return logFiles;
     }
 
     public ServerConnection wrapServerIntoConnection(HierarchyContainer serverContainer) {

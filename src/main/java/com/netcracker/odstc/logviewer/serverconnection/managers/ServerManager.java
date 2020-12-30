@@ -20,11 +20,11 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,24 +41,25 @@ public class ServerManager implements DAOChangeListener {
     private final ServerPollManager serverPollManager;
     private final ServerConnectionService serverConnectionService;
 
-    private final ScheduledExecutorService executorService;
+    private final ScheduledExecutorService runnableService;
 
     @SuppressWarnings({"squid:S1144"})
 //Suppress unused private constructor: Spring will use this constructor, even if it private
     private ServerManager(ContainerDAO containerDAO) {
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        serverConnectionService = ServerConnectionService.getInstance();
-
-        serverPollManager = ServerPollManager.getInstance();
-        DAOPublisher.getInstance().addListener(this);
-        serverConnections = Collections.synchronizedMap(new HashMap<>());
         this.containerDAO = containerDAO;
-        iterationRemove = new HashMap<>();
+        DAOPublisher.getInstance().addListener(this);
+
+        serverConnectionService = ServerConnectionService.getInstance();
+        serverPollManager = ServerPollManager.getInstance();
+
+        serverConnections = new ConcurrentHashMap<>();
+        iterationRemove = new EnumMap<>(ObjectTypes.class);
 
         iterationRemove.put(ObjectTypes.SERVER, new ArrayList<>());
         iterationRemove.put(ObjectTypes.DIRECTORY, new ArrayList<>());
         iterationRemove.put(ObjectTypes.LOGFILE, new ArrayList<>());
 
+        runnableService = Executors.newSingleThreadScheduledExecutor();
         startRunnables();
     }
 
@@ -70,12 +71,10 @@ public class ServerManager implements DAOChangeListener {
                 return;
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
             iterationRemove.get(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId)).add(objectId);
-        }
-        if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
+        } else if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
             if (Server.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
                 serverChanged(objectChangeEvent);
-            }
-            if (Directory.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
+            } else if (Directory.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
                 directoryChanged(objectChangeEvent);
             }
         }
@@ -86,18 +85,18 @@ public class ServerManager implements DAOChangeListener {
         Config.setInstance(configInstance);
 
         logger.info("Starting Polling runnable");
-        executorService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
+        runnableService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
         logger.info("Polling runnable started");
         logger.info("Starting activity check runnable");
-        executorService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
+        runnableService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
         logger.info("Activity check runnable started");
     }
 
     private void getLogsFromAllServers() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
         containerDAO.saveObjectsAttributesReferences(result);
-        if(!serverPollManager.serverConnectionsResults.isEmpty()) {
-            logger.warn("Skipping job due to precious is not finished");
+        if (!serverPollManager.serverConnectionsResults.isEmpty()) {
+            logger.warn("Skipping job due to previous is not finished");
             return;
         }
         savePollResults();
@@ -159,8 +158,7 @@ public class ServerManager implements DAOChangeListener {
             serverConnections.remove(server.getObjectId());
         } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
-            if (serverConnection != null)
-                serverConnection.setServer(server);
+            serverConnection.setServer(server);
         }
     }
 
@@ -226,7 +224,6 @@ public class ServerManager implements DAOChangeListener {
         }
         serverPollManager.getFinishedServers().clear();
     }
-
 
     private void startPoll() {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();

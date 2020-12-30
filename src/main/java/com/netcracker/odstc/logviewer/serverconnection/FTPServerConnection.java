@@ -7,6 +7,7 @@ import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +25,22 @@ public class FTPServerConnection extends AbstractServerConnection {
     public FTPServerConnection(Server server) {
         super(server);
         ftpClient = new FTPClient();
+    }
+
+    @Override
+    public List<LogFile> getLogFilesFromDirectory(Directory directory) {
+        validateConnection();
+        List<LogFile> logFiles = new ArrayList<>();
+        try {
+            for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
+                LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
+                logFiles.add(logFile);
+            }
+        } catch (IOException e) {
+            logger.error("Exception when trying get list of files", e);
+            throw new ServerConnectionException("Cant list files from FTP due to error", e);
+        }
+        return logFiles;
     }
 
     @Override
@@ -86,14 +103,6 @@ public class FTPServerConnection extends AbstractServerConnection {
         return result;
     }
 
-    protected void validateConnection() {
-        if (!isConnected) {
-            if (!connect()) {//I cant merge this one with enclosing one, because i dont need to connect() every time
-                throw new ServerConnectionException("Cant establish connection with " + server.getIp());
-            }
-        }
-    }
-
     private List<Log> extractLogsFromDirectory(HierarchyContainer directoryContainer) {
         List<Log> result = new ArrayList<>();
         Directory directory = (Directory) directoryContainer.getOriginal();
@@ -123,7 +132,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 ftpClient.completePendingCommand();
             }
         } catch (IOException e) {
-            logger.error("Error with reading file from", e);//TODO: Сделать Error - record
+            logger.error("Error with reading file from", e);
         }
         return result;
     }
