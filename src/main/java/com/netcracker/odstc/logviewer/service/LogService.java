@@ -38,6 +38,10 @@ public class LogService {
         return logs;
     }
 
+    public Log findById(BigInteger id) {
+        return logDAO.getById(id);
+    }
+
     public List<Log> findLogs(String value) {
         return logDAO.getLogByText(value);
     }
