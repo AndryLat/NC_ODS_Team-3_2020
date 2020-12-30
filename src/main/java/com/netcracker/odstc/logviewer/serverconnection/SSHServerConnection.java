@@ -150,7 +150,11 @@ public class SSHServerConnection extends AbstractServerConnection {
         List<Log> result = new ArrayList<>();
         try {
             try (InputStream inputStream = channelSftp.get(logFile.getName())) {
-                result.addAll(extractLogsFromStream(inputStream, logFile));
+                if(inputStream==null){
+                    logger.error("Cant reach file {} from {}",logFile.getName(),server.getIp());
+                }else {
+                    result.addAll(extractLogsFromStream(inputStream, logFile));
+                }
             }
         } catch (SftpException | IOException e) {
             logger.error("Error with reading file", e);

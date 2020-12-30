@@ -85,7 +85,7 @@ public class ServerManager implements DAOChangeListener {
         Config.setInstance(configInstance);
 
         logger.info("Starting Polling runnable");
-        runnableService.scheduleAtFixedRate(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
+        runnableService.scheduleWithFixedDelay(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
         logger.info("Polling runnable started");
         logger.info("Starting activity check runnable");
         runnableService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
@@ -95,7 +95,7 @@ public class ServerManager implements DAOChangeListener {
     private void getLogsFromAllServers() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
         containerDAO.saveObjectsAttributesReferences(result);
-        if (!serverPollManager.serverConnectionsResults.isEmpty()) {
+        if (!serverPollManager.getServerConnectionsResults().isEmpty()) {
             logger.warn("Skipping job due to previous is not finished");
             return;
         }
@@ -216,6 +216,7 @@ public class ServerManager implements DAOChangeListener {
                 serverConnections.get(server.getObjectId()).setServer(server);
                 serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
             } else {
+                logger.info("Adding new server to poll: {}",server.getIp());
                 ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
                 if (serverConnection == null) continue;
                 serverConnection.setDirectories(serverContainer.getChildren());

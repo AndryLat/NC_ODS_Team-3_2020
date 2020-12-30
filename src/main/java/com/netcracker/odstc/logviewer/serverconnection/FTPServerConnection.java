@@ -128,8 +128,12 @@ public class FTPServerConnection extends AbstractServerConnection {
         List<Log> result = new ArrayList<>();
         try {
             try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
-                result.addAll(extractLogsFromStream(inputStream, logFile));
-                ftpClient.completePendingCommand();
+                if(inputStream==null){
+                    logger.error("Cant reach file {} from {}",logFile.getName(),server.getIp());
+                }else {
+                    result.addAll(extractLogsFromStream(inputStream, logFile));
+                    ftpClient.completePendingCommand();
+                }
             }
         } catch (IOException e) {
             logger.error("Error with reading file from", e);
