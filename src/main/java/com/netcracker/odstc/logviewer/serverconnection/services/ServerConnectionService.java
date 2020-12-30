@@ -70,6 +70,11 @@ public class ServerConnectionService {
         return null;
     }
 
+    /**
+     * @param server Server which will be checked
+     * @return true - if server can be accessed<br/>
+     * false - if an error occurs
+     */
     public boolean isServerAvailable(Server server) {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
         boolean isServerAvailable = false;
@@ -84,6 +89,12 @@ public class ServerConnectionService {
         return isServerAvailable;
     }
 
+    /**
+     * @param server Server where directory located
+     * @param directory Folder which will be checked
+     * @return true - if directory can be accessed<br/>
+     * false - if an error occurs with server or directory
+     */
     public boolean isDirectoryAvailable(Server server, Directory directory) {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
         boolean isDirectoryAvailable = false;
@@ -102,7 +113,15 @@ public class ServerConnectionService {
         return isDirectoryAvailable;
     }
 
-    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) {
+
+    /**
+     * @param server Server where directory located
+     * @param directory Folder for listing files
+     * @return list of files as LogFile
+     * @see com.netcracker.odstc.logviewer.models.LogFile
+     * @throws ServerConnectionException when list of files cant be received
+     */
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) throws ServerConnectionException {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
         List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory);
         serverConnection.disconnect();
