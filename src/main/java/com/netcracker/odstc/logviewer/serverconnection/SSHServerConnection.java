@@ -37,7 +37,7 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFilesFromDirectory(Directory directory) {
+    public List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions) {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
         ChannelSftp channelSftp = getChannelSftp();
@@ -46,8 +46,12 @@ public class SSHServerConnection extends AbstractServerConnection {
             List files = channelSftp.ls(directory.getPath());
             for (Object file : files) {
                 String fileName = ((ChannelSftp.LsEntry) file).getFilename();
-                LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
-                logFiles.add(logFile);
+                for(String extension : extensions) {
+                    if(fileName.endsWith(extension)) {
+                        LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
+                        logFiles.add(logFile);
+                    }
+                }
             }
         } catch (SftpException e) {
             logger.error("Exception when trying get list of files", e);

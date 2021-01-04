@@ -28,13 +28,17 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFilesFromDirectory(Directory directory) {
+    public List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions) {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
         try {
             for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
-                logFiles.add(logFile);
+                for(String extension: extensions) {
+                    if (ftpFile.getName().endsWith(extension)) {
+                        LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
+                        logFiles.add(logFile);
+                    }
+                }
             }
         } catch (IOException e) {
             logger.error("Exception when trying get list of files", e);

@@ -20,7 +20,7 @@ public interface ServerConnection extends Callable<List<Log>> {
 
     void removeDirectory(Directory directory);
 
-    List<LogFile> getLogFilesFromDirectory(Directory directory);
+    List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions);
 
     void updateDirectory(Directory directory);
 
