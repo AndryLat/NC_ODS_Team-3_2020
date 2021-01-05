@@ -1,13 +1,13 @@
 package com.netcracker.odstc.logviewer.controller;
 
-
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import com.netcracker.odstc.logviewer.service.ServerService;
 import com.netcracker.odstc.logviewer.service.UserService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,33 +23,34 @@ import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 
-@RequestMapping("/server")
+@RequestMapping("/api/server")
 @RestController
 public class ServerController {
 
     private final ServerService serverService;
     private final UserService userService;
     private final EAVObjectDAO eavObjectDAO;
+    private static final String serverNotNull = "Server shouldn't be null";
+    private static final String idNotNull = "Id shouldn't be 0 or null";
+    private final Logger logger = LogManager.getLogger(ServerController.class.getName());
 
-    public ServerController(ServerService serverService, UserService userService,
-                            @Qualifier("EAVObjectDAO") EAVObjectDAO eavObjectDAO) {
+    public ServerController(ServerService serverService, UserService userService, EAVObjectDAO eavObjectDAO) {
         this.serverService = serverService;
         this.userService = userService;
         this.eavObjectDAO = eavObjectDAO;
     }
 
-
     @GetMapping("/all")
-    public ResponseEntity<List<Server>> allServer(Principal principal){
+    public ResponseEntity<List<Server>> allServer(Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        List<Server> listServer= eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
+        List<Server> listServer = eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
         return ResponseEntity.ok(listServer);
     }
 
     @PostMapping("/add")
     public ResponseEntity<Server> add(@RequestBody Server server) {
         if (server == null) {
-            return new ResponseEntity("Server shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
+            throwException(serverNotNull);
         }
         serverService.save(server);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -58,16 +59,17 @@ public class ServerController {
     @PutMapping("/update")
     public ResponseEntity<Server> update(@RequestBody Server server) {
         if (server == null) {
-            return new ResponseEntity("Server shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
+            throwException(serverNotNull);
         }
         serverService.save(server);
+        logger.info("Server save");
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
         if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity("Id shouldn't be 0 or null", HttpStatus.NOT_ACCEPTABLE);
+            throwException(idNotNull);
         }
         return ResponseEntity.ok(serverService.findById(id));
     }
@@ -75,18 +77,25 @@ public class ServerController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
         if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity("Id shouldn't be 0 or null", HttpStatus.NOT_ACCEPTABLE);
+            throwException(idNotNull);
         }
         serverService.deleteById(id);
+        logger.info("Server delete");
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/testConnection")
-    public ResponseEntity<Boolean> testConnection(@RequestBody Server server){
-        if(server == null){
-            return new ResponseEntity("Server shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
+    public ResponseEntity<Boolean> testConnection(@RequestBody Server server) {
+        if (server == null) {
+            throwException(serverNotNull);
         }
-        return  ResponseEntity.ok(ServerConnectionService.getInstance().isServerAvailable(server));
+        return ResponseEntity.ok(ServerConnectionService.getInstance().isServerAvailable(server));
+    }
+
+    private void throwException(String nameException) {
+        IllegalArgumentException exception = new IllegalArgumentException();
+        logger.error(nameException);
+        throw exception;
     }
 }
 

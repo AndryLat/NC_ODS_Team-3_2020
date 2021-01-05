@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -22,19 +23,11 @@ public class LogService {
 
     public List<Log> filtrateByDateLogs(Date... dateFrom) {
         List<Log> logs = new ArrayList<>();
-        for (Date date : dateFrom) {
-            for (Log log : logDAO.getLogByCreationDate(date))
-                logs.add(log);
-        }
         return logs;
     }
 
     public List<Log> filtrateByLevelLogs(String... levels) {
         List<Log> logs = new ArrayList<>();
-        for (String level : levels) {
-            for (Log log : logDAO.getLogByLevel(level))
-                logs.add(log);
-        }
         return logs;
     }
 
@@ -43,18 +36,16 @@ public class LogService {
     }
 
     public List<Log> findLogs(String value) {
-        return logDAO.getLogByText(value);
+        return Collections.emptyList();
     }
 
     public List<Log> sortByDate(Date date) {
         List<Log> logs = new ArrayList<>();
-        logs.add((Log) logDAO.getLogByCreationDate(date));
         return logs;
     }
 
     public List<Log> sortByLevel(String level) {
         List<Log> logs = new ArrayList<>();
-        logs.add((Log) logDAO.getLogByLevel(level));
         return logs;
     }
 

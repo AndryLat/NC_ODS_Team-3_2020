@@ -10,6 +10,7 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Primary
 @Repository
 public class EAVObjectDAO {
 
