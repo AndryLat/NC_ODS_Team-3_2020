@@ -24,11 +24,13 @@ abstract class AbstractServerConnection implements ServerConnection {
     protected ServerConnectionService serverConnectionService;
     protected List<HierarchyContainer> directories;
     protected boolean isConnected;
+    protected Config appConfiguration;
 
     protected AbstractServerConnection(Server server) {
         isConnected = false;
         serverConnectionService = ServerConnectionService.getInstance();
         this.server = server;
+        appConfiguration = Config.getInstance();
     }
 
     @Override
@@ -88,7 +90,6 @@ abstract class AbstractServerConnection implements ServerConnection {
 
     public boolean isDirectoryValid(Directory directory) {
         validateConnection();
-        Config appConfiguration = Config.getInstance();
         directory.setLastExistenceCheck(new Date());
         return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
     }
@@ -96,8 +97,15 @@ abstract class AbstractServerConnection implements ServerConnection {
     @Override
     public List<Log> getNewLogs() {
         validateConnection();
-        server.setLastAccessByJob(new Date());
-        return collectNewLogs();
+        List<Log> result = collectNewLogs();
+        if (!result.isEmpty()) {
+            server.setLastAccessByJob(new Date());
+        } else {
+            if (new Date(server.getLastAccessByJob().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date())) {
+                server.setEnabled(false);
+            }
+        }
+        return result;
     }
 
     @Override

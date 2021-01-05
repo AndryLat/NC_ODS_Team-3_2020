@@ -46,8 +46,8 @@ public class SSHServerConnection extends AbstractServerConnection {
             List files = channelSftp.ls(directory.getPath());
             for (Object file : files) {
                 String fileName = ((ChannelSftp.LsEntry) file).getFilename();
-                for(String extension : extensions) {
-                    if(fileName.endsWith(extension)) {
+                for (String extension : extensions) {
+                    if (fileName.endsWith(extension)) {
                         LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
                         logFiles.add(logFile);
                     }
@@ -146,6 +146,13 @@ public class SSHServerConnection extends AbstractServerConnection {
             directory.setConnectable(false);
         }
         channelSftp.cd("/");
+        if (!result.isEmpty()) {
+            directory.setLastExistenceCheck(new Date());
+        } else {
+            if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
+                directory.setEnabled(false);
+            }
+        }
         return result;
     }
 
@@ -154,9 +161,9 @@ public class SSHServerConnection extends AbstractServerConnection {
         List<Log> result = new ArrayList<>();
         try {
             try (InputStream inputStream = channelSftp.get(logFile.getName())) {
-                if(inputStream==null){
-                    logger.error("Cant reach file {} from {}",logFile.getName(),server.getIp());
-                }else {
+                if (inputStream == null) {
+                    logger.error("Cant reach file {} from {}", logFile.getName(), server.getIp());
+                } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                 }
             }

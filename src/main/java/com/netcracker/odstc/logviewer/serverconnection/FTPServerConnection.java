@@ -33,7 +33,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         List<LogFile> logFiles = new ArrayList<>();
         try {
             for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                for(String extension: extensions) {
+                for (String extension : extensions) {
                     if (ftpFile.getName().endsWith(extension)) {
                         LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
                         logFiles.add(logFile);
@@ -124,6 +124,13 @@ public class FTPServerConnection extends AbstractServerConnection {
             logger.error("Marking directory as unavailable", e);
             directory.setConnectable(false);
         }
+        if (!result.isEmpty()) {
+            directory.setLastExistenceCheck(new Date());
+        } else {
+            if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
+                directory.setEnabled(false);
+            }
+        }
         return result;
     }
 
@@ -132,9 +139,9 @@ public class FTPServerConnection extends AbstractServerConnection {
         List<Log> result = new ArrayList<>();
         try {
             try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
-                if(inputStream==null){
-                    logger.error("Cant reach file {} from {}",logFile.getName(),server.getIp());
-                }else {
+                if (inputStream == null) {
+                    logger.error("Cant reach file {} from {}", logFile.getName(), server.getIp());
+                } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                     ftpClient.completePendingCommand();
                 }
