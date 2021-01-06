@@ -28,10 +28,9 @@ public class ServerService {
 
     public void save(Server server) {
         if (isServerValid(server)) {
-            eavObjectDAO.saveObject(server);
+            eavObjectDAO.saveObjectAttributesReferences(server);
         }
     }
-
 
     public void deleteById(BigInteger id) {
         if (isIdValid(id)) {
@@ -59,9 +58,6 @@ public class ServerService {
         if (server.getProtocol() == null) {
             return false;
         }
-        if (server.getPort() == 0) {
-            return false;
-        }
-        return true;
+        return server.getPort() != 0;
     }
 }

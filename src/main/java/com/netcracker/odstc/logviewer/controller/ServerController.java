@@ -53,6 +53,7 @@ public class ServerController {
             throwException(serverNotNull);
         }
         serverService.save(server);
+        logger.info("Server save");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -62,7 +63,7 @@ public class ServerController {
             throwException(serverNotNull);
         }
         serverService.save(server);
-        logger.info("Server save");
+        logger.info("Server update");
         return new ResponseEntity(HttpStatus.OK);
     }
 
