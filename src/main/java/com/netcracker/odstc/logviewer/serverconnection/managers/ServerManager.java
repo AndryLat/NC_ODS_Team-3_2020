@@ -216,7 +216,7 @@ public class ServerManager implements DAOChangeListener {
                 serverConnections.get(server.getObjectId()).setServer(server);
                 serverConnections.get(server.getObjectId()).setDirectories(serverContainer.getChildren());
             } else {
-                logger.info("Adding new server to poll: {}",server.getIp());
+                logger.info("Adding new server to poll: {}", server.getIp());
                 ServerConnection serverConnection = serverConnectionService.wrapServerIntoConnection(serverContainer);
                 if (serverConnection == null) continue;
                 serverConnection.setDirectories(serverContainer.getChildren());

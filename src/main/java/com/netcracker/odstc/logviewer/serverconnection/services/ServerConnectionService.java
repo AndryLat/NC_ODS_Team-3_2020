@@ -90,7 +90,7 @@ public class ServerConnectionService {
     }
 
     /**
-     * @param server Server where directory located
+     * @param server    Server where directory located
      * @param directory Folder which will be checked
      * @return true - if directory can be accessed<br/>
      * false - if an error occurs with server or directory
@@ -115,14 +115,14 @@ public class ServerConnectionService {
 
 
     /**
-     * @param server Server where directory located
-     * @param directory Folder for listing files
+     * @param server     Server where directory located
+     * @param directory  Folder for listing files
      * @param extensions Extensions of files to include in results
      * @return list of files as LogFile
-     * @see com.netcracker.odstc.logviewer.models.LogFile
      * @throws ServerConnectionException when list of files cant be received
+     * @see com.netcracker.odstc.logviewer.models.LogFile
      */
-    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory,String[] extensions) throws ServerConnectionException {
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory, String[] extensions) throws ServerConnectionException {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
         List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory, extensions);
         serverConnection.disconnect();
