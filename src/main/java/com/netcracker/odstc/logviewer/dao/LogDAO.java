@@ -22,8 +22,8 @@ public class LogDAO extends EAVObjectDAO {
     }
 
     public List<Log> getLogByAll(String text, Date dat1, Date dat2, int V_SEVERE, int V_WARNING,
-                                  int V_INFO,int V_CONFIG,int V_FINE,int V_FINER,int V_FINEST,int V_DEBUG,
-                                  int V_TRACE,int V_ERROR,int V_FATAL, int V_SORT) {
+                                 int V_INFO,int V_CONFIG,int V_FINE,int V_FINER,int V_FINEST,int V_DEBUG,
+                                 int V_TRACE,int V_ERROR,int V_FATAL, int V_SORT) {
         String sql = "select ob.object_id       as id, \n" +
                 "                       fcl.value          as fcl_value,\n" +
                 "                       lll.value          as log_level_value,\n" +
@@ -82,6 +82,8 @@ public class LogDAO extends EAVObjectDAO {
                 "and lt.attr_id = 23 /* Log timestamp */";
         return jdbcTemplate.query(sql, new LogMapper());
     }
+
+//    "and lt.attr_id = 23 /* Log timestamp */";
 
     public void save(Log log) {
         super.saveObject(log);
