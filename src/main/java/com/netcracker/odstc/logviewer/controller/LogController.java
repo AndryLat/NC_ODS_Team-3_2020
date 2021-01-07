@@ -1,9 +1,7 @@
 package com.netcracker.odstc.logviewer.controller;
 
 import com.netcracker.odstc.logviewer.dao.LogDAO;
-import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
-import com.netcracker.odstc.logviewer.service.DirectoryService;
 import com.netcracker.odstc.logviewer.service.LogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +26,13 @@ public class LogController {
     private String logNullMessage = "Log shouldn't be 0 or null";
     private String logIdNullMessage = "Log shouldn't be 0 or null";
 
-    public LogController(DirectoryService directoryService) {
+    public LogController(LogService logService) {
         this.logService = logService;
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity<Directory> add(@RequestBody Log log) {
+    public ResponseEntity<Log> add(@RequestBody Log log) {
         if (log == null) {
             return new ResponseEntity(logNullMessage, HttpStatus.NOT_ACCEPTABLE);
         }
@@ -43,7 +41,7 @@ public class LogController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Directory> update(@RequestBody  Log log) {
+    public ResponseEntity<Log> update(@RequestBody  Log log) {
         if (log == null) {
             return new ResponseEntity(logNullMessage, HttpStatus.NOT_ACCEPTABLE);
         }
