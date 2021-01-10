@@ -75,10 +75,7 @@ public class DirectoryController {
 
     @GetMapping("/files")
     public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
-        if(logger.isInfoEnabled()) {
-            String directoryId = (directoryWithExtensionsDTO.getDirectory().getObjectId() != null ? String.valueOf(directoryWithExtensionsDTO.getDirectory().getObjectId()) : "null");
-            logger.info("GET: Requested file list from directory with id {}", directoryId);
-        }
+        logger.info("GET: Requested file listing from directory");
         return ResponseEntity.ok(logFileService.getLogFileList(directoryWithExtensionsDTO));
     }
 
