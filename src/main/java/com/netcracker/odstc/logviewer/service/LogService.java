@@ -3,6 +3,7 @@ package com.netcracker.odstc.logviewer.service;
 import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -10,10 +11,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class LogService {
     private final LogDAO logDAO;
 
-    public LogService(@Qualifier("LogDAO") LogDAO logDAO) {
+    public LogService(LogDAO logDAO) {
         this.logDAO = logDAO;
     }
 

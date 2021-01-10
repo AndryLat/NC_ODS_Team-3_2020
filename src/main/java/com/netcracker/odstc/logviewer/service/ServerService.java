@@ -2,19 +2,17 @@ package com.netcracker.odstc.logviewer.service;
 
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Server;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 
-
-@Component
+@Service
 public class ServerService {
 
     private final EAVObjectDAO eavObjectDAO;
     private final Class<Server> serverClass = Server.class;
 
-    public ServerService(@Qualifier("EAVObjectDAO") EAVObjectDAO eavObjectDAO) {
+    public ServerService(EAVObjectDAO eavObjectDAO) {
         this.eavObjectDAO = eavObjectDAO;
     }
 
