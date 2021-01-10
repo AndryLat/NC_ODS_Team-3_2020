@@ -110,9 +110,9 @@ public class FTPServerConnection extends AbstractServerConnection {
     private List<Log> extractLogsFromDirectory(HierarchyContainer directoryContainer) {
         List<Log> result = new ArrayList<>();
         Directory directory = (Directory) directoryContainer.getOriginal();
-        directory.setLastExistenceCheck(new Date());
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
+                logger.error("Cant change working directory to {} on {}",directory.getPath(),server.getIp());
                 directory.setConnectable(false);
                 return result;
             }

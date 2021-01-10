@@ -1,8 +1,11 @@
 package com.netcracker.odstc.logviewer.controller;
 
+import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.models.Directory;
+import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.service.DirectoryService;
-import org.springframework.http.HttpStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,55 +14,71 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.List;
 
-@RequestMapping("/directory")
+@RequestMapping("api/directory")
 @RestController
 public class DirectoryController {
+    private final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
+
     private final DirectoryService directoryService;
-    private String directoryNullMessage = "Directory shouldn't be 0 or null";
-    private String directoryIdNullMessage = "Id shouldn't be 0 or null";
 
     public DirectoryController(DirectoryService directoryService) {
         this.directoryService = directoryService;
     }
 
+    @GetMapping("/")//+
+    public ResponseEntity<List<Directory>> all(@RequestParam BigInteger parentId){
+        logger.info("GET: Requested all directories by parentId {}",(parentId!=null?parentId:"null"));
+        return ResponseEntity.ok(directoryService.findByParentId(parentId));
+    }
 
-    @PostMapping("/add")
+    @PostMapping("/add")//+
     public ResponseEntity<Directory> add(@RequestBody Directory directory) {
-        if (directory == null) {
-            return new ResponseEntity(directoryNullMessage, HttpStatus.NOT_ACCEPTABLE);
-        }
-        directoryService.save(directory);
-        return new ResponseEntity<>(HttpStatus.OK);
+        logger.info("POST: Requested save for directory with id {}",(directory.getObjectId()!=null?directory.getObjectId():"null"));
+        directoryService.add(directory);
+        return ResponseEntity.ok(directory);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update")//+
     public ResponseEntity<Directory> update(@RequestBody Directory directory) {
-        if (directory == null) {
-            return new ResponseEntity(directoryNullMessage, HttpStatus.NOT_ACCEPTABLE);
-        }
-        directoryService.save(directory);
-        return new ResponseEntity(HttpStatus.OK);
+        logger.info("PUT: Requested update for directory with id {}",(directory.getObjectId()!=null?directory.getObjectId():"null"));
+        directoryService.update(directory);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")//+
     public ResponseEntity<Directory> deleteById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity(directoryNullMessage, HttpStatus.NOT_ACCEPTABLE);
-        }
+        logger.info("DELETE: Requested deleting for directory id {}",(id!=null?id:"null"));
         directoryService.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/id/{id}")//+
     public ResponseEntity<Directory> findById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity(directoryIdNullMessage, HttpStatus.NOT_ACCEPTABLE);
-        }
+        logger.info("GET: Requested directory with id {}",(id!=null?id:"null"));
         return ResponseEntity.ok(directoryService.findById(id));
+    }
+
+    @GetMapping("/test")//+
+    public ResponseEntity<Boolean> testConnection(@RequestBody Directory directory){
+        logger.info("GET: Requested test connection to directory");
+        return ResponseEntity.ok(directoryService.testConnection(directory));
+    }
+    @GetMapping("/files")//+
+    public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody DirectoryWithExtensionsDTO directoryWithExtensionsDTO){
+        logger.info("GET: Requested file list from directory with id {}",(directoryWithExtensionsDTO.getDirectory().getObjectId()!=null?directoryWithExtensionsDTO.getDirectory().getObjectId():"null"));
+        return ResponseEntity.ok(directoryService.getLogFileList(directoryWithExtensionsDTO));
+    }
+    @PostMapping("files/add")//
+    public ResponseEntity<Directory> addLogFiles(List<LogFile> logFiles){
+        logger.info("POST: Requested saving {} files",(logFiles!=null?logFiles.size():"null"));
+        directoryService.addLogFileList(logFiles);
+        return ResponseEntity.noContent().build();
     }
 
 

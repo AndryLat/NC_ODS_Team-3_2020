@@ -134,7 +134,6 @@ public class SSHServerConnection extends AbstractServerConnection {
     private List<Log> extractLogsFromDirectory(ChannelSftp channelSftp, HierarchyContainer directoryContainer) throws SftpException {
         Directory directory = (Directory) directoryContainer.getOriginal();
         List<Log> result = new ArrayList<>();
-        directory.setLastExistenceCheck(new Date());
         try {
             channelSftp.cd("/" + directory.getPath());
             for (int i = 0; i < directoryContainer.getChildren().size(); i++) {
