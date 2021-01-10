@@ -4,6 +4,7 @@ import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.service.DirectoryService;
+import com.netcracker.odstc.logviewer.service.LogFileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,11 @@ public class DirectoryController {
     private final Logger logger = LogManager.getLogger(DirectoryController.class);
 
     private final DirectoryService directoryService;
+    private final LogFileService logFileService;
 
-    public DirectoryController(DirectoryService directoryService) {
+    public DirectoryController(DirectoryService directoryService,LogFileService logFileService) {
         this.directoryService = directoryService;
+        this.logFileService = logFileService;
     }
 
     @GetMapping("/")
@@ -72,14 +75,20 @@ public class DirectoryController {
 
     @GetMapping("/files")
     public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
-        logger.info("GET: Requested file list from directory with id {}", (directoryWithExtensionsDTO.getDirectory().getObjectId() != null ? directoryWithExtensionsDTO.getDirectory().getObjectId() : "null"));
-        return ResponseEntity.ok(directoryService.getLogFileList(directoryWithExtensionsDTO));
+        if(logger.isInfoEnabled()) {
+            String directoryId = (directoryWithExtensionsDTO.getDirectory().getObjectId() != null ? String.valueOf(directoryWithExtensionsDTO.getDirectory().getObjectId()) : "null");
+            logger.info("GET: Requested file list from directory with id {}", directoryId);
+        }
+        return ResponseEntity.ok(logFileService.getLogFileList(directoryWithExtensionsDTO));
     }
 
     @PostMapping("files/add")
     public ResponseEntity<Directory> addLogFiles(List<LogFile> logFiles) {
-        logger.info("POST: Requested saving {} files", (logFiles != null ? logFiles.size() : "null"));
-        directoryService.addLogFileList(logFiles);
+        if(logger.isInfoEnabled()) {
+            String size = logFiles==null?"null array": String.valueOf(logFiles.size());
+            logger.info("POST: Requested saving {} files", size);
+        }
+        logFileService.addLogFileList(logFiles);
         return ResponseEntity.noContent().build();
     }
 }

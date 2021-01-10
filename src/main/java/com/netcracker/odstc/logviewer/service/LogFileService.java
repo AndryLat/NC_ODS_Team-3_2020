@@ -1,55 +1,79 @@
 package com.netcracker.odstc.logviewer.service;
 
+import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
+import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
+import com.netcracker.odstc.logviewer.service.exceptions.LogFileServiceException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 @Service
-public class LogFileService {
+public class LogFileService extends AbstractService {
+
+    private final Logger logger = LogManager.getLogger(LogFileService.class.getName());
 
     private final EAVObjectDAO eavObjectDAO;
 
-    public LogFileService(@Qualifier("EAVObjectDAO") EAVObjectDAO eavObjectDAO) {
+    private final ServerConnectionService serverConnectionService;
+
+    public LogFileService(EAVObjectDAO eavObjectDAO) {
+        this.serverConnectionService = ServerConnectionService.getInstance();
         this.eavObjectDAO = eavObjectDAO;
     }
 
-
-    public LogFile findById(BigInteger id) {
-        if (isIdValid(id)) {
-            return eavObjectDAO.getObjectById(id, LogFile.class);
+    public List<LogFile> getLogFileList(DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
+        if (directoryWithExtensionsDTO.getDirectory()!=null) {
+            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Cant check invalid directory");
         }
-        return null;
+        Directory directory = directoryWithExtensionsDTO.getDirectory();
+        if (directory.getParentId() == null) {
+            throwLogFilesServiceExceptionWithMessage("Cant check connection with directory without parentId");
+        }
+        String[] extensions;
+        if (directoryWithExtensionsDTO.getExtensions() == null) {
+            extensions = new String[]{""};
+        } else {
+            extensions = directoryWithExtensionsDTO.getExtensions();
+        }
+        Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
+        return serverConnectionService.getLogFilesFromDirectory(server, directory, extensions);
     }
 
-    public List<LogFile> getFiles() {
-        return eavObjectDAO.getObjectsByObjectTypeId(BigInteger.valueOf(4), LogFile.class);
+    private void throwLogFilesServiceExceptionWithMessage(String message) {
+        LogFileServiceException logFileServiceException = new LogFileServiceException(message);
+        logger.error(message, logFileServiceException);
+        throw logFileServiceException;
     }
 
-    public void save(LogFile logFile) {
-        if (isLogFileValid(logFile)) {
-            eavObjectDAO.saveObject(logFile);
+    public void addLogFileList(List<LogFile> logFiles) {
+        if (logFiles == null) {
+            throwLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
+        }
+        for (LogFile logFile : logFiles) {
+            if (isFileValid(logFile)) {
+                logFile.setLastUpdate(new Date());
+                logFile.setLastRow(0);
+                validateObjectType(logFile);
+                eavObjectDAO.saveObject(logFile);
+            } else {
+                logger.error("Skipping non valid file");
+            }
         }
     }
 
-    public void deleteById(BigInteger id) {
-        if (isIdValid(id)) {
-            eavObjectDAO.deleteById(id);
+    private boolean isFileValid(LogFile logFile) {
+        if (logFile != null) {
+            return logFile.getName() != null;
         }
+        return false;
     }
 
-    private boolean isIdValid(BigInteger id) {
-        return id != null && !id.equals(BigInteger.valueOf(0));
-    }
 
-    private boolean isLogFileValid(LogFile logFile) {
-        return logFile != null
-                && logFile.getName() != null
-                && logFile.getName().trim().length() != 0
-                && logFile.getLastRow() > 0
-                && logFile.getLastUpdate() != null;
-    }
 }

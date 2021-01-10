@@ -1,12 +1,8 @@
 package com.netcracker.odstc.logviewer.service;
 
-import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
-import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import com.netcracker.odstc.logviewer.service.exceptions.DirectoryServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class DirectoryService {
+public class DirectoryService extends AbstractService {
     private static final Class<Directory> directoryClass = Directory.class;
     private final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
     private final EAVObjectDAO eavObjectDAO;
@@ -77,60 +73,7 @@ public class DirectoryService {
         return serverConnectionService.isDirectoryAvailable(server, directory);
     }
 
-    public List<LogFile> getLogFileList(DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
-        if (!isDirectoryValid(directoryWithExtensionsDTO.getDirectory())) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Cant check invalid directory");
-        }
-        Directory directory = directoryWithExtensionsDTO.getDirectory();
-        if (directory.getParentId() == null) {
-            throwDirectoryServiceExceptionWithMessage("Cant check connection with directory without parentId");
-        }
-        String[] extensions;
-        if (directoryWithExtensionsDTO.getExtensions() == null) {
-            extensions = new String[]{""};
-        } else {
-            extensions = directoryWithExtensionsDTO.getExtensions();
-        }
-        Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
-        return serverConnectionService.getLogFilesFromDirectory(server, directory, extensions);
-    }
 
-    public void addLogFileList(List<LogFile> logFiles) {
-        if (logFiles == null) {
-            throwDirectoryServiceExceptionWithMessage("List of log files cant be equals null");
-        }
-        for (LogFile logFile : logFiles) {
-            if (isFileValid(logFile)) {
-                logFile.setLastUpdate(new Date());
-                logFile.setLastRow(0);
-                validateObjectType(logFile);
-                eavObjectDAO.saveObject(logFile);
-            } else {
-                logger.error("Skipping non valid file");
-            }
-        }
-    }
-
-    private void validateObjectType(EAVObject eavObject) {
-        if (eavObject instanceof Directory) {
-            eavObject.setObjectTypeId(ObjectTypes.DIRECTORY.getObjectTypeID());
-        }
-        if (eavObject instanceof LogFile) {
-            eavObject.setObjectTypeId(ObjectTypes.LOGFILE.getObjectTypeID());
-        }
-        logger.warn("Get EAVObject that not listed in validations");
-    }
-
-    private boolean isFileValid(LogFile logFile) {
-        if (logFile != null) {
-            return logFile.getName() != null;
-        }
-        return false;
-    }
-
-    private boolean isIdValid(BigInteger id) {
-        return id != null && !id.equals(BigInteger.valueOf(0));
-    }
 
     private boolean isDirectoryValid(Directory directory) {
         if (directory != null) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 
 @Service
-public class ServerService {
+public class ServerService extends AbstractService {
 
     private final EAVObjectDAO eavObjectDAO;
     private final Class<Server> serverClass = Server.class;
@@ -34,10 +34,6 @@ public class ServerService {
         if (isIdValid(id)) {
             eavObjectDAO.deleteById(id);
         }
-    }
-
-    private boolean isIdValid(BigInteger id) {
-        return id != null && !id.equals(BigInteger.valueOf(0));
     }
 
     private boolean isServerValid(Server server) {
