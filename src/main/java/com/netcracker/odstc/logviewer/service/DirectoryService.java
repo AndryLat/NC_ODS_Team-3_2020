@@ -141,13 +141,7 @@ public class DirectoryService {
 
     private void throwDirectoryServiceExceptionWithMessage(String message) {
         DirectoryServiceException directoryServiceException = new DirectoryServiceException(message);
-        //logger.error(message,directoryServiceException);
-        throw directoryServiceException;
-    }
-
-    private void throwDirectoryServiceExceptionWithMessage(String message, Throwable throwable) {
-        DirectoryServiceException directoryServiceException = new DirectoryServiceException(message, throwable);
-        //logger.error(message,directoryServiceException);
+        logger.error(message, directoryServiceException);
         throw directoryServiceException;
     }
 }
