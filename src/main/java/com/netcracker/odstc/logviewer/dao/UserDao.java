@@ -34,11 +34,7 @@ public class UserDao extends EAVObjectDAO {
             logger.error("User by login not found:",exp);
             return null;
         }
-        if (userId != null) {
-            User result = getObjectById(userId.getObjectId(), User.class);
-            return result;
-        }
-        return null;
+        return getObjectById(userId.getObjectId(), User.class);
     }
 
     public List<User> getUsers(Pageable page) {

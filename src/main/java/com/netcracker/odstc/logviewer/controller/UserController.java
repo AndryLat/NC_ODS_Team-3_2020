@@ -18,7 +18,7 @@ import java.security.Principal;
 
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("api/user")
 public class UserController {
 
     private static final String DEFAULT_PAGE_SIZE = "10";
@@ -37,7 +37,7 @@ public class UserController {
         this.mailService = mailService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public Page<User> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageable = PageRequest.of(page, pageSize);
@@ -46,21 +46,20 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<User> create(@RequestBody User user, Principal principal) {
+        if (user == null) {
+            userService.throwException("User shouldn't be null");
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+        }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         User creator = userService.findByLogin(principal.getName());
         user.setCreated(creator.getObjectId());
-        boolean result = userService.save(user);
-        if(result){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity("User is not valid to create", HttpStatus.NOT_ACCEPTABLE);
+        userService.save(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @PutMapping("/update")
     public ResponseEntity<User> update(@RequestBody User user) {
-        if (user == null) {
-            return new ResponseEntity("User shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
-        }
         userService.update(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -68,54 +67,40 @@ public class UserController {
     @PutMapping("/updatePassword")
     public ResponseEntity<User> updatePassword(@RequestBody User user) {
         if (user == null) {
-            return new ResponseEntity("User shouldn't be null", HttpStatus.NOT_ACCEPTABLE);
+            userService.throwException("User shouldn't be null");
+            return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        boolean result = userService.updatePassword(user);
-        if(result){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity("User is not valid to update", HttpStatus.NOT_ACCEPTABLE);
+        userService.updatePassword(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/resetPassword")
     public ResponseEntity<User> resetPassword(HttpServletRequest request,
                                 @RequestParam("login") String login) {
         User user = userService.findByLogin(login);
-        if (user == null) {
-            return new ResponseEntity("User is not found", HttpStatus.NOT_ACCEPTABLE);
-        }
         String token = securityService.createPasswordResetTokenForUser(user);
         mailSender.send(mailService.constructResetTokenEmail(securityService.getAppUrl(request), token, user));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/changePassword")
-    public ResponseEntity<User> changePassword(@RequestParam("id") long id, @RequestParam("token") String token) {
-        if(securityService.validatePasswordResetToken(token)){
-            return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<User> changePassword(@RequestParam("id") BigInteger id, @RequestParam("token") String token) {
+        if(securityService.validatePasswordResetToken(token, id)){
+            userService.throwException("Password reset is not available.");
         }
-        return new ResponseEntity("Token is not available", HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> findById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity("Id shouldn't be 0 or null", HttpStatus.NOT_ACCEPTABLE);
-        }
         return ResponseEntity.ok(userService.findById(id));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            return new ResponseEntity("Id shouldn't be 0 or null", HttpStatus.NOT_ACCEPTABLE);
-        }
-        boolean result = userService.deleteById(id);
-        if(result){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity("User is not valid to delete", HttpStatus.NOT_ACCEPTABLE);
+        userService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

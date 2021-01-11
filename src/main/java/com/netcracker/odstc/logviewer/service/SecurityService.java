@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
 import java.util.Date;
 
 import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.EXPIRATION_TIME_RESET_PASSWORD;
@@ -19,6 +20,12 @@ public class SecurityService {
 
     private final Logger logger = LogManager.getLogger(SecurityService.class.getName());
 
+    private final UserService userService;
+
+    public SecurityService(UserService userService) {
+        this.userService = userService;
+    }
+
     public String createPasswordResetTokenForUser(User user) {
         String token = JWT.create()
                 .withSubject(user.getLogin())
@@ -27,7 +34,7 @@ public class SecurityService {
         return token;
     }
 
-    public boolean validatePasswordResetToken(String token){
+    public boolean validatePasswordResetToken(String token, BigInteger id){
         if (token != null) {
             try{
                 String userLogin = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
@@ -35,9 +42,12 @@ public class SecurityService {
                         .verify(token)
                         .getSubject();
                 if (userLogin != null) {
-                    return true;
+                    User user = userService.findById(id);
+                    if(userLogin.equals(user.getLogin())){
+                        return true;
+                    }
+                    logger.error("There are two different users in token and id.");
                 }
-                return false;
             }catch (TokenExpiredException exp){
                 logger.error("Password reset token expired",exp);
                 return false;
