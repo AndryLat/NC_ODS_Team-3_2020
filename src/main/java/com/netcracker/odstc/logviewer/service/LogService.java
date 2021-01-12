@@ -2,12 +2,9 @@ package com.netcracker.odstc.logviewer.service;
 
 import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -23,32 +20,18 @@ public class LogService {
         return logDAO.getObjectsByObjectTypeId(BigInteger.valueOf(5), Log.class);
     }
 
-    public List<Log> filtrateByDateLogs(Date... dateFrom) {
-        List<Log> logs = new ArrayList<>();
-        return logs;
-    }
-
-    public List<Log> filtrateByLevelLogs(String... levels) {
-        List<Log> logs = new ArrayList<>();
-        return logs;
-    }
-
     public Log findById(BigInteger id) {
-        return logDAO.getById(id);
+        return logDAO.getObjectById(id, Log.class);
     }
 
-    public List<Log> findLogs(String value) {
-        return Collections.emptyList();
+    public List<Log> getAllLogs() {
+        return logDAO.getAll();
     }
 
-    public List<Log> sortByDate(Date date) {
-        List<Log> logs = new ArrayList<>();
-        return logs;
-    }
-
-    public List<Log> sortByLevel(String level) {
-        List<Log> logs = new ArrayList<>();
-        return logs;
+    public List<Log> getAllLogsByAllValues(String text, Date dat1, Date dat2, int V_SEVERE, int V_WARNING,
+                                           int V_INFO, int V_CONFIG, int V_FINE, int V_FINER, int V_FINEST, int V_DEBUG,
+                                           int V_TRACE, int V_ERROR, int V_FATAL, int V_SORT) {
+        return logDAO.getLogByAll(text, dat1, dat2, V_SEVERE, V_WARNING, V_INFO, V_CONFIG, V_FINE, V_FINER, V_FINEST, V_DEBUG, V_TRACE, V_ERROR, V_FATAL, V_SORT);
     }
 
     public void save(Log log) {
@@ -64,9 +47,6 @@ public class LogService {
     }
 
     private boolean isLogValid(Log log) {
-        if (log != null && log.getText() != null) {
-            return true;
-        }
-        return false;
+        return log != null && log.getText() != null;
     }
 }
