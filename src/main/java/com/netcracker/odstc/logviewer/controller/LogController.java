@@ -1,35 +1,47 @@
 package com.netcracker.odstc.logviewer.controller;
 
-import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.service.LogService;
+import com.netcracker.odstc.logviewer.service.RuleContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @RequestMapping("/log")
 @RestController
 public class LogController {
-    private LogService logService;
-    LogDAO logDAO = new LogDAO(new JdbcTemplate());
+    private final Logger logger = LogManager.getLogger(LogController.class.getName());
+    private static final String DEFAULT_PAGE_SIZE = "20";
     private static final String logNullMessage = "Log shouldn't be 0 or null";
     private static final String logIdNullMessage = "Log shouldn't be 0 or null";
-    private final Logger logger = LogManager.getLogger(LogController.class.getName());
+
+    private LogService logService;
 
     public LogController(LogService logService) {
         this.logService = logService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<Log>> logs(@RequestParam BigInteger directoryId,
+                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                            @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
+                                            @RequestBody RuleContainer ruleContainer){
+        PageRequest pageable = PageRequest.of(page, pageSize);
+        List<Log> logs = logService.getAllLogsByAllValues(directoryId,ruleContainer,pageable);
+        return ResponseEntity.ok(logs);
     }
 
     @PostMapping("/add")
@@ -42,23 +54,13 @@ public class LogController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Log> update(@RequestBody Log log) {
-        if (log == null) {
-            throwException(logNullMessage);
-        }
-        logger.info("Update log");
-        logService.save(log);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Log> deleteById(@PathVariable BigInteger id) {
         if (id == null || id.equals(BigInteger.valueOf(0))) {
             throwException(logIdNullMessage);
         }
         logger.info("Delete log");
-        logService.deleteById(logDAO.getById(id));
+        logService.deleteById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
 

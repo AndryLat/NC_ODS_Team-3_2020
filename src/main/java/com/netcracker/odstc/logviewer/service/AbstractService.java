@@ -30,7 +30,8 @@ public abstract class AbstractService {
             eavObject.setObjectTypeId(ObjectTypes.SERVER.getObjectTypeID());
         }else if (eavObject instanceof Log) {
             eavObject.setObjectTypeId(ObjectTypes.LOG.getObjectTypeID());
+        }else {
+            logger.warn("Get EAVObject that not listed in validations");
         }
-        logger.warn("Get EAVObject that not listed in validations");
     }
 }
