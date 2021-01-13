@@ -5,7 +5,6 @@ import com.netcracker.odstc.logviewer.models.Log;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,10 +15,6 @@ public class LogService {
         this.logDAO = logDAO;
     }
 
-    public List<Log> getLogs() {
-        return logDAO.getObjectsByObjectTypeId(BigInteger.valueOf(5), Log.class);
-    }
-
     public Log findById(BigInteger id) {
         return logDAO.getObjectById(id, Log.class);
     }
@@ -28,10 +23,12 @@ public class LogService {
         return logDAO.getAll();
     }
 
-    public List<Log> getAllLogsByAllValues(String text, Date dat1, Date dat2, int V_SEVERE, int V_WARNING,
-                                           int V_INFO, int V_CONFIG, int V_FINE, int V_FINER, int V_FINEST, int V_DEBUG,
-                                           int V_TRACE, int V_ERROR, int V_FATAL, int V_SORT) {
-        return logDAO.getLogByAll(text, dat1, dat2, V_SEVERE, V_WARNING, V_INFO, V_CONFIG, V_FINE, V_FINER, V_FINEST, V_DEBUG, V_TRACE, V_ERROR, V_FATAL, V_SORT);
+    public List<Log> getAllLogsByAllValues(RuleContainer allValuesForLogs) {
+        return logDAO.getLogByAll(allValuesForLogs.getText(), allValuesForLogs.getDat1(), allValuesForLogs.getDat2(),
+                allValuesForLogs.getSevere(), allValuesForLogs.getWarning(), allValuesForLogs.getInfo(),
+                allValuesForLogs.getConfig(), allValuesForLogs.getFine(), allValuesForLogs.getFiner(),
+                allValuesForLogs.getFinest(), allValuesForLogs.getDebug(), allValuesForLogs.getTrace(),
+                allValuesForLogs.getError(), allValuesForLogs.getFatal(), allValuesForLogs.getSort());
     }
 
     public void save(Log log) {

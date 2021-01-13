@@ -11,6 +11,7 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEv
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -26,9 +27,15 @@ import java.util.Map;
 @Repository
 public class EAVObjectDAO {
 
-    private static final String GET_OBJECT_BY_PARENT_ID_QUERY = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE PARENT_ID  = ?";
+    private static final String GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID" +
+            " FROM OBJECTS WHERE PARENT_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-    private static final String GET_OBJECT_BY_TYPE_QUERY = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_TYPE_ID  = ?";
+    private static final String GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID " +
+            "FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+    private static final String GET_OBJECT_BY_PARENT_ID_QUERY = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE PARENT_ID  = ? ";
+
+    private static final String GET_OBJECT_BY_TYPE_QUERY = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? ";
 
     private static final String GET_OBJECT_BY_ID_QUERY = "SELECT object_id ,NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE object_id = ?";
 
@@ -77,8 +84,18 @@ public class EAVObjectDAO {
 
     private final Logger logger = LogManager.getLogger(EAVObjectDAO.class.getName());
 
+    private String errorMessage = "id can`t be null";
+
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public <T extends EAVObject> List<T> getObjectsByParentId(Pageable page, BigInteger bigInteger, Class<T> clazz) {
+        return getObjectsByQuery(page, bigInteger, clazz, GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION);
+    }
+
+    public <T extends EAVObject> List<T> getObjectsByObjectTypeId(Pageable page, BigInteger objectTypeId, Class<T> clazz) {
+        return getObjectsByQuery(page, objectTypeId, clazz, GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION);
     }
 
     public <T extends EAVObject> List<T> getObjectsByParentId(BigInteger bigInteger, Class<T> clazz) {
@@ -90,6 +107,9 @@ public class EAVObjectDAO {
     }
 
     public <T extends EAVObject> T getObjectByIdAttrByIds(BigInteger id, Class<T> clazz, List<BigInteger> attributeIds) {
+        if (id == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         EAVObject eavObject = createEAVObject(id, clazz);
         EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), id);
         if (columns == null) {
@@ -108,6 +128,9 @@ public class EAVObjectDAO {
     }
 
     public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
+        if (objectId == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         EAVObject eavObject = createEAVObject(objectId, clazz);
         EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
         if (columns != null) {
@@ -162,6 +185,9 @@ public class EAVObjectDAO {
     }
 
     public void saveAttributes(BigInteger objectId, Map<BigInteger, Attribute> attributes) {
+        if (objectId == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         for (Map.Entry<BigInteger, Attribute> attribute : attributes.entrySet()) {
             jdbcTemplate.update(UPDATE_ATTRIBUTE_QUERY,
                     objectId,
@@ -173,6 +199,9 @@ public class EAVObjectDAO {
     }
 
     public void saveReferences(BigInteger objectId, Map<BigInteger, BigInteger> references) {
+        if (objectId == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         for (Map.Entry<BigInteger, BigInteger> reference : references.entrySet()) {
             jdbcTemplate.update(UPDATE_REFERENCE_QUERY,
                     reference.getValue(),
@@ -182,12 +211,18 @@ public class EAVObjectDAO {
     }
 
     public void deleteById(BigInteger id) {
+        if (id == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
         jdbcTemplate.update(DELETE_OBJECT_QUERY, id);
         DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId));
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
+        if (objectId == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         EAVObject eavObject = new EAVObject();
         try {
             eavObject = clazz.getConstructor(BigInteger.class).newInstance(objectId);
@@ -212,6 +247,9 @@ public class EAVObjectDAO {
     }
 
     private HashMap<BigInteger, BigInteger> getReference(BigInteger id) {
+        if (id == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query(GET_OBJECT_ATTRIBUTE_BY_REFERENCE_QUERY,
                 new ReferenceMapper(),
                 id);
@@ -225,6 +263,9 @@ public class EAVObjectDAO {
     }
 
     private HashMap<BigInteger, Attribute> getAttributes(BigInteger attributeId, String query) {
+        if (attributeId == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(query,
                 new AttributeMapper(),
                 attributeId);
@@ -237,7 +278,22 @@ public class EAVObjectDAO {
     }
 
     private <T extends EAVObject> List<T> getObjectsByQuery(BigInteger id, Class<T> clazz, String query) {
+        if (id == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
         List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
+        return getObjectsByIds(objectIds, clazz);
+    }
+
+    private <T extends EAVObject> List<T> getObjectsByQuery(Pageable page, BigInteger id, Class<T> clazz, String query) {
+        if (id == null) {
+            throw new EAVAttributeException(errorMessage);
+        }
+        List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id, page.getOffset(), page.getPageSize());
+        return getObjectsByIds(objectIds, clazz);
+    }
+
+    private <T extends EAVObject> List<T> getObjectsByIds(List<EAVObject> objectIds, Class<T> clazz) {
         List<EAVObject> eavObjects = new ArrayList<>();
         EAVObject eavObject;
         for (int i = 0; i < objectIds.size(); i++) {
