@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
-import {User} from '../../entity/User';
-import {UserPage} from '../../pageable/UserPage';
-import {GlobalConstants} from '../../constants/global-constants';
+import {User} from '../../../entity/User';
+import {UserPage} from '../../../pageable/UserPage';
+import {GlobalConstants} from '../../../constants/global-constants';
 import {Router} from '@angular/router';
-import {AuthService} from "../../services/AuthService";
+import {AuthService} from "../../../services/AuthService";
 
 @Component({
   selector: 'app-users-component',

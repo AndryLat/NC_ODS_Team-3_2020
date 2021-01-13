@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {GlobalConstants} from '../../constants/global-constants';
-import {Log} from '../../entity/Log';
-import {LogLevel} from '../../entity/list/LogLevel';
+import {GlobalConstants} from '../../../constants/global-constants';
+import {Log} from '../../../entity/Log';
+import {LogLevel} from '../../../entity/list/LogLevel';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {AuthService} from "../../services/AuthService";
+import {AuthService} from "../../../services/AuthService";
 
 
 @Component({

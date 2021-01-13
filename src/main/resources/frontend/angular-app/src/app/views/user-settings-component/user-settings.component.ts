@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import {GlobalConstants} from '../constants/global-constants';
+import {GlobalConstants} from '../../constants/global-constants';
 import {HttpClient} from '@angular/common/http';
-import {User} from '../entity/User';
-import {AuthService} from "../services/AuthService";
+import {User} from '../../entity/User';
+import {AuthService} from "../../services/AuthService";
 
 
 @Component({

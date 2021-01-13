@@ -1,11 +1,11 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {LoginComponent} from './views/models/login.component';
-import {UsersComponent} from './views/models/users.component';
-import {ServersComponent} from './views/models/servers.component';
-import {DirectoriesComponent} from './views/models/directories.component';
-import {LogsComponent} from './views/models/logs.component';
-import {UserSettingsComponent} from './views/user-settings.component';
+import {LoginComponent} from './views/login-component/login.component';
+import {UsersComponent} from './views/models/users-component/users.component';
+import {ServersComponent} from './views/models/servers-component/servers.component';
+import {DirectoriesComponent} from './views/models/directories-component/directories.component';
+import {LogsComponent} from './views/models/logs-component/logs.component';
+import {UserSettingsComponent} from './views/user-settings-component/user-settings.component';
 import {AuthGuard} from "./services/AuthGuard";
 
 const routes: Routes = [

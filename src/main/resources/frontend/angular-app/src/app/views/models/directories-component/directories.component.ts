@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {GlobalConstants} from '../../constants/global-constants';
-import {Directory} from '../../entity/Directory';
-import {AuthService} from "../../services/AuthService";
+import {GlobalConstants} from '../../../constants/global-constants';
+import {Directory} from '../../../entity/Directory';
+import {AuthService} from "../../../services/AuthService";
 
 
 @Component({
