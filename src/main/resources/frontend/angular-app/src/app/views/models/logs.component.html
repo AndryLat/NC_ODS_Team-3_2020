@@ -1,0 +1,85 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-9">
+      <table class="table table-bordered">
+        <caption>Logs table</caption>
+        <thead>
+        <tr>
+          <th style="width: 70%" scope="col">Text</th>
+          <th style="width: 10%" scope="col">Level</th>
+          <th style="width: 10%" scope="col">Creation Date</th>
+          <th style="width: 10%" scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let log of logs;">
+          <td>{{log.text}}</td>
+          <td>{{formatLevel(log.level)}}</td>
+          <td>{{log.creationDate | date: 'short'}}</td>
+          <td class="d-flex justify-content-around">
+            <button class="btn btn-danger" (click)="deleteLog(log.objectId)">Delete</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-3">Settings
+      <hr>
+      <form [formGroup]="operationForm">
+        <div class="border rounded">
+          <div class="m-2">
+            <label for="searchInput">Search by text</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="Text" name="search"
+                   formControlName="search">
+          </div>
+        </div>
+        <hr>
+        <div class="border rounded">
+          <div class="m-2">
+            <p>Sorting</p>
+            <div class="row input-group-sm">
+              <label class="col-10" for="sortByLevel">Sort By Level</label>
+              <input type="radio" class="form-control col-2" [ngModel]="sort" value="level" id="sortByLevel" name="sort" formControlName="sort">
+            </div>
+            <br/>
+            <div class="row input-group-sm">
+              <label class="col-10" for="sortByDate">Sort By Date</label>
+              <input type="radio" class="form-control  col-2" [ngModel]="sort" value="date" id="sortByDate" name="sort"
+                     formControlName="sort">
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="border rounded">
+          <div class="m-2">
+            <p>Filtration</p>
+            <hr>
+            <div class="row">
+              <label class="col-10" for="dateFiltr">Filtrate by date</label>
+              <input type="checkbox" class="form-control  col-2" id="dateFiltr" name="dateFiltr"
+                     formControlName="dateFiltr">
+            </div>
+            <label for="startDate">Start date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate"
+                   formControlName="startDate">
+            <label for="endDate">End date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate"
+                   formControlName="endDate">
+            <hr>
+            <div class="row">
+              <label class="col-10" for="levelFiltr">Filtrate by level</label>
+              <input type="checkbox" class="form-control  col-2" id="levelFiltr" name="levelFiltr"
+                     formControlName="levelFiltr">
+            </div>
+            <hr>
+            <div *ngFor="let key of keys()" class="row">
+              <label class="col-10" for="logLevel">{{key}}</label>
+              <input type="checkbox" class="form-control  col-2" id="logLevel" name="logLevel"
+                     formControlName="logLevel">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

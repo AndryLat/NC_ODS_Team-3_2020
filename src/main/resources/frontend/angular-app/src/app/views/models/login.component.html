@@ -1,0 +1,22 @@
+<div class="text-center d-flex justify-content-center">
+<form class="form-signin col-3" [formGroup]="form">
+  <h1>LogViewer</h1>
+  <hr>
+  <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+  <label for="inputEmail" class="sr-only">Email address</label>
+  <input class="form-control" id="inputEmail" name="email" formControlName="email" placeholder="Email">
+  <br>
+  <label for="inputPassword" class="sr-only">Password</label>
+  <input class="form-control" id="inputPassword" name="password" formControlName="password"
+         type="password" placeholder="Password">
+  <br>
+  <button class="btn btn-lg btn-primary btn-block"
+          (click)="login()">Sign in</button>
+  <a href="#" class="nav-link">Forgot password?</a>
+</form>
+</div>
+<footer class="footer">
+  <div class="container text-center">
+    <span class="text-muted">Still in development</span>
+  </div>
+</footer>

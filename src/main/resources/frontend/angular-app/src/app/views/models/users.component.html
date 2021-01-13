@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="container col-10">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new user</button>
+  </div>
+</div>
+<hr>
+<div class="d-flex justify-content-center row">
+  <table class="col-10 table table-bordered">
+    <caption>Users table</caption>
+    <thead>
+    <tr>
+      <th scope="col">Email</th>
+      <th scope="col">Login</th>
+      <th scope="col">Password</th>
+      <th scope="col">Role</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users;">
+      <th scope="row">{{user.email}}</th>
+      <td>{{user.login}}</td>
+      <td>{{user.password}}</td>
+      <td>{{user.role}}</td>
+      <td class="d-flex justify-content-around">
+        <button class="btn btn-danger" (click)="deleteUser(user.objectId)">Delete</button></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PUT FORM -->
+        <form [formGroup]="form">
+          <div class="form-group">
+            <label for="emailInput">Email address</label>
+            <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" name="email" formControlName="email">
+          </div>
+          <div class="form-group">
+            <label for="loginInput">Login</label>
+            <input type="text" class="form-control" id="loginInput" placeholder="login" name="login" formControlName="login">
+          </div>
+          <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <input type="text" class="form-control" id="passwordInput" placeholder="password" name="password" formControlName="password">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Role</label>
+            <select class="form-control" id="exampleFormControlSelect1" name="role" formControlName="role">
+              <option *ngFor="let role of roles" [ngValue]="role">{{role}}</option>
+            </select>
+          </div>
+        </form>
+        <!-- PUT FORM -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="addUser()">Send message</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 import {AuthService} from "./services/AuthService";
 
 @Component({
@@ -7,15 +7,15 @@ import {AuthService} from "./services/AuthService";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-app';
+  title: 'LogViewer';
   constructor(private authService: AuthService) {
-  }
-
-  isAdmin(): boolean {
-    return true;
   }
 
   isLoginned(): boolean {
     return this.authService.isLoggedIn();
+  }
+
+  isAdmin(): boolean {
+    return true;
   }
 }

@@ -1,0 +1,132 @@
+<div class="row">
+  <div class="container col-10">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new server</button>
+  </div>
+</div>
+<hr>
+<div class="d-flex justify-content-center row">
+  <table class="col-10 table table-bordered">
+    <caption>Servers table</caption>
+    <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Ip</th>
+      <th scope="col">Protocol</th>
+      <th scope="col">Port</th>
+      <th scope="col">Last Log Check</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let server of servers;">
+      <td>{{server.name}}</td>
+      <td>{{server.ip}}</td>
+      <td>{{server.protocol}}</td>
+      <td>{{server.port}}</td>
+      <td class="col-1">{{server.lastAccessByJob | date: 'short'}}</td>
+      <td class="d-flex justify-content-around">
+        <button class="btn btn-dark" (click)="routeToDirectories(server.objectId)">Proceed</button>
+        <button class="btn btn-info" data-toggle="modal" data-target="#updateModal" (click)="showSettings(server)">Settings</button>
+        <button class="btn btn-danger" (click)="deleteServer(server.objectId)">Delete</button></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Adding new server</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PUT FORM -->
+        <form [formGroup]="insertForm">
+          <div class="form-group">
+            <label for="nameInput">Server name</label>
+            <input type="text" class="form-control" id="nameInput" required placeholder="Server Name" name="name" formControlName="name">
+          </div>
+          <div class="form-group">
+            <label for="ipInput">Ip address</label>
+            <input type="text" class="form-control" id="ipInput" placeholder="127.0.0.1" name="ip" formControlName="ip">
+          </div>
+          <div class="form-group">
+            <label for="portInput">Port</label>
+            <input type="text" class="form-control" id="portInput" placeholder="65535" name="port" formControlName="port">
+          </div>
+          <div class="form-group">
+            <label for="loginInput">Login</label>
+            <input type="text" class="form-control" id="loginInput" placeholder="login" name="login" formControlName="login">
+          </div>
+          <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <input type="text" class="form-control" id="passwordInput" placeholder="password" name="password" formControlName="password">
+          </div>
+          <div class="form-group">
+            <label for="protocolSelect">Protocol</label>
+            <select class="form-control" id="protocolSelect" name="protocol" formControlName="protocol">
+              <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
+            </select>
+          </div>
+        </form>
+        <!-- PUT FORM -->
+        <div class="d-flex flex-row">
+          <button type="button" class="btn btn-info col-4" (click)="testConnection()">Test connection</button>
+          <div *ngIf="!(testResult===null)" class="col-8">{{testResult}}</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset();testResult=null">Close</button>
+        <button type="submit" class="btn btn-primary" (click)="addServer()">Add Server</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateModalLabel">Settings of server</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PUT FORM -->
+        <form [formGroup]="updateForm">
+          <div class="form-group">
+            <label for="nameInputUpdate">Server name</label>
+            <input type="text" class="form-control" id="nameInputUpdate" required placeholder="Server Name" name="name" formControlName="name">
+          </div>
+          <div class="form-group">
+            <label for="portInputUpdate">Port</label>
+            <input type="text" class="form-control" id="portInputUpdate" placeholder="65535" name="port" formControlName="port">
+          </div>
+          <div class="form-group">
+            <label for="loginInputUpdate">Login</label>
+            <input type="text" class="form-control" id="loginInputUpdate" placeholder="login" name="login" formControlName="login">
+          </div>
+          <div class="form-group">
+            <label for="passwordInputUpdate">Password</label>
+            <input type="text" class="form-control" id="passwordInputUpdate" placeholder="password" name="password" formControlName="password">
+          </div>
+          <div class="form-group">
+            <label for="protocolSelectUpdate">Protocol</label>
+            <select class="form-control" id="protocolSelectUpdate" name="protocol" formControlName="protocol">
+              <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
+            </select>
+          </div>
+        </form>
+        <!-- PUT FORM -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset();testResult=null">Close</button>
+        <button type="submit" class="btn btn-primary" (click)="updateServer()">Add Server</button>
+      </div>
+    </div>
+  </div>
+</div>

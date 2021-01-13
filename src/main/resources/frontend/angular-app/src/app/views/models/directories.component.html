@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="container col-10">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new Directory</button>
+  </div>
+</div>
+<hr>
+<div class="d-flex justify-content-center row">
+  <table class="col-10 table table-bordered">
+    <caption>Directories table</caption>
+    <thead>
+    <tr>
+      <th scope="col">Path</th>
+      <th scope="col">Enabled</th>
+      <th scope="col">Last Existence Check</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let directory of directories;">
+      <td>{{directory.path}}</td>
+      <td>{{directory.enabled}}</td>
+      <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
+      <td class="d-flex justify-content-around">
+        <button class="btn btn-dark" (click)="routeToLogs(directory.objectId)">Proceed</button>
+        <button class="btn btn-danger" (click)="deleteDirectory(directory.objectId)">Delete</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Adding new directory</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PUT FORM -->
+        <form [formGroup]="insertForm">
+          <div class="form-group">
+            <label for="nameInput">Directory path (from home)</label>
+            <input type="text" class="form-control" id="nameInput" required placeholder="Directory path" name="path"
+                   formControlName="path">
+            <label for="maskInput">Extensions for files</label>
+            <input type="text" class="form-control" id="maskInput" required placeholder="Extensions for files"
+                   name="mask" formControlName="mask">
+            <hr>
+            <div class="d-flex flex-row">
+              <button type="button" class="btn btn-info col-4">Test connection</button>
+              <div class="col-8">Directory connection status</div>
+            </div>
+            <hr>
+            <button type="button" class="btn btn-info">Get file list</button>
+            <hr>
+            <table class="table table-bordered">
+              <caption>Files</caption>
+              <thead>
+              <tr>
+                <th scope="col">File name</th>
+                <th scope="col">Include?</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>FileName.txt</td>
+                <td>
+                  <input type="checkbox" class="form-control">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <!-- PUT FORM -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset()">Close</button>
+        <button type="submit" class="btn btn-primary" (click)="addDirectory()">Add Server</button>
+      </div>
+    </div>
+  </div>
+</div>
