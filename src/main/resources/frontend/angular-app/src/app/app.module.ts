@@ -7,6 +7,8 @@ import {OverlaySpinnerComponent} from "./views/overlay-spinner/overlay-spinner.c
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {AuthInterceptor} from "./services/AuthInterceptor";
 import {SpinnerOverlayService} from "./services/SpinerService";
+import {AuthService} from "./services/AuthService";
+import {AuthGuard} from "./services/AuthGuard";
 
 @NgModule({
   declarations: [
@@ -17,7 +19,7 @@ import {SpinnerOverlayService} from "./services/SpinerService";
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [
+  providers: [AuthService,AuthGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
