@@ -31,7 +31,7 @@ jobs:
       with:
         node-version: '14.15.1'
     - name: Set up Angular CLI
-      run: npm install -g @angular/cli@11.0.2 > /dev/null
+      run: npm install -g @angular/cli@11.0.5 > /dev/null
     - name: Set up Angular dependencies
       working-directory: ./src/main/resources/frontend/angular-app/
       run: npm install
