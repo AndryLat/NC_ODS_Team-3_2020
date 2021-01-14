@@ -1,4 +1,4 @@
-package com.netcracker.odstc.logviewer.containers.DTO;
+package com.netcracker.odstc.logviewer.containers.dto;
 
 import com.netcracker.odstc.logviewer.models.Directory;
 

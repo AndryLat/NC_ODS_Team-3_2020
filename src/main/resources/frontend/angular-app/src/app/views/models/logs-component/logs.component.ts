@@ -4,7 +4,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {Log} from '../../../entity/Log';
 import {LogLevel} from '../../../entity/list/LogLevel';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup} from '@angular/forms';
 import {AuthService} from "../../../services/AuthService";
 import {faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {RuleContainer} from "../../../containers/RuleContainer";
@@ -78,6 +78,7 @@ export class LogsComponent {
     this.http.get<LogPage>(GlobalConstants.apiUrl + 'api/log/',{params}).subscribe(result => {
       console.log(result);
       this.logs = result.content;
+      console.log(this.logs);
     });
   }
 

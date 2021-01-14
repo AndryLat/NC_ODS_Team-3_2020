@@ -1,6 +1,6 @@
 package com.netcracker.odstc.logviewer.service;
 
-import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
+import com.netcracker.odstc.logviewer.containers.dto.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;

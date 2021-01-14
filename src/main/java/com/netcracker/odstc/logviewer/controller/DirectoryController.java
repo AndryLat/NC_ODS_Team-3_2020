@@ -1,6 +1,6 @@
 package com.netcracker.odstc.logviewer.controller;
 
-import com.netcracker.odstc.logviewer.containers.DTO.DirectoryWithExtensionsDTO;
+import com.netcracker.odstc.logviewer.containers.dto.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.service.DirectoryService;

@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.service.LogService;
 import com.netcracker.odstc.logviewer.service.RuleContainer;
@@ -26,7 +27,7 @@ import java.math.BigInteger;
 @RestController
 public class LogController {
     private final Logger logger = LogManager.getLogger(LogController.class.getName());
-    private static final String DEFAULT_PAGE_SIZE = "2";
+    private static final String DEFAULT_PAGE_SIZE = "20";
     private static final String logNullMessage = "Log shouldn't be 0 or null";
     private static final String logIdNullMessage = "Log shouldn't be 0 or null";
 
@@ -37,10 +38,10 @@ public class LogController {
     }
 
     @GetMapping("/")
-    public Page<Log> logs(@RequestParam String directoryId,
-                          @RequestParam(value = "page", defaultValue = "0") int page,
-                          @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
-                          @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
+    public Page<LogDTO> logs(@RequestParam String directoryId,
+                             @RequestParam(value = "page", defaultValue = "0") int page,
+                             @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
+                             @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page, pageSize);
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString,RuleContainer.class);
         return logService.getAllLogsByAllValues(new BigInteger(directoryId),ruleContainer,pageable);
@@ -63,7 +64,7 @@ public class LogController {
         }
         logger.info("Delete log");
         logService.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/id/{id}")

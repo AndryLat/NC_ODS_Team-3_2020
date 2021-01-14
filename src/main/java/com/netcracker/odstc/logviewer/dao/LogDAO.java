@@ -1,20 +1,16 @@
 package com.netcracker.odstc.logviewer.dao;
 
-import com.netcracker.odstc.logviewer.models.Log;
-import com.netcracker.odstc.logviewer.models.lists.LogLevel;
+import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
+import com.netcracker.odstc.logviewer.mapper.LogDTOMapper;
+import com.netcracker.odstc.logviewer.service.RuleContainer;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -110,61 +106,30 @@ public class LogDAO extends EAVObjectDAO {
             "order by creationDate.DATE_VALUE\n" +
             "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY";
 
-    public List<Log> getLogByAll(BigInteger directoryId, String text, Date dat1, Date dat2, int V_SEVERE, int V_WARNING,
-                                 int V_INFO, int V_CONFIG, int V_FINE, int V_FINER, int V_FINEST, int V_DEBUG,
-                                 int V_TRACE, int V_ERROR, int V_FATAL, int V_SORT, Pageable pageable) {
+    public List<LogDTO> getLogByAll(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
+
 
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("directoryId",directoryId)
-                .addValue("text",text)
-                .addValue("startDate",dat1)
-                .addValue("endDate",dat2)
-                .addValue("V_SEVERE",V_SEVERE)
-                .addValue("V_WARNING",V_WARNING)
-                .addValue("V_INFO",V_INFO)
-                .addValue("V_CONFIG",V_CONFIG)
-                .addValue("V_FINE",V_FINE)
-                .addValue("V_FINER",V_FINER)
-                .addValue("V_FINEST",V_FINEST)
-                .addValue("V_DEBUG",V_DEBUG)
-                .addValue("V_TRACE",V_TRACE)
-                .addValue("V_ERROR",V_ERROR)
-                .addValue("V_FATAL",V_FATAL)
+                .addValue("text",        ruleContainer.getText())
+                .addValue("startDate",ruleContainer.getDat1())
+                .addValue("endDate",ruleContainer.getDat2())
+                .addValue("V_SEVERE",ruleContainer.getSevere())
+                .addValue("V_WARNING",ruleContainer.getWarning())
+                .addValue("V_INFO",ruleContainer.getInfo())
+                .addValue("V_CONFIG",ruleContainer.getConfig())
+                .addValue("V_FINE",ruleContainer.getFine())
+                .addValue("V_FINER",ruleContainer.getFiner())
+                .addValue("V_FINEST",ruleContainer.getFinest())
+                .addValue("V_DEBUG",ruleContainer.getDebug())
+                .addValue("V_TRACE",ruleContainer.getTrace())
+                .addValue("V_ERROR",ruleContainer.getError())
+                .addValue("V_FATAL",ruleContainer.getFatal())
                 .addValue("offset",pageable.getOffset())
                 .addValue("pageSize",pageable.getPageSize());
 
-        String query = V_SORT==0? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY:GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;
+        String query = ruleContainer.getSort()==0? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY:GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;
 
-        List<BigInteger> objectIds = new NamedParameterJdbcTemplate(jdbcTemplate).query(query,parameterSource, new ObjectIdMapper());
-
-        List<Log> logs = new ArrayList<>();
-
-        for (BigInteger id : objectIds) {
-            logs.add(getObjectById(id,Log.class));
-        }
-
-        return logs;
-    }
-
-
-    private static class ObjectIdMapper implements RowMapper<BigInteger> {
-
-        @Override
-        public BigInteger mapRow(ResultSet resultSet, int i) throws SQLException {
-            return resultSet.getBigDecimal("id").toBigInteger();
-        }
-    }
-
-    private static class LogMapper implements RowMapper<Log> {
-
-        @Override
-        public Log mapRow(ResultSet resultSet, int i) throws SQLException {
-            Log log = new Log();
-            log.setObjectId(resultSet.getBigDecimal("id").toBigInteger());
-            log.setCreationDate(resultSet.getTimestamp("log_timestamp_value"));
-            log.setLevel(LogLevel.getByID(resultSet.getBigDecimal("log_level_value").toBigInteger().intValue()));
-            log.setText(resultSet.getString("fcl_value"));
-            return log;
-        }
+        return new NamedParameterJdbcTemplate(jdbcTemplate).query(query,parameterSource, new LogDTOMapper());
     }
 }

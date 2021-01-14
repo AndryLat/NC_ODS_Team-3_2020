@@ -1,5 +1,5 @@
 export enum LogLevel {
-  SEVERE = 16,
+  SEVERE = 13,
   WARNING,
   INFO,
   CONFIG,
