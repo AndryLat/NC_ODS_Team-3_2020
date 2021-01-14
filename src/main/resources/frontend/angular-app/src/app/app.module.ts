@@ -16,6 +16,7 @@ import {AuthGuard} from "./services/AuthGuard";
 import {SpinnerService} from "./services/overlay-spinner/SpinerService";
 import {OverlaySpinnerComponent} from "./services/overlay-spinner/overlay-spinner.component";
 import { OverlayModule } from '@angular/cdk/overlay';
+import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    FormsModule, ReactiveFormsModule
+    FormsModule, ReactiveFormsModule,
+    FontAwesomeModule
   ],
   providers: [
     AuthService,

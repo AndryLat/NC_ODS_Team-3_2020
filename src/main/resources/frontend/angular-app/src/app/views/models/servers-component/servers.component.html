@@ -1,39 +1,52 @@
-<div class="row">
-  <div class="container col-10">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new server</button>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div *ngIf="errorMessage" class="alert alert-danger col-6" role="alert">
+      {{errorMessage}}
+    </div>
+    <div *ngIf="confirmMessage" class="alert alert-success col-6" role="alert">
+      {{confirmMessage}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="container-fluid col-11">
+      <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new server</button>
+    </div>
+  </div>
+  <hr>
+  <div class="d-flex justify-content-center row">
+    <table class="col-11 table table-bordered">
+      <caption>Servers table</caption>
+      <thead>
+      <tr>
+        <th style="width: 15%" scope="col">Name</th>
+        <th style="width: 25%" scope="col">Ip</th>
+        <th style="width: 10%" scope="col">Protocol</th>
+        <th style="width: 15%" scope="col">Port</th>
+        <th style="width: 25%" scope="col">Last Log Check</th>
+        <th style="width: 10%" scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let server of servers;">
+        <td>{{server.name}}</td>
+        <td>{{server.ip}}</td>
+        <td>{{server.protocol}}</td>
+        <td>{{server.port}}</td>
+        <td>{{server.lastAccessByJob | date: 'short'}}</td>
+        <td class="text-center">
+          <fa-icon class="btn fas fa-2x pointer-event" [icon]="proceedIcon" (click)="routeToDirectories(server.objectId)"></fa-icon>
+          <fa-icon class="btn fas fa-2x pointer-event" [icon]="settingIcon"  data-toggle="modal" data-target="#updateModal" (click)="showSettings(server)"></fa-icon>
+          <fa-icon class="btn fas fa-2x pointer-event" [icon]="deleteIcon" (click)="deleteServer(server.objectId)"></fa-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-<hr>
-<div class="d-flex justify-content-center row">
-  <table class="col-10 table table-bordered">
-    <caption>Servers table</caption>
-    <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Ip</th>
-      <th scope="col">Protocol</th>
-      <th scope="col">Port</th>
-      <th scope="col">Last Log Check</th>
-      <th scope="col">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let server of servers;">
-      <td>{{server.name}}</td>
-      <td>{{server.ip}}</td>
-      <td>{{server.protocol}}</td>
-      <td>{{server.port}}</td>
-      <td class="col-1">{{server.lastAccessByJob | date: 'short'}}</td>
-      <td class="d-flex justify-content-around">
-        <button class="btn btn-dark" (click)="routeToDirectories(server.objectId)">Proceed</button>
-        <button class="btn btn-info" data-toggle="modal" data-target="#updateModal" (click)="showSettings(server)">Settings</button>
-        <button class="btn btn-danger" (click)="deleteServer(server.objectId)">Delete</button></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -44,32 +57,58 @@
       </div>
       <div class="modal-body">
         <!-- PUT FORM -->
+        <div *ngIf="inputError" class="alert alert-danger col-12" role="alert">
+          {{inputError}}
+        </div>
+
         <form [formGroup]="insertForm">
           <div class="form-group">
             <label for="nameInput">Server name</label>
-            <input type="text" class="form-control" id="nameInput" required placeholder="Server Name" name="name" formControlName="name">
+            <input type="text" class="form-control" id="nameInput" required placeholder="Server Name" name="name"
+                   formControlName="name">
+            <div *ngIf="this.insertForm.controls['name'].invalid && (this.insertForm.controls['name'].dirty || this.insertForm.controls['name'].touched)" class="alert alert-danger">
+              Name cant be empty
+            </div>
           </div>
           <div class="form-group">
             <label for="ipInput">Ip address</label>
             <input type="text" class="form-control" id="ipInput" placeholder="127.0.0.1" name="ip" formControlName="ip">
+            <div *ngIf="this.insertForm.controls['ip'].invalid && (this.insertForm.controls['ip'].dirty || this.insertForm.controls['ip'].touched)" class="alert alert-danger">
+              IP cant be empty
+            </div>
           </div>
           <div class="form-group">
             <label for="portInput">Port</label>
-            <input type="text" class="form-control" id="portInput" placeholder="65535" name="port" formControlName="port">
+            <input type="text" class="form-control" id="portInput" placeholder="65535" name="port"
+                   formControlName="port">
+            <div *ngIf="this.insertForm.controls['port'].invalid && (this.insertForm.controls['port'].dirty || this.insertForm.controls['port'].touched)" class="alert alert-danger">
+              Port cant be empty
+            </div>
           </div>
           <div class="form-group">
             <label for="loginInput">Login</label>
-            <input type="text" class="form-control" id="loginInput" placeholder="login" name="login" formControlName="login">
+            <input type="text" class="form-control" id="loginInput" placeholder="login" name="login"
+                   formControlName="login">
+            <div *ngIf="this.insertForm.controls['login'].invalid && (this.insertForm.controls['login'].dirty || this.insertForm.controls['login'].touched)" class="alert alert-danger">
+              Login cant be empty
+            </div>
           </div>
           <div class="form-group">
             <label for="passwordInput">Password</label>
-            <input type="text" class="form-control" id="passwordInput" placeholder="password" name="password" formControlName="password">
+            <input type="text" class="form-control" id="passwordInput" placeholder="password" name="password"
+                   formControlName="password">
+            <div *ngIf="this.insertForm.controls['password'].invalid && (this.insertForm.controls['password'].dirty || this.insertForm.controls['password'].touched)" class="alert alert-danger">
+              Password cant be empty
+            </div>
           </div>
           <div class="form-group">
             <label for="protocolSelect">Protocol</label>
             <select class="form-control" id="protocolSelect" name="protocol" formControlName="protocol">
               <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
             </select>
+            <div *ngIf="this.insertForm.controls['protocol'].invalid && (this.insertForm.controls['protocol'].dirty || this.insertForm.controls['protocol'].touched)" class="alert alert-danger">
+              Protocol cant be empty
+            </div>
           </div>
         </form>
         <!-- PUT FORM -->
@@ -79,14 +118,17 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset();testResult=null">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="insertForm.reset();testResult=null">Close
+        </button>
         <button type="submit" class="btn btn-primary" (click)="addServer()">Add Server</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -100,19 +142,23 @@
         <form [formGroup]="updateForm">
           <div class="form-group">
             <label for="nameInputUpdate">Server name</label>
-            <input type="text" class="form-control" id="nameInputUpdate" required placeholder="Server Name" name="name" formControlName="name">
+            <input type="text" class="form-control" id="nameInputUpdate" required placeholder="Server Name" name="name"
+                   formControlName="name">
           </div>
           <div class="form-group">
             <label for="portInputUpdate">Port</label>
-            <input type="text" class="form-control" id="portInputUpdate" placeholder="65535" name="port" formControlName="port">
+            <input type="text" class="form-control" id="portInputUpdate" placeholder="65535" name="port"
+                   formControlName="port">
           </div>
           <div class="form-group">
             <label for="loginInputUpdate">Login</label>
-            <input type="text" class="form-control" id="loginInputUpdate" placeholder="login" name="login" formControlName="login">
+            <input type="text" class="form-control" id="loginInputUpdate" placeholder="login" name="login"
+                   formControlName="login">
           </div>
           <div class="form-group">
             <label for="passwordInputUpdate">Password</label>
-            <input type="text" class="form-control" id="passwordInputUpdate" placeholder="password" name="password" formControlName="password">
+            <input type="text" class="form-control" id="passwordInputUpdate" placeholder="password" name="password"
+                   formControlName="password">
           </div>
           <div class="form-group">
             <label for="protocolSelectUpdate">Protocol</label>
@@ -124,8 +170,10 @@
         <!-- PUT FORM -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset();testResult=null">Close</button>
-        <button type="submit" class="btn btn-primary" (click)="updateServer()">Add Server</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="insertForm.reset();testResult=null">Close
+        </button>
+        <button type="submit" class="btn btn-primary" (click)="updateServer()">Update Server</button>
       </div>
     </div>
   </div>
