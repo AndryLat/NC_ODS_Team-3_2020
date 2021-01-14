@@ -20,7 +20,7 @@ export class UsersComponent {
   ];
 
   constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router){
-    http.get<UserPage>(GlobalConstants.apiUrl + 'user/all').subscribe(result => {
+    http.get<UserPage>(GlobalConstants.apiUrl + 'api/user/').subscribe(result => {
       this.users = result.content;
     });
 
@@ -32,14 +32,14 @@ export class UsersComponent {
     });
   }
   deleteUser(id: bigint): void{
-    this.http.delete(GlobalConstants.apiUrl + 'user/delete/' + id).subscribe(() => {
+    this.http.delete(GlobalConstants.apiUrl + 'api/user/delete/' + id).subscribe(() => {
       this.users = this.users.filter(item => item.objectId !== id);
     });
   }
   addUser(): void{
     const user = this.form.value;
     console.log(this.form.value);
-    this.http.post(GlobalConstants.apiUrl + 'user/create', user).subscribe(() => {
+    this.http.post(GlobalConstants.apiUrl + 'api/user/create', user).subscribe(() => {
       console.log('Complete');
     });
   }

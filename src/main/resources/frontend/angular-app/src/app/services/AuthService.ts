@@ -2,25 +2,49 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from '@angular/common/http';
 import jwt_decode from "jwt-decode";
 import {Subscription} from "rxjs";
+import {User} from "../entity/User";
+import {GlobalConstants} from "../constants/global-constants";
+import {Router} from "@angular/router";
 
 export const TOKEN_NAME:string = 'jwt_token';
-export const API_URL:string = 'http://localhost:8081/'; //temporally
 
 @Injectable()
 export class AuthService {
 
   private url:string = 'login';
+  private currentUser:User;
 
-  constructor(private http:HttpClient) {}
+  constructor(private http:HttpClient, private router:Router) {}
 
   getToken():string {
     return <string>localStorage.getItem(TOKEN_NAME);
   }
 
-  setToken(token: string | null):void{
+  setToken(token: string):void{
     if (token != null) {
       localStorage.setItem(TOKEN_NAME, token);
     }
+  }
+
+  getCurrentUser():User{
+    if(this.currentUser === undefined){
+      this.setCurrentUser()
+    }
+    return this.currentUser
+  }
+
+  setCurrentUser():void{
+    const token:string = this.getToken()
+    this.currentUser = new User();
+    if(!this.isTokenExpired(token)){
+      const decoded = this.getDecodedToken(token);
+      this.currentUser.login = decoded.sub
+      this.currentUser.role = decoded.Role
+    }
+  }
+
+  getDecodedToken(token:string):JWTToken{
+    return jwt_decode<JWTToken>(token);
   }
 
   getTokenExpirationTime(token:string):Date{
@@ -48,8 +72,14 @@ export class AuthService {
 
   login(login: string, password: string ):Subscription{
     return this.http
-      .post(API_URL + this.url ,{login, password, role: 'USER'},{observe: 'response'})
+      .post(GlobalConstants.apiUrl + this.url ,{login, password, role: 'USER'},{observe: 'response'})
       .subscribe(res => this.setToken(res.headers.get('Authorization')));
+  }
+
+  logout(): void {
+    localStorage.removeItem(TOKEN_NAME);
+    this.currentUser = undefined;
+    this.router.navigate(['login']);
   }
 
   public isLoggedIn(): boolean {
@@ -61,10 +91,21 @@ export class AuthService {
     }
     return false;
   }
+
+  public isAdmin():boolean{
+    const user = this.getCurrentUser()
+    if(user === undefined){
+      return false;
+    }
+    if(user.role == 'ADMIN'){
+      return true
+    }
+    return false
+  }
 }
 
 interface JWTToken {
-  name: string;
-  role:string,
+  sub: string;
+  Role:string,
   exp: number;
 }
