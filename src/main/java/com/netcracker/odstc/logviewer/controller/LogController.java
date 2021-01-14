@@ -1,10 +1,13 @@
 package com.netcracker.odstc.logviewer.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.service.LogService;
 import com.netcracker.odstc.logviewer.service.RuleContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
-import java.util.List;
 
-@RequestMapping("/log")
+@RequestMapping("api/log")
 @RestController
 public class LogController {
     private final Logger logger = LogManager.getLogger(LogController.class.getName());
-    private static final String DEFAULT_PAGE_SIZE = "20";
+    private static final String DEFAULT_PAGE_SIZE = "2";
     private static final String logNullMessage = "Log shouldn't be 0 or null";
     private static final String logIdNullMessage = "Log shouldn't be 0 or null";
 
@@ -35,13 +37,13 @@ public class LogController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Log>> logs(@RequestParam BigInteger directoryId,
-                                            @RequestParam(value = "page", defaultValue = "0") int page,
-                                            @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
-                                            @RequestBody RuleContainer ruleContainer){
+    public Page<Log> logs(@RequestParam String directoryId,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
+                          @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page, pageSize);
-        List<Log> logs = logService.getAllLogsByAllValues(directoryId,ruleContainer,pageable);
-        return ResponseEntity.ok(logs);
+        RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString,RuleContainer.class);
+        return logService.getAllLogsByAllValues(new BigInteger(directoryId),ruleContainer,pageable);
     }
 
     @PostMapping("/add")

@@ -17,6 +17,7 @@ import {SpinnerService} from "./services/overlay-spinner/SpinerService";
 import {OverlaySpinnerComponent} from "./services/overlay-spinner/overlay-spinner.component";
 import { OverlayModule } from '@angular/cdk/overlay';
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {NgxPaginationModule} from "ngx-pagination";
 
 @NgModule({
   declarations: [
@@ -27,7 +28,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
     DirectoriesComponent,
     LogsComponent,
     UserSettingsComponent,
-    OverlaySpinnerComponent
+    OverlaySpinnerComponent,
   ],
   imports: [
     OverlayModule,
@@ -35,7 +36,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
     HttpClientModule,
     AppRoutingModule,
     FormsModule, ReactiveFormsModule,
-    FontAwesomeModule
+    FontAwesomeModule, NgxPaginationModule
   ],
   providers: [
     AuthService,

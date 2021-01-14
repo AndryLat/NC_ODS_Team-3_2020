@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import {Router} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
+import {Component} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {Directory} from '../../../entity/Directory';
 import {AuthService} from "../../../services/AuthService";
+import {BigInteger} from "@angular/compiler/src/i18n/big_integer";
 
 
 @Component({
@@ -17,11 +18,19 @@ export class DirectoriesComponent {
 
   directories: Directory[] = [];
 
-  constructor(private authService: AuthService, private router: Router, private http: HttpClient, private fb: FormBuilder, ) {
+  constructor(private authService: AuthService, private router: Router, private http: HttpClient, private fb: FormBuilder, private route: ActivatedRoute) {
 
-    http.get<Directory>(GlobalConstants.apiUrl + 'directory/id/5').subscribe(result => {
+    this.directories.push({objectId: BigInteger.zero(), path: "aw", enabled: true, lastExistenceCheck: new Date()})
+
+    const parentId = router.getCurrentNavigation().extras.state['objectId'];
+
+    console.log(parentId);
+
+    let params = new HttpParams().set("parentId", parentId)
+
+    http.get<Directory[]>(GlobalConstants.apiUrl + 'api/directory/', {params}).subscribe(result => {
       console.log(result);
-      this.directories.push(result);
+      this.directories = result;
     });
 
     this.insertForm = this.fb.group({
@@ -29,6 +38,7 @@ export class DirectoriesComponent {
       mask: ['', Validators.required]
     });
   }
+
   isLogin(): boolean {
     return this.authService.isLoggedIn();
   }

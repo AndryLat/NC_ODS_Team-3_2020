@@ -3,38 +3,41 @@ package com.netcracker.odstc.logviewer.service;
 import java.util.Date;
 
 public class RuleContainer {
-    private final String text;
-    private final Date dat1;
-    private final Date dat2;
-    private final int vSevere;
-    private final int vWarning;
-    private final int vInfo;
-    private final int vConfig;
-    private final int vFine;
-    private final int vFiner;
-    private final int vFinest;
-    private final int vDebug;
-    private final int vTrace;
-    private final int vError;
-    private final int vFatal;
-    private final int vSort;
+    private String text;
+    private Date dat1;
+    private Date dat2;
+    private int severe;
+    private int warning;
+    private int info;
+    private int config;
+    private int fine;
+    private int finer;
+    private int finest;
+    private int debug;
+    private int trace;
+    private int error;
+    private int fatal;
+    private int sort;
 
-    public RuleContainer(String text, Date dat1, Date dat2, int vSevere, int vWarning, int vInfo, int vConfig, int vFine, int vFiner, int vFinest, int vDebug, int vTrace, int vError, int vFatal, int vSort) {
+    public RuleContainer(){
+    }
+
+    public RuleContainer(String text, Date dat1, Date dat2, int severe, int vWarning, int vInfo, int vConfig, int vFine, int vFiner, int vFinest, int vDebug, int vTrace, int vError, int vFatal, int vSort) {
         this.text = text;
         this.dat1 = dat1;
         this.dat2 = dat2;
-        this.vSevere = vSevere;
-        this.vWarning = vWarning;
-        this.vInfo = vInfo;
-        this.vConfig = vConfig;
-        this.vFine = vFine;
-        this.vFiner = vFiner;
-        this.vFinest = vFinest;
-        this.vDebug = vDebug;
-        this.vTrace = vTrace;
-        this.vError = vError;
-        this.vFatal = vFatal;
-        this.vSort = vSort;
+        this.severe = severe;
+        this.warning = vWarning;
+        this.info = vInfo;
+        this.config = vConfig;
+        this.fine = vFine;
+        this.finer = vFiner;
+        this.finest = vFinest;
+        this.debug = vDebug;
+        this.trace = vTrace;
+        this.error = vError;
+        this.fatal = vFatal;
+        this.sort = vSort;
     }
 
     public String getText() {
@@ -50,50 +53,110 @@ public class RuleContainer {
     }
 
     public int getSevere() {
-        return vSevere;
+        return severe;
     }
 
     public int getWarning() {
-        return vWarning;
+        return warning;
     }
 
     public int getInfo() {
-        return vInfo;
+        return info;
     }
 
     public int getConfig() {
-        return vConfig;
+        return config;
     }
 
     public int getFine() {
-        return vFine;
+        return fine;
     }
 
     public int getFiner() {
-        return vFiner;
+        return finer;
     }
 
     public int getFinest() {
-        return vFinest;
+        return finest;
     }
 
     public int getDebug() {
-        return vDebug;
+        return debug;
     }
 
     public int getTrace() {
-        return vTrace;
+        return trace;
     }
 
     public int getError() {
-        return vError;
+        return error;
     }
 
     public int getFatal() {
-        return vFatal;
+        return fatal;
     }
 
     public int getSort() {
-        return vSort;
+        return sort;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setDat1(Date dat1) {
+        this.dat1 = dat1;
+    }
+
+    public void setDat2(Date dat2) {
+        this.dat2 = dat2;
+    }
+
+    public void setSevere(int severe) {
+        this.severe = severe;
+    }
+
+    public void setWarning(int warning) {
+        this.warning = warning;
+    }
+
+    public void setInfo(int info) {
+        this.info = info;
+    }
+
+    public void setConfig(int config) {
+        this.config = config;
+    }
+
+    public void setFine(int fine) {
+        this.fine = fine;
+    }
+
+    public void setFiner(int finer) {
+        this.finer = finer;
+    }
+
+    public void setFinest(int finest) {
+        this.finest = finest;
+    }
+
+    public void setDebug(int debug) {
+        this.debug = debug;
+    }
+
+    public void setTrace(int trace) {
+        this.trace = trace;
+    }
+
+    public void setError(int error) {
+        this.error = error;
+    }
+
+    public void setFatal(int fatal) {
+        this.fatal = fatal;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 }

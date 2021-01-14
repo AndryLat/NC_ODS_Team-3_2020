@@ -12,16 +12,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let log of logs;">
+        <tr *ngFor="let log of logs | paginate: {id: 'logs', itemsPerPage: 2,currentPage: currentPage, totalItems: 10};">
           <td>{{log.text}}</td>
           <td>{{formatLevel(log.level)}}</td>
           <td>{{log.creationDate | date: 'short'}}</td>
-          <td class="d-flex justify-content-around">
-            <button class="btn btn-danger" (click)="deleteLog(log.objectId)">Delete</button>
+          <td class="text-center">
+            <fa-icon class="btn fas fa-2x pointer-event" [icon]="deleteIcon" (click)="deleteLog(log.objectId)"></fa-icon>
           </td>
         </tr>
         </tbody>
       </table>
+      <pagination-controls id="logs" (pageChange)="getLogsFromPage($event)"></pagination-controls>
     </div>
     <div class="col-3">Settings
       <hr>
@@ -29,8 +30,8 @@
         <div class="border rounded">
           <div class="m-2">
             <label for="searchInput">Search by text</label>
-            <input type="text" class="form-control" id="searchInput" placeholder="Text" name="search"
-                   formControlName="search">
+            <input type="text" class="form-control" id="searchInput" placeholder="Text" name="text"
+                   formControlName="text">
           </div>
         </div>
         <hr>
@@ -39,13 +40,13 @@
             <p>Sorting</p>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByLevel">Sort By Level</label>
-              <input type="radio" class="form-control col-2" [ngModel]="sort" value="level" id="sortByLevel" name="sort" formControlName="sort">
+              <input type="radio" class="form-control col-2" value="1" id="sortByLevel" name="vSort" formControlName="vSort">
             </div>
             <br/>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByDate">Sort By Date</label>
-              <input type="radio" class="form-control  col-2" [ngModel]="sort" value="date" id="sortByDate" name="sort"
-                     formControlName="sort">
+              <input type="radio" class="form-control  col-2" value="0" id="sortByDate" name="vSort"
+                     formControlName="vSort">
             </div>
           </div>
         </div>
@@ -54,31 +55,21 @@
           <div class="m-2">
             <p>Filtration</p>
             <hr>
-            <div class="row">
-              <label class="col-10" for="dateFiltr">Filtrate by date</label>
-              <input type="checkbox" class="form-control  col-2" id="dateFiltr" name="dateFiltr"
-                     formControlName="dateFiltr">
-            </div>
-            <label for="startDate">Start date</label>
-            <input type="date" class="form-control" id="startDate" name="startDate"
-                   formControlName="startDate">
-            <label for="endDate">End date</label>
-            <input type="date" class="form-control" id="endDate" name="endDate"
-                   formControlName="endDate">
-            <hr>
-            <div class="row">
-              <label class="col-10" for="levelFiltr">Filtrate by level</label>
-              <input type="checkbox" class="form-control  col-2" id="levelFiltr" name="levelFiltr"
-                     formControlName="levelFiltr">
-            </div>
+            <label for="dat1">Start date</label>
+            <input type="date" class="form-control" id="dat1" name="dat1"
+                   formControlName="dat1">
+            <label for="dat2">End date</label>
+            <input type="date" class="form-control" id="dat2" name="dat2"
+                   formControlName="dat2">
             <hr>
             <div *ngFor="let key of keys()" class="row">
               <label class="col-10" for="logLevel">{{key}}</label>
               <input type="checkbox" class="form-control  col-2" id="logLevel" name="logLevel"
-                     formControlName="logLevel">
+                     formControlName="{{key}}">
             </div>
           </div>
         </div>
+        <button class="btn btn-primary row" type="submit" (click)="getLogsByRule(currentPage)">Apply</button>
       </form>
     </div>
   </div>

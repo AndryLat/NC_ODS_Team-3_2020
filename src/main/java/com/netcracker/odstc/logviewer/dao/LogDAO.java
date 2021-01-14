@@ -24,7 +24,7 @@ public class LogDAO extends EAVObjectDAO {
         super(jdbcTemplate);
     }
 
-    private static final String GET_ALL_BY_RULE_QUERY = "WITH files AS (\n" +
+    private static final String GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY = "WITH files AS (\n" +
             "    SELECT OBJECT_ID\n" +
             "    FROM OBJECTS files\n" +
             "    WHERE PARENT_ID = :directoryId\n" +
@@ -67,6 +67,49 @@ public class LogDAO extends EAVObjectDAO {
             "order by logLevel.list_value_id, creationDate.date_value asc\n" +
             "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY\n";
 
+    private static final String GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY = "WITH files AS (\n" +
+            "    SELECT OBJECT_ID\n" +
+            "    FROM OBJECTS files\n" +
+            "    WHERE PARENT_ID = :directoryId\n" +
+            ")\n" +
+            "select ob.object_id     as id,\n" +
+            "       text.value        as fcl_value,\n" +
+            "       logLevel.LIST_VALUE_ID as log_level_value,\n" +
+            "       creationDate.date_value as log_timestamp_value\n" +
+            "from objects ob\n" +
+            "         left join attributes text on text.object_id = ob.object_id\n" +
+            "         left join attributes logLevel on logLevel.object_id = ob.object_id\n" +
+            "         left join attributes creationDate on creationDate.object_id = ob.object_id\n" +
+            "where ob.object_type_id = 5\n" +
+            "  and text.attr_id = 23 /* Full content of log */\n" +
+            "  and logLevel.attr_id = 24 /* Log level */\n" +
+            "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
+            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
+            "  and text.value like '%' || :text || '%'\n" +
+            "  and creationDate.date_value BETWEEN  nvl(TO_TIMESTAMP ('10-12-02 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value) and nvl(TO_TIMESTAMP ('10-01-22 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value)\n" +
+            "  and (\n" +
+            "        (\n" +
+            "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
+            "                    + :V_FINEST + :V_DEBUG + :V_TRACE + :V_ERROR + :V_FATAL = 0\n" +
+            "            )\n" +
+            "        or\n" +
+            "        (\n" +
+            "                (:V_SEVERE = 1 and logLevel.LIST_VALUE_ID = 13)\n" +
+            "                or (:V_WARNING = 1 and logLevel.LIST_VALUE_ID = 14)\n" +
+            "                or (:V_INFO = 1 and logLevel.LIST_VALUE_ID = 15)\n" +
+            "                or (:V_CONFIG = 1 and logLevel.LIST_VALUE_ID = 16)\n" +
+            "                or (:V_FINE = 1 and logLevel.LIST_VALUE_ID = 17)\n" +
+            "                or (:V_FINER = 1 and logLevel.LIST_VALUE_ID = 18)\n" +
+            "                or (:V_FINEST = 1 and logLevel.LIST_VALUE_ID = 19)\n" +
+            "                or (:V_DEBUG = 1 and logLevel.LIST_VALUE_ID = 20)\n" +
+            "                or (:V_TRACE = 1 and logLevel.LIST_VALUE_ID = 21)\n" +
+            "                or (:V_ERROR = 1 and logLevel.LIST_VALUE_ID = 22)\n" +
+            "                or (:V_FATAL = 1 and logLevel.LIST_VALUE_ID = 23)\n" +
+            "            )\n" +
+            "    )\n" +
+            "order by creationDate.DATE_VALUE\n" +
+            "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY";
+
     public List<Log> getLogByAll(BigInteger directoryId, String text, Date dat1, Date dat2, int V_SEVERE, int V_WARNING,
                                  int V_INFO, int V_CONFIG, int V_FINE, int V_FINER, int V_FINEST, int V_DEBUG,
                                  int V_TRACE, int V_ERROR, int V_FATAL, int V_SORT, Pageable pageable) {
@@ -87,11 +130,12 @@ public class LogDAO extends EAVObjectDAO {
                 .addValue("V_TRACE",V_TRACE)
                 .addValue("V_ERROR",V_ERROR)
                 .addValue("V_FATAL",V_FATAL)
-                .addValue("V_SORT",V_SORT)
                 .addValue("offset",pageable.getOffset())
                 .addValue("pageSize",pageable.getPageSize());
 
-        List<BigInteger> objectIds = new NamedParameterJdbcTemplate(jdbcTemplate).query(GET_ALL_BY_RULE_QUERY,parameterSource, new ObjectIdMapper());
+        String query = V_SORT==0? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY:GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;
+
+        List<BigInteger> objectIds = new NamedParameterJdbcTemplate(jdbcTemplate).query(query,parameterSource, new ObjectIdMapper());
 
         List<Log> logs = new ArrayList<>();
 

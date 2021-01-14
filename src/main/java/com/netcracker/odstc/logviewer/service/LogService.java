@@ -2,6 +2,8 @@ package com.netcracker.odstc.logviewer.service;
 
 import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +26,12 @@ public class LogService extends AbstractService {
         return logDAO.getObjectById(id, Log.class);
     }
 
-    public List<Log> getAllLogsByAllValues(BigInteger directoryId,RuleContainer allValuesForLogs, Pageable pageable) {
-        return logDAO.getLogByAll(directoryId,allValuesForLogs.getText(), allValuesForLogs.getDat1(), allValuesForLogs.getDat2(),
+    public Page<Log> getAllLogsByAllValues(BigInteger directoryId, RuleContainer allValuesForLogs, Pageable pageable) {
+        return new PageImpl<>(logDAO.getLogByAll(directoryId, allValuesForLogs.getText(), allValuesForLogs.getDat1(), allValuesForLogs.getDat2(),
                 allValuesForLogs.getSevere(), allValuesForLogs.getWarning(), allValuesForLogs.getInfo(),
                 allValuesForLogs.getConfig(), allValuesForLogs.getFine(), allValuesForLogs.getFiner(),
                 allValuesForLogs.getFinest(), allValuesForLogs.getDebug(), allValuesForLogs.getTrace(),
-                allValuesForLogs.getError(), allValuesForLogs.getFatal(), allValuesForLogs.getSort(),pageable);
+                allValuesForLogs.getError(), allValuesForLogs.getFatal(), allValuesForLogs.getSort(), pageable));
     }
 
     public void save(Log log) {

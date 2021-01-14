@@ -35,6 +35,7 @@ export class ServersComponent {
   testResult: string;
 
   constructor(private authService: AuthService, private router: Router, private http: HttpClient, private fb: FormBuilder, ) {
+    this.servers.push(new Server("Omega"))
     this.http.get<Server[]>(this.localApi + '/').subscribe(result => {
       this.servers = result;
     },error => {
