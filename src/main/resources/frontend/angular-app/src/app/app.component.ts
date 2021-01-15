@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {AuthService} from "./services/AuthService";
 
 @Component({
@@ -8,6 +8,7 @@ import {AuthService} from "./services/AuthService";
 })
 export class AppComponent {
   title: 'LogViewer';
+
   constructor(private authService: AuthService) {
   }
 

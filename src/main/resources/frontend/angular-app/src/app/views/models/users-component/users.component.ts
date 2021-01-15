@@ -9,7 +9,8 @@ import {AuthService} from "../../../services/AuthService";
 
 @Component({
   selector: 'app-users-component',
-  templateUrl: './users.component.html'})
+  templateUrl: './users.component.html'
+})
 export class UsersComponent {
   form: FormGroup;
 
@@ -19,7 +20,7 @@ export class UsersComponent {
     'USER', 'ADMIN'
   ];
 
-  constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router){
+  constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router) {
     http.get<UserPage>(GlobalConstants.apiUrl + 'user/all').subscribe(result => {
       this.users = result.content;
     });
@@ -31,12 +32,14 @@ export class UsersComponent {
       role: ['', Validators.required]
     });
   }
-  deleteUser(id: bigint): void{
+
+  deleteUser(id: bigint): void {
     this.http.delete(GlobalConstants.apiUrl + 'user/delete/' + id).subscribe(() => {
       this.users = this.users.filter(item => item.objectId !== id);
     });
   }
-  addUser(): void{
+
+  addUser(): void {
     const user = this.form.value;
     console.log(this.form.value);
     this.http.post(GlobalConstants.apiUrl + 'user/create', user).subscribe(() => {

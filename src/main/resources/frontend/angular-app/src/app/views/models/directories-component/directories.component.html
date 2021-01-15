@@ -1,6 +1,6 @@
 <div class="row">
   <div class="container col-10">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new Directory</button>
+    <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new Directory</button>
   </div>
 </div>
 <hr>
@@ -21,21 +21,21 @@
       <td>{{directory.enabled}}</td>
       <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
       <td class="d-flex justify-content-around">
-        <button class="btn btn-dark" (click)="routeToLogs(directory.objectId)">Proceed</button>
-        <button class="btn btn-danger" (click)="deleteDirectory(directory.objectId)">Delete</button>
+        <button (click)="routeToLogs(directory.objectId)" class="btn btn-dark">Proceed</button>
+        <button (click)="deleteDirectory(directory.objectId)" class="btn btn-danger">Delete</button>
       </td>
     </tr>
     </tbody>
   </table>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog"
+     tabindex="-1">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Adding new directory</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -44,18 +44,20 @@
         <form [formGroup]="insertForm">
           <div class="form-group">
             <label for="nameInput">Directory path (from home)</label>
-            <input type="text" class="form-control" id="nameInput" required placeholder="Directory path" name="path"
-                   formControlName="path">
+            <input class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
+                   required
+                   type="text">
             <label for="maskInput">Extensions for files</label>
-            <input type="text" class="form-control" id="maskInput" required placeholder="Extensions for files"
-                   name="mask" formControlName="mask">
+            <input class="form-control" formControlName="mask" id="maskInput" name="mask"
+                   placeholder="Extensions for files"
+                   required type="text">
             <hr>
             <div class="d-flex flex-row">
-              <button type="button" class="btn btn-info col-4">Test connection</button>
+              <button class="btn btn-info col-4" type="button">Test connection</button>
               <div class="col-8">Directory connection status</div>
             </div>
             <hr>
-            <button type="button" class="btn btn-info">Get file list</button>
+            <button class="btn btn-info" type="button">Get file list</button>
             <hr>
             <table class="table table-bordered">
               <caption>Files</caption>
@@ -69,7 +71,7 @@
               <tr>
                 <td>FileName.txt</td>
                 <td>
-                  <input type="checkbox" class="form-control">
+                  <input class="form-control" type="checkbox">
                 </td>
               </tr>
               </tbody>
@@ -79,8 +81,8 @@
         <!-- PUT FORM -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="insertForm.reset()">Close</button>
-        <button type="submit" class="btn btn-primary" (click)="addDirectory()">Add Server</button>
+        <button (click)="insertForm.reset()" class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+        <button (click)="addDirectory()" class="btn btn-primary" type="submit">Add Server</button>
       </div>
     </div>
   </div>

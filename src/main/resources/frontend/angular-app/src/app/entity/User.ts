@@ -1,4 +1,4 @@
-export class User{
+export class User {
   objectId: bigint;
   email: string;
   login: string;

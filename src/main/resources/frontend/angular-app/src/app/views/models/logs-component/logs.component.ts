@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {GlobalConstants} from '../../../constants/global-constants';
-import {Log} from '../../../entity/Log';
 import {LogLevel} from '../../../entity/list/LogLevel';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {AuthService} from "../../../services/AuthService";
@@ -15,36 +14,37 @@ import {LogPage} from "../../../pageable/LogPage";
   selector: 'app-logs',
   templateUrl: './logs.component.html'
 })
-export class LogsComponent {
+export class LogsComponent implements OnInit {
   deleteIcon = faTrashAlt;
   rule: RuleContainer;
   directoryId: string;
-  currentPage: number;
 
-  logs: Log[] = [];
+  logPage: LogPage;
 
   operationForm: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router, private http: HttpClient, private fb: FormBuilder) {
-
-    this.currentPage = 0;
-    this.rule = new RuleContainer("",new Date(0),new Date(),0,0,0,0,0,0,0,0,0,0,0,0);
-
-    this.directoryId = router.getCurrentNavigation().extras.state['objectId'].toString();
-
-    this.logs.push(new Log('OmegaLog', LogLevel.CONFIG, new Date()));
-
+  constructor(private authService: AuthService,
+              private router: Router,
+              private http: HttpClient,
+              private fb: FormBuilder) {
     this.operationForm = this.fb.group({
       text: [''],
       vSort: [''],
       dat1: [''],
       dat2: ['']
     });
-    for(let level of this.keys()) {
-      this.operationForm.addControl(level,this.fb.control(''));
+    for (let level of this.keys()) {
+      this.operationForm.addControl(level, this.fb.control(''));
     }
-    this.getLogsByRule(this.currentPage);
 
+    this.directoryId = this.router.getCurrentNavigation().extras.state['objectId'].toString();
+
+  }
+
+  ngOnInit(): void {
+    this.rule = new RuleContainer("", null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    this.getLogsByRule(0);
   }
 
   deleteLog(objectId: bigint): void {
@@ -61,24 +61,24 @@ export class LogsComponent {
     this.rule.dat2 = this.operationForm.controls['dat2'].value;
     this.rule.sort = this.operationForm.controls['vSort'].value;
 
-    for(let level of this.keys()) {
-      if(this.operationForm.controls[level].value){
+    for (let level of this.keys()) {
+      if (this.operationForm.controls[level].value) {
         this.rule[level.toLowerCase()] = 1;
-      }else{
+      } else {
         this.rule[level.toLowerCase()] = 0;
       }
     }
 
     console.log(this.rule)
     let params = new HttpParams()
-      .set("rule",JSON.stringify(this.rule))
+      .set("rule", JSON.stringify(this.rule))
       .set("directoryId", this.directoryId)
-      .set("page",this.currentPage.toString());
+      .set("page", pageNumber.toString());
 
-    this.http.get<LogPage>(GlobalConstants.apiUrl + 'api/log/',{params}).subscribe(result => {
+    this.http.get<LogPage>(GlobalConstants.apiUrl + 'api/log/', {params}).subscribe(result => {
       console.log(result);
-      this.logs = result.content;
-      console.log(this.logs);
+      this.logPage = result;
+      console.log(this.logPage);
     });
   }
 
@@ -89,10 +89,5 @@ export class LogsComponent {
 
   formatLevel(level: LogLevel): string {
     return LogLevel[level];
-  }
-
-  getLogsFromPage(event: number) {
-    this.currentPage = event;
-    this.getLogsByRule(this.currentPage);
   }
 }

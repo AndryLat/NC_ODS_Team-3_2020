@@ -1,5 +1,20 @@
 export class RuleContainer {
-
+  
+  text: string;
+  dat1: Date;
+  dat2: Date;
+  severe: number;
+  warning: number;
+  info: number;
+  config: number;
+  fine: number;
+  finer: number;
+  finest: number;
+  debug: number;
+  trace: number;
+  error: number;
+  fatal: number;
+  sort: number;
 
   constructor(text: string, dat1: Date, dat2: Date, vSevere: number, vWarning: number, vInfo: number, vConfig: number, vFine: number, vFiner: number, vFinest: number, vDebug: number, vTrace: number, vError: number, vFatal: number, vSort: number) {
     this.text = text;
@@ -18,20 +33,4 @@ export class RuleContainer {
     this.fatal = vFatal;
     this.sort = vSort;
   }
-
-  text:string;
-  dat1:Date;
-  dat2:Date;
-  severe:number;
-  warning:number;
-  info:number;
-  config:number;
-  fine:number;
-  finer:number;
-  finest:number;
-  debug:number;
-  trace:number;
-  error:number;
-  fatal:number;
-  sort:number;
 }

@@ -5,24 +5,26 @@
         <caption>Logs table</caption>
         <thead>
         <tr>
-          <th style="width: 70%" scope="col">Text</th>
-          <th style="width: 10%" scope="col">Level</th>
-          <th style="width: 10%" scope="col">Creation Date</th>
-          <th style="width: 10%" scope="col">Actions</th>
+          <th scope="col" style="width: 70%">Text</th>
+          <th scope="col" style="width: 10%">Level</th>
+          <th scope="col" style="width: 10%">Creation Date</th>
+          <th scope="col" style="width: 10%">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let log of logs | paginate: {id: 'logs', itemsPerPage: 2,currentPage: currentPage, totalItems: 10};">
+        <tr
+          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements};">
           <td>{{log.text}}</td>
           <td>{{formatLevel(log.level)}}</td>
           <td>{{log.creationDate | date: 'short'}}</td>
           <td class="text-center">
-            <fa-icon class="btn fas fa-2x pointer-event" [icon]="deleteIcon" (click)="deleteLog(log.objectId)"></fa-icon>
+            <fa-icon (click)="deleteLog(log.objectId)" [icon]="deleteIcon"
+                     class="btn fas fa-2x pointer-event"></fa-icon>
           </td>
         </tr>
         </tbody>
       </table>
-      <pagination-controls id="logs" (pageChange)="getLogsFromPage($event)"></pagination-controls>
+      <pagination-controls (pageChange)="getLogsByRule($event)" id="logs"></pagination-controls>
     </div>
     <div class="col-3">Settings
       <hr>
@@ -30,8 +32,8 @@
         <div class="border rounded">
           <div class="m-2">
             <label for="searchInput">Search by text</label>
-            <input type="text" class="form-control" id="searchInput" placeholder="Text" name="text"
-                   formControlName="text">
+            <input class="form-control" formControlName="text" id="searchInput" name="text" placeholder="Text"
+                   type="text">
           </div>
         </div>
         <hr>
@@ -40,13 +42,14 @@
             <p>Sorting</p>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByLevel">Sort By Level</label>
-              <input type="radio" class="form-control col-2" value="1" id="sortByLevel" name="vSort" formControlName="vSort">
+              <input class="form-control col-2" formControlName="vSort" id="sortByLevel" name="vSort" type="radio"
+                     value="1">
             </div>
             <br/>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByDate">Sort By Date</label>
-              <input type="radio" class="form-control  col-2" value="0" id="sortByDate" name="vSort"
-                     formControlName="vSort">
+              <input class="form-control  col-2" formControlName="vSort" id="sortByDate" name="vSort" type="radio"
+                     value="0">
             </div>
           </div>
         </div>
@@ -56,20 +59,20 @@
             <p>Filtration</p>
             <hr>
             <label for="dat1">Start date</label>
-            <input type="date" class="form-control" id="dat1" name="dat1"
-                   formControlName="dat1">
+            <input class="form-control" formControlName="dat1" id="dat1" name="dat1"
+                   type="date">
             <label for="dat2">End date</label>
-            <input type="date" class="form-control" id="dat2" name="dat2"
-                   formControlName="dat2">
+            <input class="form-control" formControlName="dat2" id="dat2" name="dat2"
+                   type="date">
             <hr>
             <div *ngFor="let key of keys()" class="row">
               <label class="col-10" for="logLevel">{{key}}</label>
-              <input type="checkbox" class="form-control  col-2" id="logLevel" name="logLevel"
-                     formControlName="{{key}}">
+              <input class="form-control  col-2" formControlName="{{key}}" id="logLevel" name="logLevel"
+                     type="checkbox">
             </div>
           </div>
         </div>
-        <button class="btn btn-primary row" type="submit" (click)="getLogsByRule(currentPage)">Apply</button>
+        <button (click)="getLogsByRule(0)" class="btn btn-primary row" type="submit">Apply</button>
       </form>
     </div>
   </div>

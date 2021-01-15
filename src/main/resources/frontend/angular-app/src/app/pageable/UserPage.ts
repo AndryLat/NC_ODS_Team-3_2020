@@ -1,6 +1,6 @@
 import {User} from '../entity/User';
 
-export class UserPage{
+export class UserPage {
   content: User[];
   'last': boolean;
   'totalPages': number;

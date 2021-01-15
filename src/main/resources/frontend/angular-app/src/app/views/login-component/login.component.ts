@@ -6,7 +6,8 @@ import {AuthService} from "../../services/AuthService";
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']})
+  styleUrls: ['./login.component.css']
+})
 export class LoginComponent {
 
   form: FormGroup;
@@ -14,7 +15,7 @@ export class LoginComponent {
   constructor(private fb: FormBuilder,
               private authService: AuthService,
               private router: Router) {
-    if(authService.isLoggedIn()){
+    if (authService.isLoggedIn()) {
       this.router.navigateByUrl("/");
     }
     this.form = this.fb.group({

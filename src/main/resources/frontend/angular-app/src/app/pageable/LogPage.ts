@@ -1,6 +1,6 @@
 import {Log} from "../entity/Log";
 
-export class LogPage{
+export class LogPage {
   content: Log[];
   'last': boolean;
   'totalPages': number;

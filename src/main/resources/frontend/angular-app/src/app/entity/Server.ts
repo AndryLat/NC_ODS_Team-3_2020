@@ -1,12 +1,5 @@
-import {BigInteger} from "@angular/compiler/src/i18n/big_integer";
-
 export class Server {
-  constructor(omega: string) {
-    this.name = omega;
-    this.objectId = 12;
-  }
-
-  objectId: number;
+  objectId: bigint;
   name: string;
   parentId: number;
   ip: string;

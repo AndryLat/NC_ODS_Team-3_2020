@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {GlobalConstants} from '../../constants/global-constants';
 import {HttpClient} from '@angular/common/http';
 import {User} from '../../entity/User';

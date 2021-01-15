@@ -48,13 +48,15 @@ public class ServerController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Server> add(@RequestBody Server server) {
+    public ResponseEntity<BigInteger> add(@RequestBody Server server, Principal principal) {
         if (server == null) {
             throwException(serverNotNull);
         }
-        serverService.save(server);
-        logger.info("Server save");
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        User user = userService.findByLogin(principal.getName());
+        serverService.add(server, user.getObjectId());
+        logger.info("Server added");
+        return ResponseEntity.ok(server.getObjectId());
     }
 
     @PutMapping("/update")
@@ -62,7 +64,7 @@ public class ServerController {
         if (server == null) {
             throwException(serverNotNull);
         }
-        serverService.save(server);
+        serverService.update(server);
         logger.info("Server update");
         return new ResponseEntity(HttpStatus.OK);
     }

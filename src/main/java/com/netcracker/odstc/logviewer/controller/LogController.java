@@ -39,7 +39,7 @@ public class LogController {
 
     @GetMapping("/")
     public Page<LogDTO> logs(@RequestParam String directoryId,
-                             @RequestParam(value = "page", defaultValue = "0") int page,
+                             @RequestParam(value = "page", defaultValue = "1") int page,
                              @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
                              @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page, pageSize);

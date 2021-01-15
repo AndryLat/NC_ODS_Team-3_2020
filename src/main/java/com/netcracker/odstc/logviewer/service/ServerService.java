@@ -5,6 +5,7 @@ import com.netcracker.odstc.logviewer.models.Server;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Date;
 
 @Service
 public class ServerService extends AbstractService {
@@ -24,7 +25,20 @@ public class ServerService extends AbstractService {
         return new Server();
     }
 
-    public void save(Server server) {
+    public void add(Server server, BigInteger parentId) {
+        if (isServerValid(server)) {
+            server.setEnabled(true);
+            server.setConnectable(true);
+            server.setLastAccessByJob(new Date());
+            server.setLastAccessByUser(new Date());
+            server.setParentId(parentId);
+            validateObjectType(server);
+
+            eavObjectDAO.saveObjectAttributesReferences(server);
+        }
+    }
+
+    public void update(Server server) {
         if (isServerValid(server)) {
             eavObjectDAO.saveObjectAttributesReferences(server);
         }

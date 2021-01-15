@@ -9,17 +9,18 @@ import {UserSettingsComponent} from './views/user-settings-component/user-settin
 import {AuthGuard} from "./services/AuthGuard";
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent},
-  { path: 'users', component: UsersComponent, canActivate: [AuthGuard]},
-  { path: 'servers', component: ServersComponent, canActivate: [AuthGuard]},
-  { path: '', redirectTo: 'servers', pathMatch: 'full', canActivate: [AuthGuard]},
-  { path: 'directories', component: DirectoriesComponent, canActivate: [AuthGuard]},
-  { path: 'logs', component: LogsComponent, canActivate: [AuthGuard]},
-  { path: 'settings', component: UserSettingsComponent, canActivate: [AuthGuard]}
+  {path: 'login', component: LoginComponent},
+  {path: 'users', component: UsersComponent, canActivate: [AuthGuard]},
+  {path: 'servers', component: ServersComponent, canActivate: [AuthGuard]},
+  {path: '', redirectTo: 'servers', pathMatch: 'full', canActivate: [AuthGuard]},
+  {path: 'directories', component: DirectoriesComponent, canActivate: [AuthGuard]},
+  {path: 'logs', component: LogsComponent, canActivate: [AuthGuard]},
+  {path: 'settings', component: UserSettingsComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  imports: [RouterModule.forRoot(routes, {useHash: true})],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

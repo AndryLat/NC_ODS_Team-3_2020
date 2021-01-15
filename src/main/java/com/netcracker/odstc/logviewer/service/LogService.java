@@ -4,7 +4,6 @@ import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class LogService extends AbstractService {
     }
 
     public Page<LogDTO> getAllLogsByAllValues(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
-        return new PageImpl<>(logDAO.getLogByAll(directoryId, ruleContainer, pageable));
+        return logDAO.getLogByAll(directoryId, ruleContainer, pageable);
     }
 
     public void save(Log log) {

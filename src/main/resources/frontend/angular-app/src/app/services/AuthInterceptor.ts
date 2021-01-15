@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
             next: HttpHandler): Observable<HttpEvent<any>> {
     const idToken = this.authService.getToken();
 
-    this.spinnerOverlayService.show();
+    const spinnerSubscription = this.spinnerOverlayService.spinner$.subscribe();
 
     console.log("Intercepted")
 
@@ -25,9 +25,9 @@ export class AuthInterceptor implements HttpInterceptor {
           idToken)
       });
 
-      return next.handle(cloned).pipe(finalize(() => this.spinnerOverlayService.hide()));
+      return next.handle(cloned).pipe(finalize(() => spinnerSubscription.unsubscribe()));
     } else {
-      return next.handle(req).pipe(finalize(() => this.spinnerOverlayService.hide()));
+      return next.handle(req).pipe(finalize(() => spinnerSubscription.unsubscribe()));
     }
   }
 }

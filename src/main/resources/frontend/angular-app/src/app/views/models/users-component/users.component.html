@@ -1,6 +1,6 @@
 <div class="row">
   <div class="container col-10">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add new user</button>
+    <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new user</button>
   </div>
 </div>
 <hr>
@@ -23,18 +23,20 @@
       <td>{{user.password}}</td>
       <td>{{user.role}}</td>
       <td class="d-flex justify-content-around">
-        <button class="btn btn-danger" (click)="deleteUser(user.objectId)">Delete</button></td>
+        <button (click)="deleteUser(user.objectId)" class="btn btn-danger">Delete</button>
+      </td>
     </tr>
     </tbody>
   </table>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog"
+     tabindex="-1">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">New message</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -43,19 +45,24 @@
         <form [formGroup]="form">
           <div class="form-group">
             <label for="emailInput">Email address</label>
-            <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" name="email" formControlName="email">
+            <input class="form-control" formControlName="email" id="emailInput" name="email"
+                   placeholder="name@example.com"
+                   type="email">
           </div>
           <div class="form-group">
             <label for="loginInput">Login</label>
-            <input type="text" class="form-control" id="loginInput" placeholder="login" name="login" formControlName="login">
+            <input class="form-control" formControlName="login" id="loginInput" name="login" placeholder="login"
+                   type="text">
           </div>
           <div class="form-group">
             <label for="passwordInput">Password</label>
-            <input type="text" class="form-control" id="passwordInput" placeholder="password" name="password" formControlName="password">
+            <input class="form-control" formControlName="password" id="passwordInput" name="password"
+                   placeholder="password"
+                   type="text">
           </div>
           <div class="form-group">
             <label for="exampleFormControlSelect1">Role</label>
-            <select class="form-control" id="exampleFormControlSelect1" name="role" formControlName="role">
+            <select class="form-control" formControlName="role" id="exampleFormControlSelect1" name="role">
               <option *ngFor="let role of roles" [ngValue]="role">{{role}}</option>
             </select>
           </div>
@@ -63,8 +70,8 @@
         <!-- PUT FORM -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" (click)="addUser()">Send message</button>
+        <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+        <button (click)="addUser()" class="btn btn-primary" type="button">Send message</button>
       </div>
     </div>
   </div>

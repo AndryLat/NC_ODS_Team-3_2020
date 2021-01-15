@@ -1,6 +1,6 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { AppComponent } from './app.component';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {AppComponent} from './app.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {LoginComponent} from './views/login-component/login.component';
 import {AppRoutingModule} from './app-routing.module';
@@ -15,7 +15,7 @@ import {AuthInterceptor} from "./services/AuthInterceptor";
 import {AuthGuard} from "./services/AuthGuard";
 import {SpinnerService} from "./services/overlay-spinner/SpinerService";
 import {OverlaySpinnerComponent} from "./services/overlay-spinner/overlay-spinner.component";
-import { OverlayModule } from '@angular/cdk/overlay';
+import {OverlayModule} from '@angular/cdk/overlay';
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NgxPaginationModule} from "ngx-pagination";
 
@@ -40,15 +40,17 @@ import {NgxPaginationModule} from "ngx-pagination";
   ],
   providers: [
     AuthService,
-    {provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true},
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
     SpinnerService,
     AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor() {
-     // localStorage.removeItem('id_token');
+    // localStorage.removeItem('id_token');
   }
 }
