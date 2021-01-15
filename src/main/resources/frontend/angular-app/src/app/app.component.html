@@ -15,9 +15,10 @@
            id="navbarDropdown" role="button">
           Extras
         </a>
-        <div aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="#" routerLink="/settings" routerLinkActive="active">Settings</a>
-          <a *ngIf="isAdmin()" class="dropdown-item" href="#" routerLink="/users" routerLinkActive="active">Users</a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" routerLink="/settings" routerLinkActive="active" href="#">Settings</a>
+          <a class="dropdown-item" *ngIf="isAdmin()" routerLink="/users" routerLinkActive="active" href="#">Users</a>
+          <a class="dropdown-item" (click)="logout()" routerLinkActive="active" href="#">Logout</a>
         </div>
       </a>
     </div>

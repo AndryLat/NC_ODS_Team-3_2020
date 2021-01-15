@@ -45,21 +45,22 @@ export class DirectoriesComponent implements OnInit {
   }
 
 
-  isLogin(): boolean {
-    return this.authService.isLoggedIn();
-  }
-
   routeToLogs(objectId: bigint): void {
     this.router.navigateByUrl('/logs', {state: {objectId}});
   }
 
   deleteDirectory(objectId: bigint): void {
-    // TODO: Delete server
+    this.http.delete(GlobalConstants.apiUrl + 'api/directory/delete/' + objectId).subscribe(() => {
+      this.directories = this.directories.filter(item => item.objectId !== objectId);
+    });
   }
 
   addDirectory(): void {
-    // TODO: Insert post
-    console.log('Adding button work...');
+    const directory = this.insertForm.value;
+    console.log(this.insertForm.value);
+    this.http.post(GlobalConstants.apiUrl + 'api/directory/add', directory).subscribe(() => {
+      console.log('Complete');
+    });
     this.insertForm.reset({});
   }
 }
