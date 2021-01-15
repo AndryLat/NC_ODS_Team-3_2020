@@ -23,6 +23,8 @@ export class LogsComponent implements OnInit {
 
   operationForm: FormGroup;
 
+  localApi: string = GlobalConstants.apiUrl + 'api/log';
+
   constructor(private authService: AuthService,
               private router: Router,
               private http: HttpClient,
@@ -44,11 +46,13 @@ export class LogsComponent implements OnInit {
   ngOnInit(): void {
     this.rule = new RuleContainer("", null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    this.getLogsByRule(0);
+    this.getLogsByRule(1);
   }
 
   deleteLog(objectId: bigint): void {
-    // TODO: Delete server
+    this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
+    }, error => {
+    })
   }
 
   getLogsByRule(pageNumber: number): void {
@@ -75,9 +79,10 @@ export class LogsComponent implements OnInit {
       .set("directoryId", this.directoryId)
       .set("page", pageNumber.toString());
 
-    this.http.get<LogPage>(GlobalConstants.apiUrl + 'api/log/', {params}).subscribe(result => {
+    this.http.get<LogPage>(this.localApi+'/', {params}).subscribe(result => {
       console.log(result);
       this.logPage = result;
+      this.logPage.number = this.logPage.number + 1;// In Spring pages start from 0.
       console.log(this.logPage);
     });
   }

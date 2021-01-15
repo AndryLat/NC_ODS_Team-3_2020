@@ -42,7 +42,7 @@ public class LogController {
                              @RequestParam(value = "page", defaultValue = "1") int page,
                              @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
                              @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
-        PageRequest pageable = PageRequest.of(page, pageSize);
+        PageRequest pageable = PageRequest.of(page-1, pageSize);// On UI pages starts from 1. Spring start count from 0.
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString,RuleContainer.class);
         return logService.getAllLogsByAllValues(new BigInteger(directoryId),ruleContainer,pageable);
     }

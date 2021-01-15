@@ -81,7 +81,7 @@ public class LogDAO extends EAVObjectDAO {
             "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
             "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
             "  and text.value like '%' || :text || '%'\n" +
-            "  and creationDate.date_value BETWEEN  nvl(TO_TIMESTAMP ('10-12-02 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value) and nvl(TO_TIMESTAMP ('10-01-22 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value)\n" +
+            "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
             "  and (\n" +
             "        (\n" +
             "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
@@ -127,7 +127,7 @@ public class LogDAO extends EAVObjectDAO {
             "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
             "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
             "  and text.value like '%' || :text || '%'\n" +
-            "  and creationDate.date_value BETWEEN  nvl(TO_TIMESTAMP ('10-12-02 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value) and nvl(TO_TIMESTAMP ('10-01-22 14:10:10.123000', 'DD-MM-RR HH24:MI:SS.FF'), creationDate.date_value)\n" +
+            "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
             "  and (\n" +
             "        (\n" +
             "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
@@ -180,7 +180,7 @@ public class LogDAO extends EAVObjectDAO {
                 .addValue("V_FATAL", ruleContainer.getFatal());
 
         MapSqlParameterSource parameterSourceForObject = new MapSqlParameterSource(parameterSourceCount.getValues())
-                .addValue("offset", pageable.getOffset() - pageable.getPageSize())
+                .addValue("offset", pageable.getOffset())
                 .addValue("pageSize", pageable.getPageSize());
 
         String query = ruleContainer.getSort() == 0 ? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY : GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;

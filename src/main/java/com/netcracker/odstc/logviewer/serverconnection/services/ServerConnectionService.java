@@ -40,7 +40,7 @@ public class ServerConnectionService {
     public Date formatDate(String date) {
         Date logCreationDate = null;
         try {
-            logCreationDate = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss.SSS").parse(date);
+            logCreationDate = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS").parse(date);
         } catch (ParseException e) {
             logger.error(e.getMessage(), e);
         }
