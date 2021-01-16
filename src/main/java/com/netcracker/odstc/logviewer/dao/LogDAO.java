@@ -115,7 +115,7 @@ public class LogDAO extends EAVObjectDAO {
             "  and text.attr_id = 23 /* Full content of log */\n" +
             "  and logLevel.attr_id = 24 /* Log level */\n" +
             "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
-            "  and ob.PARENT_ID IN (SELECT ob.OBJECT_ID FROM files)\n" +
+            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
             "  and text.value like '%' || :text || '%'\n" +
             "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
             "  and (\n" +
