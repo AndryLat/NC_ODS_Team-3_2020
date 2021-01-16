@@ -10,9 +10,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -104,28 +101,21 @@ public class LogDAO extends EAVObjectDAO {
             "    )\n" +
             "order by creationDate.DATE_VALUE\n" +
             "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY";
-    private static final String GET_TOTAL_COUNT_LOGS_QUERY = "DELETE\n" +
-            "FROM OBJECTS counter\n" +
-            "WHERE EXISTS (\n" +
-            "WITH files AS (\n" +
+    private static final String GET_TOTAL_COUNT_LOGS_QUERY = "WITH files AS (\n" +
             "    SELECT OBJECT_ID\n" +
             "    FROM OBJECTS files\n" +
             "    WHERE PARENT_ID = :directoryId\n" +
             ")\n" +
-            "select ob.object_id     as id,\n" +
-            "       text.value        as fcl_value,\n" +
-            "       logLevel.LIST_VALUE_ID as log_level_value,\n" +
-            "       creationDate.date_value as log_timestamp_value\n" +
+            "select COUNT(*)\n" +
             "from objects ob\n" +
             "         left join attributes text on text.object_id = ob.object_id\n" +
             "         left join attributes logLevel on logLevel.object_id = ob.object_id\n" +
             "         left join attributes creationDate on creationDate.object_id = ob.object_id\n" +
             "where ob.object_type_id = 5\n" +
-            " AND counter.OBJECT_ID = ob.OBJECT_ID\n" +
             "  and text.attr_id = 23 /* Full content of log */\n" +
             "  and logLevel.attr_id = 24 /* Log level */\n" +
             "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
-            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
+            "  and ob.PARENT_ID IN (SELECT ob.OBJECT_ID FROM files)\n" +
             "  and text.value like '%' || :text || '%'\n" +
             "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
             "  and (\n" +
@@ -147,19 +137,13 @@ public class LogDAO extends EAVObjectDAO {
             "                or (:V_ERROR = 1 and logLevel.LIST_VALUE_ID = 22)\n" +
             "                or (:V_FATAL = 1 and logLevel.LIST_VALUE_ID = 23)\n" +
             "            )\n" +
-            "    ))\n";
+            "    )";
 
-    private final PlatformTransactionManager platformTransactionManager;
-
-    public LogDAO(JdbcTemplate jdbcTemplate, PlatformTransactionManager platformTransactionManager) {
+    public LogDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
-        this.platformTransactionManager = platformTransactionManager;
     }
 
     public Page<LogDTO> getLogByAll(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
-        DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
-        TransactionStatus status = platformTransactionManager.getTransaction(paramTransactionDefinition);
-
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 
         MapSqlParameterSource parameterSourceCount = new MapSqlParameterSource()
@@ -186,10 +170,12 @@ public class LogDAO extends EAVObjectDAO {
         String query = ruleContainer.getSort() == 0 ? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY : GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;
         List<LogDTO> content = namedParameterJdbcTemplate.query(query, parameterSourceForObject, new LogDTOMapper());
 
-        int totalRows = namedParameterJdbcTemplate.update(GET_TOTAL_COUNT_LOGS_QUERY, parameterSourceCount);
+        BigInteger totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_COUNT_LOGS_QUERY, parameterSourceCount, BigInteger.class);
 
-        platformTransactionManager.rollback(status);
+        if (totalRows == null) {
+            totalRows = BigInteger.ZERO;
+        }
 
-        return new PageImpl<>(content, pageable, totalRows);
+        return new PageImpl<>(content, pageable, totalRows.longValue());
     }
 }
