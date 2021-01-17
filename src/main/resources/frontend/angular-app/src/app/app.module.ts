@@ -28,7 +28,7 @@ import {NgxPaginationModule} from "ngx-pagination";
     DirectoriesComponent,
     LogsComponent,
     UserSettingsComponent,
-    OverlaySpinnerComponent,
+    OverlaySpinnerComponent
   ],
   imports: [
     OverlayModule,
@@ -51,6 +51,5 @@ import {NgxPaginationModule} from "ngx-pagination";
 })
 export class AppModule {
   constructor() {
-    // localStorage.removeItem('id_token');
   }
 }

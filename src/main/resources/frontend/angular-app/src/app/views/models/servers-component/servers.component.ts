@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {AuthService} from "../../../services/AuthService";
-import {faCogs, faSignInAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faCogs, faSignInAlt, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {matchPattern} from "../../../services/validators/matchPatternValidator";
 
 @Component({
   selector: 'app-servers',
@@ -15,6 +16,9 @@ export class ServersComponent implements OnInit {
   proceedIcon = faSignInAlt;
   settingIcon = faCogs;
   deleteIcon = faTrashAlt;
+
+  enabledIcon = faCheck;
+  disabledIcon = faTimes;
 
 
   localApi: string = GlobalConstants.apiUrl + 'api/server'
@@ -41,16 +45,19 @@ export class ServersComponent implements OnInit {
 
     this.insertForm = this.fb.group({
       name: ['', Validators.required],
-      ip: ['', Validators.required],
-      port: ['', Validators.required],
+      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.]+$/, "Special characters is not allowed")]],
+      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed")]],
       login: ['', Validators.required],
       password: ['', Validators.required],
       protocol: ['', Validators.required]
     });
 
     this.updateForm = this.fb.group({
+      objectId: [''],
+      parentId: [''],
       name: ['', Validators.required],
-      port: ['', Validators.required],
+      ip: [''],
+      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed")]],
       login: ['', Validators.required],
       password: ['', Validators.required],
       protocol: ['', Validators.required],
@@ -59,12 +66,32 @@ export class ServersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.servers.push(new Server())
+    let ser = new Server();
+    ser.enabled = true;
+    this.servers.push(ser);
+    //return;
     this.http.get<Server[]>(this.localApi + '/').subscribe(result => {
       this.servers = result;
     }, error => {
       this.errorMessage = "Cant get list of servers";
     });
+  }
+
+  getErrorByControlName(control: AbstractControl): string {
+    let errors = control.errors;
+    console.log(errors);
+    if (errors.max) {
+      return 'Specified number is greater than max allowed: ' + errors.max.max;
+    }
+    if (errors.min) {
+      return 'Specified number is lower than min allowed: ' + errors.min.min;
+    }
+    if (errors.required) {
+      return 'This field is required';
+    }
+    if (errors.matchPattern) {
+      return errors.matchPattern.message;
+    }
   }
 
 
@@ -74,9 +101,14 @@ export class ServersComponent implements OnInit {
     this.router.navigateByUrl('/directories', {state: {objectId}});
   }
 
-  deleteServer(objectId: number): void {
+  deleteServer(objectId: bigint): void {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
       this.confirmMessage = "Server deleted successful";
+
+      let changedServer = this.servers.find(this.findIndexToUpdate);
+      let index = this.servers.indexOf(changedServer);
+
+      this.servers.splice(index, 1);
     }, error => {
       this.errorMessage = "Error with deleting server";
     })
@@ -94,7 +126,6 @@ export class ServersComponent implements OnInit {
     const server = this.insertForm.value;
 
     if (!this.insertForm.valid) {
-      this.inputError = "Form not valid";
       return;
     }
     this.http.post(this.localApi + "/add", server).subscribe(result => {
@@ -108,7 +139,10 @@ export class ServersComponent implements OnInit {
   }
 
   showSettings(server: Server): void {
+    this.updateForm.controls.objectId.setValue(server.objectId);
+    this.updateForm.controls.parentId.setValue(server.parentId);
     this.updateForm.controls.name.setValue(server.name);
+    this.updateForm.controls.ip.setValue(server.ip);
     this.updateForm.controls.port.setValue(server.port);
     this.updateForm.controls.login.setValue(server.login);
     this.updateForm.controls.password.setValue(server.password);
@@ -117,6 +151,9 @@ export class ServersComponent implements OnInit {
   }
 
   updateServerByForm(): void {
+    if (!this.updateForm.valid) {
+      return;
+    }
     const server = this.updateForm.value;
 
     this.http.put(this.localApi + "/update", server).subscribe(result => {

@@ -34,7 +34,9 @@
         <td>{{server.protocol}}</td>
         <td>{{server.port}}</td>
         <td>{{server.lastAccessByJob | date: 'short'}}</td>
-        <td>{{server.enabled}}</td>
+        <td class="text-center">
+          <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        </td>
         <td class="text-center">
           <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>
@@ -61,7 +63,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <!-- PUT FORM -->
+        <!-- INSERT FORM -->
         <div *ngIf="inputError" class="alert alert-danger col-12" role="alert">
           {{inputError}}
         </div>
@@ -75,7 +77,7 @@
             <div
               *ngIf="this.insertForm.controls['name'].invalid && (this.insertForm.controls['name'].dirty || this.insertForm.controls['name'].touched)"
               class="alert alert-danger">
-              Name cant be empty
+              {{getErrorByControlName(this.insertForm.controls['name'])}}
             </div>
           </div>
           <div class="form-group">
@@ -84,17 +86,17 @@
             <div
               *ngIf="this.insertForm.controls['ip'].invalid && (this.insertForm.controls['ip'].dirty || this.insertForm.controls['ip'].touched)"
               class="alert alert-danger">
-              IP cant be empty
+              {{getErrorByControlName(this.insertForm.controls['ip'])}}
             </div>
           </div>
           <div class="form-group">
             <label for="portInput">Port</label>
             <input class="form-control" formControlName="port" id="portInput" name="port" placeholder="65535"
-                   type="text">
+                   type="number">
             <div
-              *ngIf="this.insertForm.controls['port'].invalid && (this.insertForm.controls['port'].dirty || this.insertForm.controls['port'].touched)"
+              *ngIf="this.insertForm.controls['port'].errors && (this.insertForm.controls['port'].dirty || this.insertForm.controls['port'].touched)"
               class="alert alert-danger">
-              Port cant be empty
+              {{getErrorByControlName(this.insertForm.controls['port'])}}
             </div>
           </div>
           <div class="form-group">
@@ -104,7 +106,7 @@
             <div
               *ngIf="this.insertForm.controls['login'].invalid && (this.insertForm.controls['login'].dirty || this.insertForm.controls['login'].touched)"
               class="alert alert-danger">
-              Login cant be empty
+              {{getErrorByControlName(this.insertForm.controls['login'])}}
             </div>
           </div>
           <div class="form-group">
@@ -115,7 +117,7 @@
             <div
               *ngIf="this.insertForm.controls['password'].invalid && (this.insertForm.controls['password'].dirty || this.insertForm.controls['password'].touched)"
               class="alert alert-danger">
-              Password cant be empty
+              {{getErrorByControlName(this.insertForm.controls['password'])}}
             </div>
           </div>
           <div class="form-group">
@@ -126,11 +128,11 @@
             <div
               *ngIf="this.insertForm.controls['protocol'].invalid && (this.insertForm.controls['protocol'].dirty || this.insertForm.controls['protocol'].touched)"
               class="alert alert-danger">
-              Protocol cant be empty
+              {{getErrorByControlName(this.insertForm.controls['protocol'])}}
             </div>
           </div>
         </form>
-        <!-- PUT FORM -->
+        <!-- INSERT FORM -->
         <div class="d-flex flex-row">
           <button (click)="testConnection()" class="btn btn-info col-4" type="button">Test connection</button>
           <div *ngIf="!(testResult===null)" class="col-8">{{testResult}}</div>
@@ -140,7 +142,8 @@
         <button (click)="insertForm.reset();testResult=null" class="btn btn-secondary" data-dismiss="modal"
                 type="button">Close
         </button>
-        <button (click)="addServer()" class="btn btn-primary" type="submit">Add Server</button>
+        <button (click)="insertForm.markAllAsTouched();addServer()" class="btn btn-primary" type="submit">Add Server
+        </button>
       </div>
     </div>
   </div>
@@ -157,23 +160,41 @@
         </button>
       </div>
       <div class="modal-body">
-        <!-- PUT FORM -->
+        <!-- UPDATE FORM -->
         <form [formGroup]="updateForm">
+          <input formControlName="objectId" id="objectIdInputUpdate" name="objectId" type="hidden">
+          <input formControlName="parentId" id="parentIdInputUpdate" name="parentId" type="hidden">
           <div class="form-group">
             <label for="nameInputUpdate">Server name</label>
             <input class="form-control" formControlName="name" id="nameInputUpdate" name="name"
-                   placeholder="Server Name" required
+                   placeholder="Server Name"
                    type="text">
+            <div
+              *ngIf="this.updateForm.controls['name'].invalid && (this.updateForm.controls['name'].dirty || this.updateForm.controls['name'].touched)"
+              class="alert alert-danger">
+              {{getErrorByControlName(this.updateForm.controls['name'])}}
+            </div>
           </div>
           <div class="form-group">
             <label for="portInputUpdate">Port</label>
             <input class="form-control" formControlName="port" id="portInputUpdate" name="port" placeholder="65535"
                    type="text">
+            <div
+              *ngIf="this.updateForm.controls['port'].invalid && (this.updateForm.controls['port'].dirty || this.updateForm.controls['port'].touched)"
+              class="alert alert-danger">
+              {{getErrorByControlName(this.updateForm.controls['port'])}}
+            </div>
           </div>
+          <input formControlName="ip" id="ipInputUpdate" name="ip" type="hidden">
           <div class="form-group">
             <label for="loginInputUpdate">Login</label>
             <input class="form-control" formControlName="login" id="loginInputUpdate" name="login" placeholder="login"
                    type="text">
+            <div
+              *ngIf="this.updateForm.controls['login'].invalid && (this.updateForm.controls['login'].dirty || this.updateForm.controls['login'].touched)"
+              class="alert alert-danger">
+              {{getErrorByControlName(this.updateForm.controls['login'])}}
+            </div>
           </div>
           <div class="form-group">
             <label for="passwordInputUpdate">Password</label>
@@ -186,6 +207,11 @@
             <select class="form-control" formControlName="protocol" id="protocolSelectUpdate" name="protocol">
               <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
             </select>
+            <div
+              *ngIf="this.updateForm.controls['protocol'].invalid && (this.updateForm.controls['protocol'].dirty || this.updateForm.controls['protocol'].touched)"
+              class="alert alert-danger">
+              {{getErrorByControlName(this.updateForm.controls['protocol'])}}
+            </div>
           </div>
           <div class="form-check">
             <input class="form-check-input" formControlName="enabled" id="enabledSelectUpdate" name="enabled"
@@ -193,13 +219,15 @@
             <label class="form-check-label" for="enabledSelectUpdate">Enabled</label>
           </div>
         </form>
-        <!-- PUT FORM -->
+        <!-- UPDATE FORM -->
       </div>
       <div class="modal-footer">
-        <button (click)="insertForm.reset();testResult=null" class="btn btn-secondary" data-dismiss="modal"
+        <button (click)="updateForm.reset()" class="btn btn-secondary" data-dismiss="modal"
                 type="button">Close
         </button>
-        <button (click)="updateServerByForm()" class="btn btn-primary" type="submit">Update Server</button>
+        <button (click)="updateForm.markAllAsTouched();updateServerByForm()" class="btn btn-primary" type="submit">
+          Update Server
+        </button>
       </div>
     </div>
   </div>
