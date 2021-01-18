@@ -1,7 +1,6 @@
-export class Server {
-  objectId: bigint;
-  name: string;
-  parentId: number;
+import {EAVObject} from "./EAVObject";
+
+export class Server extends EAVObject{
   ip: string;
   port: number;
   protocol: string;

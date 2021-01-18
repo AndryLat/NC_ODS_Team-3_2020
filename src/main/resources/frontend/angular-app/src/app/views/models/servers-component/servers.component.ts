@@ -1,12 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {AuthService} from "../../../services/AuthService";
 import {faCheck, faCogs, faSignInAlt, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {matchPattern} from "../../../services/validators/matchPatternValidator";
+import {ServerPage} from "../../../pageable/ServerPage";
+import {EAVObject} from "../../../entity/EAVObject";
 
 @Component({
   selector: 'app-servers',
@@ -30,7 +32,7 @@ export class ServersComponent implements OnInit {
   confirmMessage: string;
   inputError: string;
 
-  servers: Server[] = [];
+  serverPage: ServerPage;
 
   protocols = [
     'SSH', 'FTP'
@@ -66,15 +68,7 @@ export class ServersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let ser = new Server();
-    ser.enabled = true;
-    this.servers.push(ser);
-    //return;
-    this.http.get<Server[]>(this.localApi + '/').subscribe(result => {
-      this.servers = result;
-    }, error => {
-      this.errorMessage = "Cant get list of servers";
-    });
+    this.getServersFromPage(1);
   }
 
   getErrorByControlName(control: AbstractControl): string {
@@ -105,10 +99,10 @@ export class ServersComponent implements OnInit {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
       this.confirmMessage = "Server deleted successful";
 
-      let changedServer = this.servers.find(this.findIndexToUpdate);
-      let index = this.servers.indexOf(changedServer);
+      let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId == objectId);
+      let index = this.serverPage.content.indexOf(changedServer);
 
-      this.servers.splice(index, 1);
+      this.serverPage.content.splice(index, 1);
     }, error => {
       this.errorMessage = "Error with deleting server";
     })
@@ -131,7 +125,7 @@ export class ServersComponent implements OnInit {
     this.http.post(this.localApi + "/add", server).subscribe(result => {
       this.confirmMessage = "Server added";
       server['objectId'] = result;
-      this.servers.push(server);
+      this.getServersFromPage(1);
       this.insertForm.reset({});
     }, error => {
       this.inputError = "Cant add server";
@@ -159,10 +153,8 @@ export class ServersComponent implements OnInit {
     this.http.put(this.localApi + "/update", server).subscribe(result => {
       this.confirmMessage = "Server updated";
 
-      let changedServer = this.servers.find(this.findIndexToUpdate);
-      let index = this.servers.indexOf(changedServer);
-
-      this.servers.splice(index, 1, server);
+      let index = this.getIndexByObjectIdOfObject(server);
+      this.serverPage.content.splice(index, 1, server);
 
     }, error => {
       alert("Cant update server");
@@ -176,8 +168,21 @@ export class ServersComponent implements OnInit {
     })
   }
 
-  private findIndexToUpdate(newItem) {
-    return newItem.id === this;
+  getServersFromPage(pageNumber: number): void {
+
+    let params = new HttpParams()
+      .set("page", pageNumber.toString());
+
+    this.http.get<ServerPage>(this.localApi+'/', {params}).subscribe(result => {
+      console.log(result);
+      this.serverPage = result;
+      this.serverPage.number = this.serverPage.number + 1;// In Spring pages start from 0.
+      console.log(this.serverPage);
+    });
   }
 
+  getIndexByObjectIdOfObject(object: EAVObject): number{
+    let changedServer = this.serverPage.content.find(changedElement => changedElement.objectId == object.objectId);
+    return this.serverPage.content.indexOf(changedServer);
+  }
 }

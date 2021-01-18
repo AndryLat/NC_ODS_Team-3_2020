@@ -1,6 +1,7 @@
 import {LogLevel} from './list/LogLevel';
+import {EAVObject} from "./EAVObject";
 
-export class Log {
+export class Log extends EAVObject{
   objectId: bigint;
   text: string;
   level: LogLevel;

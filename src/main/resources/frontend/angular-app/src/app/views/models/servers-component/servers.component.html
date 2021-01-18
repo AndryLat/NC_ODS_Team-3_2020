@@ -13,8 +13,8 @@
     </div>
   </div>
   <hr>
-  <div class="d-flex justify-content-center row">
-    <table class="col-11 table table-bordered">
+  <div class="row">
+    <table class="table table-bordered">
       <caption>Servers table</caption>
       <thead>
       <tr>
@@ -28,7 +28,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let server of servers;">
+      <tr *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
         <td>{{server.name}}</td>
         <td>{{server.ip}}</td>
         <td>{{server.protocol}}</td>
@@ -48,6 +48,7 @@
       </tr>
       </tbody>
     </table>
+    <pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></pagination-controls>
   </div>
 </div>
 

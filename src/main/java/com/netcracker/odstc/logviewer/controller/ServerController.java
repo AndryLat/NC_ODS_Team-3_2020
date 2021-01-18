@@ -38,7 +38,7 @@ public class ServerController {
     public Page<Server> showAllServers(Principal principal,
                                        @RequestParam(value = "page", defaultValue = "0") int page,
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
-        PageRequest pageRequest = PageRequest.of(page, pageSize);
+        PageRequest pageRequest = PageRequest.of(page-1, pageSize);
         User user = userService.findByLogin(principal.getName());
         List<Server> servers = serverService.showAllServersByPagination(pageRequest, user);
         return new PageImpl<>(servers);
