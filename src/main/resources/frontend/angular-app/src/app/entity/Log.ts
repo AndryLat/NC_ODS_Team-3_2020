@@ -5,4 +5,5 @@ export class Log {
   text: string;
   level: LogLevel;
   creationDate: Date;
+  checked?: boolean;
 }

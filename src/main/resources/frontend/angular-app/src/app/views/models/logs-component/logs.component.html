@@ -1,17 +1,26 @@
 <div class="container-fluid">
   <div class="row">
+    <div *ngIf="msg" class="alert alert-info col-6" role="alert">
+      {{msg}}
+    </div>
     <div class="col-9">
       <table class="table table-bordered">
         <caption>Logs table</caption>
         <thead>
         <tr>
+          <th scope="col" style="width: 5%"><input type="checkbox" [checked]="isAllCheckBoxChecked()"
+                                                   (change)="checkAllCheckBox($event)"></th>
           <th scope="col" style="width: 90%">Text</th>
-          <th scope="col" style="width: 10%">Actions</th>
+          <th scope="col" style="width: 5%">
+            <fa-icon (click)="deleteSelectedLogs()" [icon]="deleteIcon"
+                     class="btn fas fa-2x pointer-event"></fa-icon>
+          </th>
         </tr>
         </thead>
         <tbody>
         <tr
-          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements};">
+          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
+          <td><input type="checkbox" value="{{log.objectId}}" [(ngModel)]="logPage?.content[i].checked"></td>
           <td>{{log.text}}</td>
           <td class="text-center">
             <fa-icon (click)="deleteLog(log.objectId)" [icon]="deleteIcon"

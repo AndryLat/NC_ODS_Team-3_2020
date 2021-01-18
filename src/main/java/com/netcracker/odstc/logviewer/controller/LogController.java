@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @RequestMapping("api/log")
 @RestController
@@ -42,9 +43,9 @@ public class LogController {
                              @RequestParam(value = "page", defaultValue = "1") int page,
                              @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
                              @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
-        PageRequest pageable = PageRequest.of(page-1, pageSize);// On UI pages starts from 1. Spring start count from 0.
-        RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString,RuleContainer.class);
-        return logService.getAllLogsByAllValues(new BigInteger(directoryId),ruleContainer,pageable);
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
+        RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
+        return logService.getAllLogsByAllValues(new BigInteger(directoryId), ruleContainer, pageable);
     }
 
     @PostMapping("/add")
@@ -64,6 +65,18 @@ public class LogController {
         }
         logger.info("Delete log");
         logService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/deletes/{ids}")
+    public ResponseEntity<Log> deleteByIds(@PathVariable List<BigInteger> ids) {
+        for (BigInteger id : ids) {
+            if (id == null || id.equals(BigInteger.valueOf(0))) {
+                throwException(logIdNullMessage);
+            }
+        }
+        logger.info("Delete logs");
+        logService.deleteByIds(ids);
         return ResponseEntity.noContent().build();
     }
 

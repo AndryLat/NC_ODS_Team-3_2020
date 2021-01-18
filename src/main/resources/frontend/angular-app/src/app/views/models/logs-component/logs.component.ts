@@ -9,7 +9,6 @@ import {faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {RuleContainer} from "../../../containers/RuleContainer";
 import {LogPage} from "../../../pageable/LogPage";
 
-
 @Component({
   selector: 'app-logs',
   templateUrl: './logs.component.html'
@@ -19,11 +18,14 @@ export class LogsComponent implements OnInit {
   rule: RuleContainer;
   directoryId: string;
 
+  msg: string;
+
   logPage: LogPage;
 
   operationForm: FormGroup;
 
   localApi: string = GlobalConstants.apiUrl + 'api/log';
+  x: any;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -44,15 +46,48 @@ export class LogsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rule = new RuleContainer("", null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
+    this.rule = new RuleContainer("", null, null, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0);
     this.getLogsByRule(1);
   }
 
   deleteLog(objectId: bigint): void {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
+      this.msg = 'Log successfully deleted';
     }, error => {
+      this.msg = 'Something went wrong during deleting logs';
     })
+    let changedServer = this.logPage.content.find(deletedLog => deletedLog.objectId == objectId);
+    let index = this.logPage.content.indexOf(changedServer);
+    this.logPage.content.splice(index, 1);
+  }
+
+  checkAllCheckBox(ev) {
+    this.logPage?.content.forEach(x => x.checked = ev.target.checked)
+  }
+
+  isAllCheckBoxChecked() {
+    return this.logPage?.content.every(p => p.checked);
+  }
+
+  deleteSelectedLogs(): void {
+    const selectedProducts = this.logPage?.content.filter(product => product.checked).map(p => p.objectId);
+    if (selectedProducts && selectedProducts.length > 0) {
+      this.http.delete(this.localApi + "/deletes/" + selectedProducts)
+        .subscribe(result => {
+            this.msg = 'Logs successfully deleted';
+            for (let i = 0; i < selectedProducts.length; i++) {
+              let changedServer = this.logPage.content.find(deletedLog => deletedLog.objectId == selectedProducts[i]);
+              let index = this.logPage.content.indexOf(changedServer);
+              this.logPage.content.splice(index, 1);
+            }
+          }, error => {
+            this.msg = 'Something went wrong during deleting logs';
+          }
+        );
+    } else {
+      this.msg = 'You must select at least one log';
+    }
   }
 
   getLogsByRule(pageNumber: number): void {
@@ -79,7 +114,7 @@ export class LogsComponent implements OnInit {
       .set("directoryId", this.directoryId)
       .set("page", pageNumber.toString());
 
-    this.http.get<LogPage>(this.localApi+'/', {params}).subscribe(result => {
+    this.http.get<LogPage>(this.localApi + '/', {params}).subscribe(result => {
       console.log(result);
       this.logPage = result;
       this.logPage.number = this.logPage.number + 1;// In Spring pages start from 0.
@@ -94,5 +129,9 @@ export class LogsComponent implements OnInit {
 
   formatLevel(level: LogLevel): string {
     return LogLevel[level];
+  }
+
+  private findIndexToUpdate(newItem) {
+    return newItem.objectId === this;
   }
 }
