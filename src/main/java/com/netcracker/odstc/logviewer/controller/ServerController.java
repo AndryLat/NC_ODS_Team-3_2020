@@ -8,16 +8,12 @@ import com.netcracker.odstc.logviewer.service.ServerService;
 import com.netcracker.odstc.logviewer.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.security.Principal;
@@ -32,6 +28,7 @@ public class ServerController {
     private final EAVObjectDAO eavObjectDAO;
     private static final String serverNotNull = "Server shouldn't be null";
     private static final String idNotNull = "Id shouldn't be 0 or null";
+    private static final String DEFAULT_PAGE_SIZE = "10";
     private final Logger logger = LogManager.getLogger(ServerController.class.getName());
 
     public ServerController(ServerService serverService, UserService userService, EAVObjectDAO eavObjectDAO) {
@@ -41,10 +38,13 @@ public class ServerController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Server>> showAllServers(Principal principal) {
+    public Page<Server> showAllServers(Principal principal,
+                                                       @RequestParam (value = "page", defaultValue = "0") int page,
+                                                       @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize);
         User user = userService.findByLogin(principal.getName());
-        List<Server> listServer = eavObjectDAO.getObjectsByParentId(user.getObjectId(), Server.class);
-        return ResponseEntity.ok(listServer);
+        List<Server> serve = eavObjectDAO.getObjectsByParentId(pageRequest,user.getObjectId(), Server.class);
+       return new PageImpl<>(serve);
     }
 
     @PostMapping("/add")
