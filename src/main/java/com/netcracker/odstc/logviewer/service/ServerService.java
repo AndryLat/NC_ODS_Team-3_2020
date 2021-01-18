@@ -2,10 +2,13 @@ package com.netcracker.odstc.logviewer.service;
 
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ServerService extends AbstractService {
@@ -23,6 +26,10 @@ public class ServerService extends AbstractService {
             return eavObjectDAO.getObjectById(id, serverClass);
         }
         return new Server();
+    }
+
+    public List<Server> showAllServersByPagination(PageRequest pageRequest, User user) {
+        return eavObjectDAO.getObjectsByParentId(pageRequest, user.getObjectId(), Server.class);
     }
 
     public void add(Server server, BigInteger parentId) {

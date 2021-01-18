@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.controller;
 
-import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
@@ -25,26 +24,24 @@ public class ServerController {
 
     private final ServerService serverService;
     private final UserService userService;
-    private final EAVObjectDAO eavObjectDAO;
     private static final String serverNotNull = "Server shouldn't be null";
     private static final String idNotNull = "Id shouldn't be 0 or null";
     private static final String DEFAULT_PAGE_SIZE = "10";
     private final Logger logger = LogManager.getLogger(ServerController.class.getName());
 
-    public ServerController(ServerService serverService, UserService userService, EAVObjectDAO eavObjectDAO) {
+    public ServerController(ServerService serverService, UserService userService) {
         this.serverService = serverService;
         this.userService = userService;
-        this.eavObjectDAO = eavObjectDAO;
     }
 
     @GetMapping("/")
     public Page<Server> showAllServers(Principal principal,
-                                                       @RequestParam (value = "page", defaultValue = "0") int page,
-                                                       @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+                                       @RequestParam(value = "page", defaultValue = "0") int page,
+                                       @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         User user = userService.findByLogin(principal.getName());
-        List<Server> serve = eavObjectDAO.getObjectsByParentId(pageRequest,user.getObjectId(), Server.class);
-       return new PageImpl<>(serve);
+        List<Server> servers = serverService.showAllServersByPagination(pageRequest, user);
+        return new PageImpl<>(servers);
     }
 
     @PostMapping("/add")
