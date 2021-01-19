@@ -46,11 +46,11 @@ export class ServersComponent implements OnInit {
               private fb: FormBuilder,) {
 
     this.insertForm = this.fb.group({
-      name: ['', Validators.required],
-      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.]+$/, "Special characters is not allowed")]],
-      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed")]],
-      login: ['', Validators.required],
-      password: ['', Validators.required],
+      name: ['', Validators.required,Validators.maxLength(64)],
+      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.]+$/, "Special characters is not allowed"),Validators.maxLength(128)]],
+      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed"),Validators.maxLength(5)]],
+      login: ['', Validators.required,Validators.maxLength(64)],
+      password: ['', Validators.required,Validators.maxLength(128)],
       protocol: ['', Validators.required]
     });
 
@@ -79,6 +79,9 @@ export class ServersComponent implements OnInit {
     }
     if (errors.min) {
       return 'Specified number is lower than min allowed: ' + errors.min.min;
+    }
+    if(errors.maxLength){
+      return 'Max allowed length: ' + errors.maxLength.requiredLength;
     }
     if (errors.required) {
       return 'This field is required';
