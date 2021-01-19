@@ -3,7 +3,7 @@ package com.netcracker.odstc.logviewer.restexception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import static org.springframework.http.HttpStatus.*;
 
-import com.netcracker.odstc.logviewer.service.exceptions.DirectoryServiceException;
+import com.netcracker.odstc.logviewer.service.exceptions.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,7 +16,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {ApiRequestException.class,
             JsonMappingException.class,
-            DirectoryServiceException.class
+            DirectoryServiceException.class,
+            LogServiceException.class,
+            LogFileServiceException.class,
+            ServerServiceException.class,
+            UserServiceException.class
     })
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException ex) {
         //1.Create payload containing exception
