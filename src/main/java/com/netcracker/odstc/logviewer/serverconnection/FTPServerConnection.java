@@ -41,7 +41,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (IOException e) {
-            logger.error("Exception when trying get list of files", e);
+            logger.error("Exception when trying get list of files from {} at {}",directory.getPath(),server.getIp(), e);
             throw new ServerConnectionException("Cant list files from FTP due to error", e);
         }
         return logFiles;
@@ -49,9 +49,10 @@ public class FTPServerConnection extends AbstractServerConnection {
 
     @Override
     public boolean connect() {
-        logger.debug("Making connection to {}", server.getName());
+        logger.debug("Making connection to {}", server.getIp());
         try {
             ftpClient.setConnectTimeout(CONNECT_TIMEOUT);
+            ftpClient.setDataTimeout(CONNECT_TIMEOUT);
             ftpClient.connect(server.getIp(), server.getPort());
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -94,6 +95,9 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     protected List<Log> collectNewLogs() {
+        if (directories.isEmpty()) {
+            throw new ServerConnectionException("Server "+server.getIp()+" have empty list of active directories. Mark as cant be connected.");
+        }
         List<Log> result = new ArrayList<>();
         try {
             for (int i = 0; i < directories.size(); i++) {
@@ -102,7 +106,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 ftpClient.changeToParentDirectory();
             }
         } catch (IOException e) {
-            throw new ServerConnectionException("Server Connection Problem", e);
+            throw new ServerConnectionException("Server connection problem in collectNewLogs", e);
         }
         return result;
     }
@@ -121,7 +125,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 result.addAll(extractLogsFromFile(logFile));
             }
         } catch (IOException e) {
-            logger.error("Marking directory as unavailable", e);
+            logger.error("Marking directory {} from {} as unavailable",directory.getPath(),server.getIp(), e);
             directory.setConnectable(false);
         }
         if (!result.isEmpty()) {
@@ -147,7 +151,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error with reading file from", e);
+            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(),e);
         }
         return result;
     }

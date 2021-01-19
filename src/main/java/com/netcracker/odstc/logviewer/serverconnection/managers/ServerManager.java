@@ -16,21 +16,27 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEv
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.EnumMap;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Component
-public class ServerManager implements DAOChangeListener {
+@EnableScheduling
+public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
 
     private final ContainerDAO containerDAO;
@@ -47,7 +53,7 @@ public class ServerManager implements DAOChangeListener {
 //Suppress unused private constructor: Spring will use this constructor, even if it private
     private ServerManager(ContainerDAO containerDAO) {
         this.containerDAO = containerDAO;
-        DAOPublisher.getInstance().addListener(this);
+        DAOPublisher.getInstance().addListener(this,ObjectTypes.DIRECTORY,ObjectTypes.SERVER,ObjectTypes.LOGFILE);
 
         serverConnectionService = ServerConnectionService.getInstance();
         serverPollManager = ServerPollManager.getInstance();
@@ -60,7 +66,6 @@ public class ServerManager implements DAOChangeListener {
         iterationRemove.put(ObjectTypes.LOGFILE, new ArrayList<>());
 
         runnableService = Executors.newSingleThreadScheduledExecutor();
-        startRunnables();
     }
 
     @Override
@@ -80,17 +85,36 @@ public class ServerManager implements DAOChangeListener {
         }
     }
 
-    private void startRunnables() {
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
+        logger.info("Starting job runner");
         Config configInstance = containerDAO.getObjectById(BigInteger.ZERO, Config.class);
         Config.setInstance(configInstance);
 
-        logger.info("Starting Polling runnable");
-        runnableService.scheduleWithFixedDelay(this::getLogsFromAllServers, 0, configInstance.getChangesPollingPeriod(), TimeUnit.MILLISECONDS);
-        logger.info("Polling runnable started");
-        logger.info("Starting activity check runnable");
-        runnableService.scheduleAtFixedRate(this::revalidateServers, 0, configInstance.getActivityPollingPeriod(), TimeUnit.MILLISECONDS);
-        logger.info("Activity check runnable started");
+        scheduledTaskRegistrar.setScheduler(runnableService);
+        logger.info("Start job creating");
+        logger.info("Starting Poll job");
+        scheduledTaskRegistrar.addTriggerTask(this::getLogsFromAllServers, triggerContext -> {
+            Calendar nextExecutionTime =  new GregorianCalendar();
+            Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
+            nextExecutionTime.setTime(lastActualExecutionTime != null ? lastActualExecutionTime : new Date());
+            nextExecutionTime.add(Calendar.MILLISECOND, (int)configInstance.getChangesPollingPeriod());
+            return nextExecutionTime.getTime();
+        });
+        logger.info("Poll job Started");
+
+        logger.info("Starting Activity validation job");
+        scheduledTaskRegistrar.addTriggerTask(this::revalidateServers, triggerContext -> {
+            Calendar nextExecutionTime =  new GregorianCalendar();
+            Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
+            nextExecutionTime.setTime(lastActualExecutionTime != null ? lastActualExecutionTime : new Date());
+            nextExecutionTime.add(Calendar.MILLISECOND, (int)configInstance.getActivityPollingPeriod());
+            return nextExecutionTime.getTime();
+        });
+        logger.info("Activity validation job started");
+        logger.info("Jobs created");
     }
+
 
     private void getLogsFromAllServers() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());

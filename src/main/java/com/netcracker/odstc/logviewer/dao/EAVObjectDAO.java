@@ -5,6 +5,7 @@ import com.netcracker.odstc.logviewer.mapper.ObjectMapper;
 import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -159,7 +161,9 @@ public class EAVObjectDAO {
         saveObject(eavObject);
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
         saveReferences(eavObject.getObjectId(), eavObject.getReferences());
-        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE, this, eavObject, null));
+
+        ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE, this, eavObject, null);
+        DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(eavObject.getObjectTypeId()));
     }
 
     public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
@@ -216,7 +220,9 @@ public class EAVObjectDAO {
         }
         BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
         jdbcTemplate.update(DELETE_OBJECT_QUERY, id);
-        DAOPublisher.getInstance().notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId));
+
+        ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);
+        DAOPublisher.getInstance().notifyListeners(objectChangeEvent,ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
