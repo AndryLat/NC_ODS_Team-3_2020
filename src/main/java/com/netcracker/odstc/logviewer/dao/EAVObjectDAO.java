@@ -6,7 +6,6 @@ import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
-import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -109,40 +107,40 @@ public class EAVObjectDAO {
     }
 
     public <T extends EAVObject> T getObjectByIdAttrByIds(BigInteger id, Class<T> clazz, List<BigInteger> attributeIds) {
-        if (id == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        EAVObject eavObject = createEAVObject(id, clazz);
-        EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), id);
-        if (columns == null) {
-            throw new EAVAttributeException("Object id cant be find in DataBase or its corrupted by object type id");
-        }
-        eavObject.setName(columns.getName());
-        eavObject.setParentId(columns.getParentId());
-        eavObject.setObjectTypeId(columns.getObjectTypeId());
-        for (BigInteger attributeId : attributeIds) {
-            eavObject.setAttributes(getAttributes(attributeId, GET_ATTRIBUTE_BY_ID_QUERY));
-        }
-        eavObject.setReferences(getReference(id));
-
-        return (T) eavObject;
-
-    }
-
-    public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
-        if (objectId == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        EAVObject eavObject = createEAVObject(objectId, clazz);
-        EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
-        if (columns != null) {
+        try {
+            EAVObject eavObject = createEAVObject(id, clazz);
+            EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), id);
+            if (columns == null) {
+                throw new IllegalArgumentException("Object id cant be find in DataBase or its corrupted by object type id");
+            }
             eavObject.setName(columns.getName());
             eavObject.setParentId(columns.getParentId());
             eavObject.setObjectTypeId(columns.getObjectTypeId());
-            eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
-            eavObject.setReferences(getReference(objectId));
+            for (BigInteger attributeId : attributeIds) {
+                eavObject.setAttributes(getAttributes(attributeId, GET_ATTRIBUTE_BY_ID_QUERY));
+            }
+            eavObject.setReferences(getReference(id));
+            return (T) eavObject;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
-        return (T) eavObject;
+    }
+
+    public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
+        try {
+            EAVObject eavObject = createEAVObject(objectId, clazz);
+            EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
+            if (columns != null) {
+                eavObject.setName(columns.getName());
+                eavObject.setParentId(columns.getParentId());
+                eavObject.setObjectTypeId(columns.getObjectTypeId());
+                eavObject.setAttributes(getAttributes(objectId, GET_ATTRIBUTE_BY_OBJECT_ID_QUERY));
+                eavObject.setReferences(getReference(objectId));
+            }
+            return (T) eavObject;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
+        }
     }
 
     public <T extends EAVObject> List<T> getAttributeByValue(String value) {
@@ -189,46 +187,46 @@ public class EAVObjectDAO {
     }
 
     public void saveAttributes(BigInteger objectId, Map<BigInteger, Attribute> attributes) {
-        if (objectId == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        for (Map.Entry<BigInteger, Attribute> attribute : attributes.entrySet()) {
-            jdbcTemplate.update(UPDATE_ATTRIBUTE_QUERY,
-                    objectId,
-                    attribute.getKey(),
-                    attribute.getValue().getValue(),
-                    attribute.getValue().getDateValue(),
-                    attribute.getValue().getListValueId());
+        try {
+            for (Map.Entry<BigInteger, Attribute> attribute : attributes.entrySet()) {
+                jdbcTemplate.update(UPDATE_ATTRIBUTE_QUERY,
+                        objectId,
+                        attribute.getKey(),
+                        attribute.getValue().getValue(),
+                        attribute.getValue().getDateValue(),
+                        attribute.getValue().getListValueId());
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
     }
 
     public void saveReferences(BigInteger objectId, Map<BigInteger, BigInteger> references) {
-        if (objectId == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        for (Map.Entry<BigInteger, BigInteger> reference : references.entrySet()) {
-            jdbcTemplate.update(UPDATE_REFERENCE_QUERY,
-                    reference.getValue(),
-                    reference.getKey(),
-                    objectId);
+        try {
+            for (Map.Entry<BigInteger, BigInteger> reference : references.entrySet()) {
+                jdbcTemplate.update(UPDATE_REFERENCE_QUERY,
+                        reference.getValue(),
+                        reference.getKey(),
+                        objectId);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
     }
 
     public void deleteById(BigInteger id) {
-        if (id == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
-        jdbcTemplate.update(DELETE_OBJECT_QUERY, id);
+        try {
+            BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
+            jdbcTemplate.update(DELETE_OBJECT_QUERY, id);
 
-        ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);
-        DAOPublisher.getInstance().notifyListeners(objectChangeEvent,ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
+            ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);
+            DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
+        }
     }
 
     private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
-        if (objectId == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
         EAVObject eavObject = new EAVObject();
         try {
             eavObject = clazz.getConstructor(BigInteger.class).newInstance(objectId);
@@ -253,50 +251,54 @@ public class EAVObjectDAO {
     }
 
     private HashMap<BigInteger, BigInteger> getReference(BigInteger id) {
-        if (id == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query(GET_OBJECT_ATTRIBUTE_BY_REFERENCE_QUERY,
-                new ReferenceMapper(),
-                id);
+        try {
+            List<Map.Entry<BigInteger, BigInteger>> objectReferences = jdbcTemplate.query(GET_OBJECT_ATTRIBUTE_BY_REFERENCE_QUERY,
+                    new ReferenceMapper(),
+                    id);
 
-        HashMap<BigInteger, BigInteger> references = new HashMap<>();
-        for (Map.Entry<BigInteger, BigInteger> attribute :
-                objectReferences) {
-            references.put(attribute.getKey(), attribute.getValue());
+            HashMap<BigInteger, BigInteger> references = new HashMap<>();
+            for (Map.Entry<BigInteger, BigInteger> attribute :
+                    objectReferences) {
+                references.put(attribute.getKey(), attribute.getValue());
+            }
+            return references;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
-        return references;
     }
 
     private HashMap<BigInteger, Attribute> getAttributes(BigInteger attributeId, String query) {
-        if (attributeId == null) {
-            throw new EAVAttributeException(errorMessage);
-        }
-        List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(query,
-                new AttributeMapper(),
-                attributeId);
+        try {
+            List<Map.Entry<BigInteger, Attribute>> objectAttributes = jdbcTemplate.query(query,
+                    new AttributeMapper(),
+                    attributeId);
 
-        HashMap<BigInteger, Attribute> attributes = new HashMap<>();
-        for (Map.Entry<BigInteger, Attribute> attribute : objectAttributes) {
-            attributes.put(attribute.getKey(), attribute.getValue());
+            HashMap<BigInteger, Attribute> attributes = new HashMap<>();
+            for (Map.Entry<BigInteger, Attribute> attribute : objectAttributes) {
+                attributes.put(attribute.getKey(), attribute.getValue());
+            }
+            return attributes;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
-        return attributes;
     }
 
     private <T extends EAVObject> List<T> getObjectsByQuery(BigInteger id, Class<T> clazz, String query) {
-        if (id == null) {
-            throw new EAVAttributeException(errorMessage);
+        try {
+            List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
+            return getObjectsByIds(objectIds, clazz);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
-        List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
-        return getObjectsByIds(objectIds, clazz);
     }
 
     private <T extends EAVObject> List<T> getObjectsByQuery(Pageable page, BigInteger id, Class<T> clazz, String query) {
-        if (id == null) {
-            throw new EAVAttributeException(errorMessage);
+        try {
+            List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id, page.getOffset(), page.getPageSize());
+            return getObjectsByIds(objectIds, clazz);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(errorMessage, e);
         }
-        List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id, page.getOffset(), page.getPageSize());
-        return getObjectsByIds(objectIds, clazz);
     }
 
     private <T extends EAVObject> List<T> getObjectsByIds(List<EAVObject> objectIds, Class<T> clazz) {
