@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +23,6 @@ public class ServerController {
 
     private final ServerService serverService;
     private final UserService userService;
-    private static final String serverNotNull = "Server shouldn't be null";
-    private static final String idNotNull = "Id shouldn't be 0 or null";
     private static final String DEFAULT_PAGE_SIZE = "10";
     private final Logger logger = LogManager.getLogger(ServerController.class.getName());
 
@@ -46,10 +43,6 @@ public class ServerController {
 
     @PostMapping("/add")
     public ResponseEntity<BigInteger> add(@RequestBody Server server, Principal principal) {
-        if (server == null) {
-            throwException(serverNotNull);
-        }
-
         User user = userService.findByLogin(principal.getName());
         serverService.add(server, user.getObjectId());
         logger.info("Server added");
@@ -58,44 +51,28 @@ public class ServerController {
 
     @PutMapping("/update")
     public ResponseEntity<Server> update(@RequestBody Server server) {
-        if (server == null) {
-            throwException(serverNotNull);
-        }
         serverService.update(server);
         logger.info("Server update");
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            throwException(idNotNull);
-        }
-        return ResponseEntity.ok(serverService.findById(id));
+        Server server = serverService.findById(id);
+        return ResponseEntity.ok(server);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            throwException(idNotNull);
-        }
         serverService.deleteById(id);
         logger.info("Server delete");
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/testConnection")
     public ResponseEntity<Boolean> testConnection(@RequestBody Server server) {
-        if (server == null) {
-            throwException(serverNotNull);
-        }
         return ResponseEntity.ok(ServerConnectionService.getInstance().isServerAvailable(server));
     }
 
-    private void throwException(String nameException) {
-        IllegalArgumentException exception = new IllegalArgumentException();
-        logger.error(nameException);
-        throw exception;
-    }
 }
 
