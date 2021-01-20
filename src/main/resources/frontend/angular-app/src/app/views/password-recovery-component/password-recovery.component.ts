@@ -6,8 +6,7 @@ import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-password-recovery',
-  templateUrl: './password-recovery.component.html',
-  styleUrls: ['./password-recovery.component.css']
+  templateUrl: './password-recovery.component.html'
 })
 export class PasswordRecoveryComponent {
 
