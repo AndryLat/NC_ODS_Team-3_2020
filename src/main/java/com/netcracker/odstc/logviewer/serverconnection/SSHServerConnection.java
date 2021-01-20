@@ -54,7 +54,7 @@ public class SSHServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (SftpException e) {
-            logger.error("Exception when trying get list of files from {} at {}",directory.getPath(),server.getIp(), e);
+            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
             throw new ServerConnectionException("Cant list files from SSH due to error", e);
         }
         return logFiles;
@@ -88,21 +88,27 @@ public class SSHServerConnection extends AbstractServerConnection {
     public boolean isDirectoryValid(Directory directory) {
         if (!super.isDirectoryValid(directory))
             return false;
+        ChannelSftp channelSftp;
         try {
-            ChannelSftp channelSftp = getChannelSftp();
-            if (channelSftp.ls(directory.getPath()).isEmpty()) {
-                directory.setConnectable(false);
-            }
+            channelSftp = getChannelSftp();
+        } catch (ServerConnectionException serverConnectionException) {
+            logger.error("Error with connection to {} during directory checking", server.getIp());
+            server.setConnectable(false);
+            return false;
+        }
+        try {
+            channelSftp.cd(directory.getPath());
+            channelSftp.cd("/");
             return true;
         } catch (SftpException e) {
-            server.setConnectable(false);
+            directory.setConnectable(false);
             return false;
         }
     }
 
     protected List<Log> collectNewLogs() {
         if (directories.isEmpty()) {
-            throw new ServerConnectionException("Server "+server.getIp()+" have empty list of active directories. Mark as cant be connected.");
+            throw new ServerConnectionException("Server " + server.getIp() + " have empty list of active directories. Mark as cant be connected.");
         }
         List<Log> result = new ArrayList<>();
         try {
@@ -125,7 +131,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             sftp.connect();
             channelSftp = (ChannelSftp) sftp;
         } catch (JSchException e) {
-            logger.error("Error with creating SFTP on {}",server.getIp(), e);
+            logger.error("Error with creating SFTP on {}", server.getIp(), e);
             throw new ServerConnectionException("Error with creating SFTP ", e);
         }
         return channelSftp;
@@ -140,18 +146,12 @@ public class SSHServerConnection extends AbstractServerConnection {
                 LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
                 result.addAll(extractLogsFromFile(channelSftp, logFile));
             }
+            channelSftp.cd("/");
         } catch (SftpException e) {
-            logger.error("Marking directory {} from {} as unavailable",directory.getPath(),server.getIp(), e);
+            logger.error("Marking directory {} from {} as unavailable", directory.getPath(), server.getIp(), e);
             directory.setConnectable(false);
         }
-        channelSftp.cd("/");
-        if (!result.isEmpty()) {
-            directory.setLastExistenceCheck(new Date());
-        } else {
-            if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
-                directory.setEnabled(false);
-            }
-        }
+        validateDirectoryByResult(result, directory);
         return result;
     }
 
@@ -167,7 +167,7 @@ public class SSHServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (SftpException | IOException e) {
-            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(),e);
+            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(), e);
         }
         return result;
     }

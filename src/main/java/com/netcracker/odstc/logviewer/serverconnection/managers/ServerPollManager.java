@@ -18,13 +18,14 @@ import java.util.concurrent.Future;
 
 public class ServerPollManager {
     private static ServerPollManager instance;
-    private final Map<ServerConnection, Future<List<Log>>> serverConnectionsResults;
     private final Logger logger = LogManager.getLogger(ServerPollManager.class.getName());
     private final ExecutorService service = Executors.newFixedThreadPool(4);
+
+    private final Map<ServerConnection, Future<List<Log>>> activeServerConnections;
     private final Map<BigInteger, ServerConnection> finishedServers;
 
     private ServerPollManager() {
-        serverConnectionsResults = new HashMap<>();
+        activeServerConnections = new HashMap<>();
         finishedServers = new HashMap<>();
     }
 
@@ -35,8 +36,8 @@ public class ServerPollManager {
         return instance;
     }
 
-    public Map<ServerConnection, Future<List<Log>>> getServerConnectionsResults() {
-        return serverConnectionsResults;
+    public Map<ServerConnection, Future<List<Log>>> getActiveServerConnections() {
+        return activeServerConnections;
     }
 
     public Map<BigInteger, ServerConnection> getFinishedServers() {
@@ -44,13 +45,13 @@ public class ServerPollManager {
     }
 
     public void executeExtractingLogs(ServerConnection serverConnection) {
-        if (!serverConnectionsResults.containsKey(serverConnection))
-            serverConnectionsResults.put(serverConnection, service.submit(serverConnection));
+        if (!activeServerConnections.containsKey(serverConnection))
+            activeServerConnections.put(serverConnection, service.submit(serverConnection));
     }
 
     public List<Log> getLogsFromThreads() {
         List<Log> logs = new ArrayList<>();
-        Iterator<Map.Entry<ServerConnection, Future<List<Log>>>> resultIterator = serverConnectionsResults.entrySet().iterator();
+        Iterator<Map.Entry<ServerConnection, Future<List<Log>>>> resultIterator = activeServerConnections.entrySet().iterator();
         while (resultIterator.hasNext()) {
             Map.Entry<ServerConnection, Future<List<Log>>> future = resultIterator.next();
             if (future.getValue().isDone()) {

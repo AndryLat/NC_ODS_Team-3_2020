@@ -9,6 +9,8 @@ import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.regex.Matcher;
 
 abstract class AbstractServerConnection implements ServerConnection {
     protected static final int CONNECT_TIMEOUT = 500;
+    private static final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
     protected List<HierarchyContainer> directories;
@@ -148,6 +151,17 @@ abstract class AbstractServerConnection implements ServerConnection {
     }
 
     protected abstract List<Log> collectNewLogs();
+
+    protected void validateDirectoryByResult(List<Log> result, Directory directory) {
+        if (!result.isEmpty()) {
+            directory.setLastExistenceCheck(new Date());
+        } else {
+            if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
+                logger.warn("Directory {} from {} exceeds directory activity period. Marking as unavailable", directory.getPath(), server.getIp());
+                directory.setEnabled(false);
+            }
+        }
+    }
 
     private Log convertLineToLog(LogFile logFile, Log lastLog, String line) {
         Matcher matcher = checkMatcher(lastLog, line);

@@ -53,7 +53,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
 //Suppress unused private constructor: Spring will use this constructor, even if it private
     private ServerManager(ContainerDAO containerDAO) {
         this.containerDAO = containerDAO;
-        DAOPublisher.getInstance().addListener(this,ObjectTypes.DIRECTORY,ObjectTypes.SERVER,ObjectTypes.LOGFILE);
+        DAOPublisher.getInstance().addListener(this, ObjectTypes.DIRECTORY, ObjectTypes.SERVER, ObjectTypes.LOGFILE);
 
         serverConnectionService = ServerConnectionService.getInstance();
         serverPollManager = ServerPollManager.getInstance();
@@ -72,8 +72,6 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
     public void objectChanged(ObjectChangeEvent objectChangeEvent) {
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
             BigInteger objectTypeId = (BigInteger) objectChangeEvent.getArgument();
-            if (objectTypeId.equals(ObjectTypes.USER.getObjectTypeID()) || objectTypeId.equals(ObjectTypes.LOG.getObjectTypeID()))
-                return;
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
             iterationRemove.get(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId)).add(objectId);
         } else if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
@@ -95,31 +93,30 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
         logger.info("Start job creating");
         logger.info("Starting Poll job");
         scheduledTaskRegistrar.addTriggerTask(this::getLogsFromAllServers, triggerContext -> {
-            Calendar nextExecutionTime =  new GregorianCalendar();
+            Calendar nextExecutionTime = new GregorianCalendar();
             Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
             nextExecutionTime.setTime(lastActualExecutionTime != null ? lastActualExecutionTime : new Date());
-            nextExecutionTime.add(Calendar.MILLISECOND, (int)configInstance.getChangesPollingPeriod());
+            nextExecutionTime.add(Calendar.MILLISECOND, (int) configInstance.getChangesPollingPeriod());
             return nextExecutionTime.getTime();
         });
         logger.info("Poll job Started");
 
         logger.info("Starting Activity validation job");
         scheduledTaskRegistrar.addTriggerTask(this::revalidateServers, triggerContext -> {
-            Calendar nextExecutionTime =  new GregorianCalendar();
+            Calendar nextExecutionTime = new GregorianCalendar();
             Date lastActualExecutionTime = triggerContext.lastActualExecutionTime();
             nextExecutionTime.setTime(lastActualExecutionTime != null ? lastActualExecutionTime : new Date());
-            nextExecutionTime.add(Calendar.MILLISECOND, (int)configInstance.getActivityPollingPeriod());
+            nextExecutionTime.add(Calendar.MILLISECOND, (int) configInstance.getActivityPollingPeriod());
             return nextExecutionTime.getTime();
         });
         logger.info("Activity validation job started");
         logger.info("Jobs created");
     }
 
-
     private void getLogsFromAllServers() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
         containerDAO.saveObjectsAttributesReferences(result);
-        if (!serverPollManager.getServerConnectionsResults().isEmpty()) {
+        if (!serverPollManager.getActiveServerConnections().isEmpty()) {
             logger.warn("Skipping job due to previous is not finished");
             return;
         }
@@ -180,6 +177,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
         Server server = (Server) objectChangeEvent.getObject();
         if (!server.isEnabled() && serverConnections.containsKey(server.getObjectId())) {
             serverConnections.remove(server.getObjectId());
+            iterationRemove.get(ObjectTypes.SERVER).add(server.getObjectId());
         } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
             serverConnection.setServer(server);
@@ -200,16 +198,16 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
                 }
             }
         }
-        clearIterationInfo();
         containerDAO.saveObjectsAttributesReferences(servers);
         containerDAO.saveObjectsAttributesReferences(directories);
         containerDAO.saveObjectsAttributesReferences(logFiles);
     }
 
     private void excludeRemoved() {
-        for (Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator(); serverConnectionIterator.hasNext(); ) {
+        for (Iterator<ServerConnection> serverConnectionIterator = serverPollManager.getFinishedServers().values().iterator(); serverConnectionIterator.hasNext(); ) {
             ServerConnection serverConnection = serverConnectionIterator.next();
             if (iterationRemove.get(ObjectTypes.SERVER).contains(serverConnection.getServer().getObjectId())) {
+                serverConnection.disconnect();
                 serverConnectionIterator.remove();
                 continue;
             }
@@ -233,7 +231,6 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
     private void updateActiveServersFromDB() {
         List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
         logger.info("Active Servers in DB: {}", serverContainers.size());
-        logger.info("Active Servers in Poll: {}", serverConnections.size());
         for (HierarchyContainer serverContainer : serverContainers) {
             Server server = (Server) serverContainer.getOriginal();
             if (serverConnections.containsKey(server.getObjectId())) {
@@ -247,6 +244,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
                 serverConnections.put(server.getObjectId(), serverConnection);
             }
         }
+        logger.info("Active Servers in Poll: {}", serverConnections.size());
         serverPollManager.getFinishedServers().clear();
     }
 

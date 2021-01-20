@@ -12,7 +12,7 @@ import java.util.Map;
 public class DAOPublisher {
     private static DAOPublisher instance;
     private final Logger logger = LogManager.getLogger(DAOPublisher.class.getName());
-    private final Map<ObjectTypes,List<DAOChangeListener>> listeners;
+    private final Map<ObjectTypes, List<DAOChangeListener>> listeners;
 
     private final List<Class> ignoredClasses;
 
@@ -28,14 +28,15 @@ public class DAOPublisher {
         return instance;
     }
 
-    public void addListener(ObjectTypes objectType,DAOChangeListener daoChangeListener) {
-        if(!listeners.containsKey(objectType)) {
-            listeners.put(objectType,new ArrayList<>());
+    public void addListener(ObjectTypes objectType, DAOChangeListener daoChangeListener) {
+        if (!listeners.containsKey(objectType)) {
+            listeners.put(objectType, new ArrayList<>());
         }
         listeners.get(objectType).add(daoChangeListener);
     }
+
     public void addListener(DAOChangeListener daoChangeListener, ObjectTypes... objectTypeIds) {
-        for (ObjectTypes objectTypeId:objectTypeIds) {
+        for (ObjectTypes objectTypeId : objectTypeIds) {
             if (!listeners.containsKey(objectTypeId)) {
                 listeners.put(objectTypeId, new ArrayList<>());
             }
@@ -43,15 +44,15 @@ public class DAOPublisher {
         }
     }
 
-    public void removeListener(ObjectTypes objectType,DAOChangeListener daoChangeListener) {
+    public void removeListener(ObjectTypes objectType, DAOChangeListener daoChangeListener) {
         listeners.get(objectType).remove(daoChangeListener);
     }
 
-    public void notifyListeners(ObjectChangeEvent objectChangeEvent,ObjectTypes objectType) {
+    public void notifyListeners(ObjectChangeEvent objectChangeEvent, ObjectTypes objectType) {
         logger.info("Got new event {}, Value: {}", objectChangeEvent.getChangeType(), objectChangeEvent);
         for (Class clazz : ignoredClasses) {
             if (clazz.isAssignableFrom(objectChangeEvent.getSource().getClass())) {
-                logger.info("Ignoring event from {} with event {}",clazz.getName(), objectChangeEvent);
+                logger.info("Ignoring event from {} with event {}", clazz.getName(), objectChangeEvent);
                 return;
             }
         }
@@ -60,10 +61,11 @@ public class DAOPublisher {
         }
     }
 
-    public void addIgnoredClass(Class clazz){
+    public void addIgnoredClass(Class clazz) {
         ignoredClasses.add(clazz);
     }
-    public void removeIgnoredClass(Class clazz){
+
+    public void removeIgnoredClass(Class clazz) {
         ignoredClasses.remove(clazz);
     }
 }

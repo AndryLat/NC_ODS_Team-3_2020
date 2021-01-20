@@ -41,7 +41,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (IOException e) {
-            logger.error("Exception when trying get list of files from {} at {}",directory.getPath(),server.getIp(), e);
+            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
             throw new ServerConnectionException("Cant list files from FTP due to error", e);
         }
         return logFiles;
@@ -84,11 +84,13 @@ public class FTPServerConnection extends AbstractServerConnection {
         if (!super.isDirectoryValid(directory))
             return false;
         try {
-            boolean isActive = ftpClient.changeWorkingDirectory(directory.getPath());
-            if (isActive)
+            boolean isAccessible = ftpClient.changeWorkingDirectory(directory.getPath());
+            if (isAccessible) {
                 ftpClient.changeToParentDirectory();
-            return isActive;
+            }
+            return isAccessible;
         } catch (IOException e) {
+            logger.error("Error with connection to {} during directory checking", server.getIp());
             server.setConnectable(false);
             return false;
         }
@@ -96,7 +98,7 @@ public class FTPServerConnection extends AbstractServerConnection {
 
     protected List<Log> collectNewLogs() {
         if (directories.isEmpty()) {
-            throw new ServerConnectionException("Server "+server.getIp()+" have empty list of active directories. Mark as cant be connected.");
+            throw new ServerConnectionException("Server " + server.getIp() + " have empty list of active directories. Mark as cant be connected.");
         }
         List<Log> result = new ArrayList<>();
         try {
@@ -116,7 +118,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         Directory directory = (Directory) directoryContainer.getOriginal();
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
-                logger.error("Cant change working directory to {} on {}",directory.getPath(),server.getIp());
+                logger.error("Cant change working directory to {} on {}", directory.getPath(), server.getIp());
                 directory.setConnectable(false);
                 return result;
             }
@@ -124,17 +126,12 @@ public class FTPServerConnection extends AbstractServerConnection {
                 LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
                 result.addAll(extractLogsFromFile(logFile));
             }
+            ftpClient.changeToParentDirectory();
         } catch (IOException e) {
-            logger.error("Marking directory {} from {} as unavailable",directory.getPath(),server.getIp(), e);
+            logger.error("Marking directory {} from {} as unavailable", directory.getPath(), server.getIp(), e);
             directory.setConnectable(false);
         }
-        if (!result.isEmpty()) {
-            directory.setLastExistenceCheck(new Date());
-        } else {
-            if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
-                directory.setEnabled(false);
-            }
-        }
+        validateDirectoryByResult(result, directory);
         return result;
     }
 
@@ -151,7 +148,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(),e);
+            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(), e);
         }
         return result;
     }

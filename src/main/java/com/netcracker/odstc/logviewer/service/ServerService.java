@@ -42,7 +42,7 @@ public class ServerService extends AbstractService {
         if (!isServerValid(server)) {
             throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
         }
-        server.setEnabled(true);
+        server.setEnabled(false);
         server.setConnectable(true);
         server.setLastAccessByJob(new Date());
         server.setLastAccessByUser(new Date());
