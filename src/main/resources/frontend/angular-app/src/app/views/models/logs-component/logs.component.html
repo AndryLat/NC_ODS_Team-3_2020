@@ -64,11 +64,9 @@
             <p>Filtration</p>
             <hr>
             <label for="dat1">Start date</label>
-            <input class="form-control" formControlName="dat1" id="dat1" name="dat1"
-                   type="date">
+            <input class="form-control" type="datetime-local" formControlName="dat1" id="dat1" name="dat1">
             <label for="dat2">End date</label>
-            <input class="form-control" formControlName="dat2" id="dat2" name="dat2"
-                   type="date">
+            <input class="form-control" type="datetime-local" formControlName="dat2" id="dat2" name="dat2">
             <hr>
             <div *ngFor="let key of keys()" class="row">
               <label class="col-10" for="logLevel">{{key}}</label>
