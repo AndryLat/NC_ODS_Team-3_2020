@@ -85,11 +85,12 @@ public class UserController {
     }
 
     @GetMapping("/changePassword")
-    public ResponseEntity<User> changePassword(@RequestParam("id") BigInteger id, @RequestParam("token") String token) {
+    public ResponseEntity<String> changePassword(@RequestParam("id") BigInteger id, @RequestParam("token") String token) {
         if(securityService.validatePasswordResetToken(token, id)){
             userService.throwException("Password reset is not available.");
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        String login = securityService.getLoginUserFromToken(token);
+        return ResponseEntity.ok(login);
     }
 
     @GetMapping("/{id}")

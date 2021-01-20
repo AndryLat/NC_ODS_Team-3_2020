@@ -69,4 +69,23 @@ public class SecurityService {
                 .append(contextPath);
         return url.toString();
     }
+
+    public String getLoginUserFromToken(String token){
+        String login;
+        if (token != null) {
+            try{
+                login = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                        .build()
+                        .verify(token)
+                        .getSubject();
+                if (login != null) {
+                    return login;
+                }
+            }catch (TokenExpiredException exp){
+                logger.error("Password reset token expired",exp);
+                return null;
+            }
+        }
+        return null;
+    }
 }
