@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AttributesTest {
 
     @Test
-    void values() {
+    void testValues_idNotNull_allValuesHaveId() {
         for(Attributes attributes:Attributes.values()){
             assertNotNull(attributes.getAttrId());
         }

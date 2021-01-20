@@ -42,7 +42,7 @@ public class FTPServerConnection extends AbstractServerConnection {
             }
         } catch (IOException e) {
             logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
-            throw new ServerConnectionException("Cant list files from FTP due to error", e);
+            throw new ServerConnectionException("Can't list files from FTP due to error", e);
         }
         return logFiles;
     }
@@ -118,7 +118,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         Directory directory = (Directory) directoryContainer.getOriginal();
         try {
             if (!ftpClient.changeWorkingDirectory(directory.getPath())) {
-                logger.error("Cant change working directory to {} on {}", directory.getPath(), server.getIp());
+                logger.error("Can't change working directory to {} on {}", directory.getPath(), server.getIp());
                 directory.setConnectable(false);
                 return result;
             }
@@ -131,7 +131,7 @@ public class FTPServerConnection extends AbstractServerConnection {
             logger.error("Marking directory {} from {} as unavailable", directory.getPath(), server.getIp(), e);
             directory.setConnectable(false);
         }
-        validateDirectoryByResult(result, directory);
+        validateDirectoryByLogCollectionResult(result, directory);
         return result;
     }
 
@@ -141,7 +141,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         try {
             try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
                 if (inputStream == null) {
-                    logger.error("Cant reach file {} from {}", logFile.getName(), server.getIp());
+                    logger.error("Can't reach file {} from {}", logFile.getName(), server.getIp());
                 } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                     ftpClient.completePendingCommand();

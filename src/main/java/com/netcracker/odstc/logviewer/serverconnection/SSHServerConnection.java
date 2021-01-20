@@ -55,7 +55,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             }
         } catch (SftpException e) {
             logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
-            throw new ServerConnectionException("Cant list files from SSH due to error", e);
+            throw new ServerConnectionException("Can't list files from SSH due to error", e);
         }
         return logFiles;
     }
@@ -151,7 +151,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             logger.error("Marking directory {} from {} as unavailable", directory.getPath(), server.getIp(), e);
             directory.setConnectable(false);
         }
-        validateDirectoryByResult(result, directory);
+        validateDirectoryByLogCollectionResult(result, directory);
         return result;
     }
 
@@ -161,7 +161,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             try (InputStream inputStream = channelSftp.get(logFile.getName())) {
                 if (inputStream == null) {
-                    logger.error("Cant reach file {} from {}", logFile.getName(), server.getIp());
+                    logger.error("Can't reach file {} from {}", logFile.getName(), server.getIp());
                 } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                 }

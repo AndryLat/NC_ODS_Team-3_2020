@@ -53,7 +53,6 @@ public class Attribute {
         this.listValueId = listValueId;
     }
 
-
     @Override
     public String toString() {
         return "Attribute{" +

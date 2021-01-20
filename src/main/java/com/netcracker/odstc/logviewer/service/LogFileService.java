@@ -30,11 +30,11 @@ public class LogFileService extends AbstractService {
 
     public List<LogFile> getLogFileList(DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
         if (directoryWithExtensionsDTO.getDirectory()!=null) {
-            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Cant check invalid directory");
+            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
         }
         Directory directory = directoryWithExtensionsDTO.getDirectory();
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage("Cant check connection with directory without parentId");
+            throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
         }
         String[] extensions;
         if (directoryWithExtensionsDTO.getExtensions() == null) {
@@ -74,6 +74,4 @@ public class LogFileService extends AbstractService {
         }
         return false;
     }
-
-
 }

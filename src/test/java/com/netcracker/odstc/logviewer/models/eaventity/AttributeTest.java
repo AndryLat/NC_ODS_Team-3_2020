@@ -22,7 +22,7 @@ class AttributeTest {
 
 
     @Test
-    void constructors(){
+    void testConstructors_ObjectsCreated_ObjectsHaveValues(){
         Attribute attribute2 = new Attribute(value);
         Attribute attribute3 = new Attribute(dateValue);
         Attribute attribute4 = new Attribute(listValueId);
@@ -38,21 +38,21 @@ class AttributeTest {
         assertEquals(listValueId,attribute5.getListValueId());
     }
     @Test
-    void setGetValue() {
+    void testSetGetValue_ValueSet_ValueIsSetAndRead() {
         attribute.setValue(value);
 
         assertEquals(value,attribute.getValue());
     }
 
     @Test
-    void setGetDateValue() {
+    void testSetGetValue_DateValueSet_DateValueIsSetAndRead() {
         attribute.setDateValue(dateValue);
 
         assertEquals(dateValue,attribute.getDateValue());
     }
 
     @Test
-    void setGetListValueId() {
+    void testSetGetValue_ListValueIdSet_ListValueIdIsSetAndRead() {
         attribute.setListValueId(listValueId);
 
         assertEquals(listValueId,attribute.getListValueId());

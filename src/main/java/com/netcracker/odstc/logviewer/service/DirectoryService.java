@@ -27,21 +27,21 @@ public class DirectoryService extends AbstractService {
 
     public List<Directory> findByParentId(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Cant get directories by parentId");
+            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
         }
         return eavObjectDAO.getObjectsByParentId(id, directoryClass);
     }
 
     public Directory findById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Cant get directory");
+            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directory");
         }
         return eavObjectDAO.getObjectById(id, directoryClass);
     }
 
     public void add(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Cant save directory");
+            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
         directory.setLastExistenceCheck(new Date());
         directory.setLastAccessByUser(new Date());
@@ -53,27 +53,25 @@ public class DirectoryService extends AbstractService {
 
     public void update(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Cant save directory");
+            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
         eavObjectDAO.saveObjectAttributesReferences(directory);
     }
 
     public void deleteById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid id. Cant delete directory");
+            throwDirectoryServiceExceptionWithMessage("Got invalid id. Can't delete directory");
         }
         eavObjectDAO.deleteById(id);
     }
 
     public boolean testConnection(Directory directory) {
         if (!isDirectoryValid(directory) || directory.getParentId() == null) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Cant check invalid directory or without parentId");
+            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
         }
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
         return serverConnectionService.isDirectoryAvailable(server, directory);
     }
-
-
 
     private boolean isDirectoryValid(Directory directory) {
         if (directory != null) {

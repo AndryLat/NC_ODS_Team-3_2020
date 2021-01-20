@@ -19,7 +19,7 @@
       <thead>
       <tr>
         <th scope="col" style="width: 15%">Name</th>
-        <th scope="col" style="width: 25%">Ip</th>
+        <th scope="col" style="width: 25%">IP</th>
         <th scope="col" style="width: 10%">Protocol</th>
         <th scope="col" style="width: 15%">Port</th>
         <th scope="col" style="width: 17%">Last Log Check</th>
@@ -82,7 +82,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="ipInput">Ip address</label>
+            <label for="ipInput">IP address</label>
             <input class="form-control" formControlName="ip" id="ipInput" name="ip" placeholder="127.0.0.1" type="text">
             <div
               *ngIf="this.insertForm.controls['ip'].invalid && (this.insertForm.controls['ip'].dirty || this.insertForm.controls['ip'].touched)"

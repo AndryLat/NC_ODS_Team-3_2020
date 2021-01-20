@@ -100,7 +100,7 @@ export class ServersComponent implements OnInit {
 
   deleteServer(objectId: bigint): void {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
-      this.confirmMessage = "Server deleted successful";
+      this.confirmMessage = "Server deleted successfully";
 
       let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId == objectId);
       let index = this.serverPage.content.indexOf(changedServer);
@@ -113,7 +113,7 @@ export class ServersComponent implements OnInit {
 
   testConnection(): void {
     this.http.post<boolean>(this.localApi + '/testConnection', this.insertForm.value).subscribe(result => {
-      this.testResult = result ? "Connection established" : "Cant connect";
+      this.testResult = result ? "Connection established" : "Can't connect to server";
     }, error => {
       this.testResult = "Error with checking connection";
     })
@@ -131,7 +131,7 @@ export class ServersComponent implements OnInit {
       this.getServersFromPage(1);
       this.insertForm.reset({});
     }, error => {
-      this.inputError = "Cant add server";
+      this.inputError = "Сan't add server";
     })
   }
 
@@ -160,7 +160,7 @@ export class ServersComponent implements OnInit {
       this.serverPage.content.splice(index, 1, server);
 
     }, error => {
-      alert("Cant update server");
+      alert("Сan't update server");
     })
   }
 

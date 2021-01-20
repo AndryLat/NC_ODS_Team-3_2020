@@ -22,7 +22,7 @@ class EAVObjectTest {
         eavObject1 = new EAVObject();
     }
     @Test
-    void constructors(){
+    void testConstructors_ObjectsCreated_ObjectsHaveValues(){
         EAVObject eavObjectEmpty = new EAVObject();
         assertNotNull(eavObjectEmpty.getAttributes());
         assertNotNull(eavObjectEmpty.getReferences());
@@ -56,7 +56,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetAttributeValue() {
+    void testSetGetValue_ValueSet_ValueIsAddedAndRead() {
         String value = "Omega";
         eavObject1.setAttributeValue(BigInteger.valueOf(1),value);
 
@@ -64,7 +64,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetAttributeDateValue() {
+    void testSetGetValue_DateValueSet_DateValueIsAddedAndRead() {
         Date date = new Date(23);
 
         eavObject1.setAttributeDateValue(BigInteger.valueOf(2),date);
@@ -73,7 +73,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetAttributeListValueId() {
+    void testSetGetValue_ListValueIdSet_ListValueIdIsAddedAndRead() {
         BigInteger listValueId = BigInteger.valueOf(3);
 
         eavObject1.setAttributeListValueId(BigInteger.valueOf(3),listValueId);
@@ -82,7 +82,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetReference() {
+    void testSetGetReference_ReferenceSet_ReferenceIsAddedAndRead() {
         BigInteger referenceId = BigInteger.valueOf(25);
 
         eavObject1.setReference(BigInteger.valueOf(4),referenceId);
@@ -91,7 +91,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetAttributes() {
+    void setGetAttributes_attributesSetAsMap_attributesIsSetAndRead() {
         Map<BigInteger,Attribute> attributeMap = new HashMap<>();
         String value = "Omega";
         attributeMap.put(BigInteger.valueOf(1),new Attribute(value));
@@ -111,7 +111,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setGetReferences() {
+    void setGetReferences_referencesSetAsMap_referencesIsSetAndRead() {
         Map<BigInteger,BigInteger> references = new HashMap<>();
 
         BigInteger reference1 = BigInteger.valueOf(45);
@@ -130,7 +130,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void setParentId() {
+    void testSetGetParentId_ParentIdSet_ParentIdIsSetAndRead() {
         BigInteger parentId = BigInteger.valueOf(12);
 
         eavObject1.setParentId(parentId);
@@ -139,7 +139,7 @@ class EAVObjectTest {
     }
 
     @Test
-    void GetObjectTypeId() {
+    void testSetGetObjectTypeId_ObjectTypeIdSet_ObjectTypeIdIsSetAndRead() {
         BigInteger objectTypeId = BigInteger.valueOf(12);
 
         eavObject1.setParentId(objectTypeId);
@@ -147,68 +147,24 @@ class EAVObjectTest {
         assertEquals(objectTypeId,eavObject1.getParentId());
     }
     @Test
-    void getNonExistedAttributeValue(){
+    void testGetAttributeValue_GetNonExistedAttributeValue_ThrowException(){
         BigInteger attrId = BigInteger.valueOf(1111);
         assertThrows(EAVAttributeException.class,()->eavObject1.getAttributeValue(attrId));
     }
     @Test
-    void getNonExistedAttributeDateValue(){
+    void testGetAttributeDateValue_GetNonExistedAttributeDateValue_ThrowException(){
         BigInteger attrId = BigInteger.valueOf(2222);
         assertThrows(EAVAttributeException.class,()->eavObject1.getAttributeDateValue(attrId));
     }
     @Test
-    void getNonExistedAttributeListValueId(){
+    void testGetAttributeListValueId_GetNonExistedAttributeListValueId_ThrowException(){
         BigInteger attrId = BigInteger.valueOf(3333);
         assertThrows(EAVAttributeException.class,()->eavObject1.getAttributeListValueId(attrId));
     }
+
     @Test
-    void GetExistedAttributes(){
-        EAVObject eavObjectWithAttributes = new EAVObject();
-        Map<BigInteger,Attribute> attributeMap = new HashMap<>();
-        attributeMap.put(BigInteger.valueOf(1),new Attribute("Omega"));
-        attributeMap.put(BigInteger.valueOf(2),new Attribute(new Date()));
-        attributeMap.put(BigInteger.valueOf(3),new Attribute(BigInteger.valueOf(1)));
-        eavObjectWithAttributes.setAttributes(attributeMap);
-
-        String value = "Alpha";
-        Date dateValue = new Date(11);
-        BigInteger listValueId = BigInteger.valueOf(224);
-
-        eavObjectWithAttributes.setAttributeValue(BigInteger.valueOf(1),value);
-        eavObjectWithAttributes.setAttributeDateValue(BigInteger.valueOf(2),dateValue);
-        eavObjectWithAttributes.setAttributeListValueId(BigInteger.valueOf(3),listValueId);
-
-        assertEquals(value,eavObjectWithAttributes.getAttributeValue(BigInteger.valueOf(1)));
-        assertEquals(dateValue,eavObjectWithAttributes.getAttributeDateValue(BigInteger.valueOf(2)));
-        assertEquals(listValueId,eavObjectWithAttributes.getAttributeListValueId(BigInteger.valueOf(3)));
-    }
-    @Test
-    void createObjectWithSetters(){
-        EAVObject eavObject = new EAVObject();
-        BigInteger objectId = BigInteger.valueOf(1);
-        eavObject.setObjectId(objectId);
-        BigInteger objectTypeId = BigInteger.valueOf(2);
-        eavObject.setObjectTypeId(objectTypeId);
-        BigInteger parentId = BigInteger.valueOf(3);
-        eavObject.setParentId(parentId);
-        String name = "Omegison";
-        eavObject.setName(name);
-
-        assertEquals(objectId,eavObject.getObjectId());
-        assertEquals(objectTypeId,eavObject.getObjectTypeId());
-        assertEquals(parentId,eavObject.getParentId());
-        assertEquals(name,eavObject.getName());
-    }
-    @Test
-    void getNonExistingReference(){
+    void testGetAttributeReference_GetNonExistedReference_ThrowException(){
         BigInteger attrId = BigInteger.valueOf(1111);
         assertThrows(EAVAttributeException.class,()->eavObject1.getReference(attrId));
-    }
-    @Test
-    void setExistingReference(){
-        EAVObject eavObject = new EAVObject();
-        eavObject.setReference(BigInteger.valueOf(12),BigInteger.valueOf(10));
-        eavObject.setReference(BigInteger.valueOf(12),BigInteger.valueOf(1));
-        assertEquals(BigInteger.valueOf(1),eavObject.getReference(BigInteger.valueOf(12)));
     }
 }

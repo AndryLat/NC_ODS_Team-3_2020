@@ -26,7 +26,7 @@ public class LogService extends AbstractService {
         if (isIdValid(directoryId) && ruleContainer != null && pageable != null) {
             return logDAO.getLogByAll(directoryId, ruleContainer, pageable);
         } else
-            throwLogServiceExceptionWithMessage("Values cant be null");
+            throwLogServiceExceptionWithMessage("Values сan't be null");
         return null;
     }
 

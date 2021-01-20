@@ -152,8 +152,8 @@ abstract class AbstractServerConnection implements ServerConnection {
 
     protected abstract List<Log> collectNewLogs();
 
-    protected void validateDirectoryByResult(List<Log> result, Directory directory) {
-        if (!result.isEmpty()) {
+    protected void validateDirectoryByLogCollectionResult(List<Log> collectedLogs, Directory directory) {
+        if (!collectedLogs.isEmpty()) {
             directory.setLastExistenceCheck(new Date());
         } else {
             if (new Date(directory.getLastExistenceCheck().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date())) {
