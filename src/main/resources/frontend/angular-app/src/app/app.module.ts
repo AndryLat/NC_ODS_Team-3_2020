@@ -10,6 +10,7 @@ import {ServersComponent} from './views/models/servers-component/servers.compone
 import {DirectoriesComponent} from './views/models/directories-component/directories.component';
 import {LogsComponent} from './views/models/logs-component/logs.component';
 import {UserSettingsComponent} from './views/user-settings-component/user-settings.component';
+import {PasswordRecoveryComponent} from './views/password-recovery-component/password-recovery.component';
 import {AuthService} from "./services/AuthService";
 import {AuthInterceptor} from "./services/AuthInterceptor";
 import {AuthGuard} from "./services/AuthGuard";
@@ -28,7 +29,9 @@ import {NgxPaginationModule} from "ngx-pagination";
     DirectoriesComponent,
     LogsComponent,
     UserSettingsComponent,
-    OverlaySpinnerComponent
+    OverlaySpinnerComponent,
+    PasswordRecoveryComponent
+
   ],
   imports: [
     OverlayModule,
