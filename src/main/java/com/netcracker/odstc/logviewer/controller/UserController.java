@@ -77,7 +77,7 @@ public class UserController {
 
     @PostMapping("/resetPassword")
     public ResponseEntity<User> resetPassword(HttpServletRequest request,
-                                @RequestParam("login") String login) {
+                                @RequestBody String login) {
         User user = userService.findByLogin(login);
         String token = securityService.createPasswordResetTokenForUser(user);
         mailSender.send(mailService.constructResetTokenEmail(securityService.getAppUrl(request), token, user));
