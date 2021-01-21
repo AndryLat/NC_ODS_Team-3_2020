@@ -19,15 +19,16 @@ public class LogFile extends EAVObject {
         setObjectTypeId(ObjectTypes.LOGFILE.getObjectTypeID());
     }
 
-    public LogFile(String name, int lastRow) {
+    public LogFile(String fileName, int lastRow) {
         super();
-        setName(name);
+        setFileName(fileName);
+        setName(fileName);
         setLastRow(lastRow);
         setLastUpdate(new Date());
     }
 
-    public LogFile(String name, int lastRow, BigInteger parentId) {
-        this(name, lastRow);
+    public LogFile(String fileName, int lastRow, BigInteger parentId) {
+        this(fileName, lastRow);
         setParentId(parentId);
     }
 
@@ -38,6 +39,14 @@ public class LogFile extends EAVObject {
 
     @Override
     public void setName(String name) {
+        setAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId(), name);
+    }
+
+    public String getFileName() {
+        return getAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId());
+    }
+
+    public void setFileName(String name) {
         setAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId(), name);
     }
 

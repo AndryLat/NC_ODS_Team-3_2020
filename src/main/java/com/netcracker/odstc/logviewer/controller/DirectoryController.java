@@ -67,20 +67,23 @@ public class DirectoryController {
         return ResponseEntity.ok(directoryService.findById(id));
     }
 
-    @GetMapping("/test")
+    @PostMapping("/test")
     public ResponseEntity<Boolean> testConnection(@RequestBody Directory directory) {
         logger.info("GET: Requested test connection to directory");
-        return ResponseEntity.ok(directoryService.testConnection(directory));
+        Directory dir = new Directory(directory.getPath());
+        dir.setParentId(directory.getParentId());
+        return ResponseEntity.ok(directoryService.testConnection(dir));
     }
 
-    @GetMapping("/files")
-    public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
+    @PostMapping("/files")
+    public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody Directory directory) {
         logger.info("GET: Requested file listing from directory");
+        DirectoryWithExtensionsDTO directoryWithExtensionsDTO = new DirectoryWithExtensionsDTO(directory, null);
         return ResponseEntity.ok(logFileService.getLogFileList(directoryWithExtensionsDTO));
     }
 
-    @PostMapping("files/add")
-    public ResponseEntity<Directory> addLogFiles(List<LogFile> logFiles) {
+    @PostMapping("/files/add")
+    public ResponseEntity<Directory> addLogFiles(@RequestBody List<LogFile> logFiles) {
         if(logger.isInfoEnabled()) {
             String size = logFiles==null?"null array": String.valueOf(logFiles.size());
             logger.info("POST: Requested saving {} files", size);

@@ -29,7 +29,7 @@ public class LogFileService extends AbstractService {
     }
 
     public List<LogFile> getLogFileList(DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
-        if (directoryWithExtensionsDTO.getDirectory()!=null) {
+        if (directoryWithExtensionsDTO.getDirectory()==null) {
             throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
         }
         Directory directory = directoryWithExtensionsDTO.getDirectory();
@@ -55,15 +55,16 @@ public class LogFileService extends AbstractService {
     public void addLogFileList(List<LogFile> logFiles) {
         if (logFiles == null) {
             throwLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
-        }
-        for (LogFile logFile : logFiles) {
-            if (isFileValid(logFile)) {
-                logFile.setLastUpdate(new Date());
-                logFile.setLastRow(0);
-                validateObjectType(logFile);
-                eavObjectDAO.saveObject(logFile);
-            } else {
-                logger.error("Skipping non valid file");
+        } else {
+            for (LogFile logFile : logFiles) {
+                if (isFileValid(logFile)) {
+                    logFile.setLastUpdate(new Date());
+                    logFile.setLastRow(0);
+                    validateObjectType(logFile);
+                    eavObjectDAO.saveObject(logFile);
+                } else {
+                    logger.error("Skipping non valid file");
+                }
             }
         }
     }
