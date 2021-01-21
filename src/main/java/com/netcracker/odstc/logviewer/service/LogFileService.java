@@ -1,6 +1,5 @@
 package com.netcracker.odstc.logviewer.service;
 
-import com.netcracker.odstc.logviewer.containers.dto.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
@@ -28,22 +27,15 @@ public class LogFileService extends AbstractService {
         this.eavObjectDAO = eavObjectDAO;
     }
 
-    public List<LogFile> getLogFileList(DirectoryWithExtensionsDTO directoryWithExtensionsDTO) {
-        if (directoryWithExtensionsDTO.getDirectory()==null) {
+    public List<LogFile> getLogFileList(Directory directory) {
+        if (directory==null) {
             throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
         }
-        Directory directory = directoryWithExtensionsDTO.getDirectory();
         if (directory.getParentId() == null) {
             throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
         }
-        String[] extensions;
-        if (directoryWithExtensionsDTO.getExtensions() == null) {
-            extensions = new String[]{""};
-        } else {
-            extensions = directoryWithExtensionsDTO.getExtensions();
-        }
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
-        return serverConnectionService.getLogFilesFromDirectory(server, directory, extensions);
+        return serverConnectionService.getLogFilesFromDirectory(server, directory);
     }
 
     private void throwLogFilesServiceExceptionWithMessage(String message) {

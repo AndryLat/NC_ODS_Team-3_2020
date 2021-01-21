@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 public interface ServerConnection extends Callable<List<Log>> {
+
     Server getServer();
 
     void setServer(Server server);
@@ -21,6 +22,8 @@ public interface ServerConnection extends Callable<List<Log>> {
     void removeDirectory(Directory directory);
 
     List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions);
+
+    List<LogFile> getLogFilesFromDirectory(Directory directory);
 
     void updateDirectory(Directory directory);
 

@@ -21,13 +21,14 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 abstract class AbstractServerConnection implements ServerConnection {
-    protected static final int CONNECT_TIMEOUT = 500;
     private static final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
     protected List<HierarchyContainer> directories;
     protected boolean isConnected;
     protected Config appConfiguration;
+
+    protected static final int CONNECT_TIMEOUT = 500;
 
     protected AbstractServerConnection(Server server) {
         isConnected = false;

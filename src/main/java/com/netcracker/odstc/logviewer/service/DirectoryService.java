@@ -7,11 +7,13 @@ import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnection
 import com.netcracker.odstc.logviewer.service.exceptions.DirectoryServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class DirectoryService extends AbstractService {
@@ -25,11 +27,11 @@ public class DirectoryService extends AbstractService {
         this.eavObjectDAO = eavObjectDAO;
     }
 
-    public List<Directory> findByParentId(BigInteger id) {
+    public Page<Directory> findByParentId(BigInteger id, Pageable pageable) {
         if (!isIdValid(id)) {
             throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
         }
-        return eavObjectDAO.getObjectsByParentId(id, directoryClass);
+        return new PageImpl<>(eavObjectDAO.getObjectsByParentId(pageable,id, directoryClass));
     }
 
     public Directory findById(BigInteger id) {

@@ -61,6 +61,26 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
+    public List<LogFile> getLogFilesFromDirectory(Directory directory) {
+        validateConnection();
+        List<LogFile> logFiles = new ArrayList<>();
+        ChannelSftp channelSftp = getChannelSftp();
+
+        try {
+            List files = channelSftp.ls(directory.getPath());
+            for (Object file : files) {
+                String fileName = ((ChannelSftp.LsEntry) file).getFilename();
+                LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
+                logFiles.add(logFile);
+            }
+        } catch (SftpException e) {
+            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
+            throw new ServerConnectionException("Can't list files from SSH due to error", e);
+        }
+        return logFiles;
+    }
+
+    @Override
     public boolean connect() {
         logger.debug("Making connection to {}", server.getIp());
         try {

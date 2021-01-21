@@ -1,12 +1,14 @@
 package com.netcracker.odstc.logviewer.controller;
 
-import com.netcracker.odstc.logviewer.containers.dto.DirectoryWithExtensionsDTO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.service.DirectoryService;
 import com.netcracker.odstc.logviewer.service.LogFileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,8 @@ import java.util.List;
 public class DirectoryController {
     private final Logger logger = LogManager.getLogger(DirectoryController.class);
 
+    private static final String DEFAULT_PAGE_SIZE = "10";
+
     private final DirectoryService directoryService;
     private final LogFileService logFileService;
 
@@ -35,9 +39,12 @@ public class DirectoryController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Directory>> all(@RequestParam BigInteger parentId) {
+    public ResponseEntity<Page<Directory>> all(@RequestParam BigInteger parentId,
+                                               @RequestParam(value = "page", defaultValue = "1") int page,
+                                               @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
+        Pageable pageable = PageRequest.of(page-1,pageSize);
         logger.info("GET: Requested all directories by parentId {}", (parentId != null ? parentId : "null"));
-        return ResponseEntity.ok(directoryService.findByParentId(parentId));
+        return ResponseEntity.ok(directoryService.findByParentId(parentId,pageable));
     }
 
     @PostMapping("/add")
@@ -78,8 +85,7 @@ public class DirectoryController {
     @PostMapping("/files")
     public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestBody Directory directory) {
         logger.info("GET: Requested file listing from directory");
-        DirectoryWithExtensionsDTO directoryWithExtensionsDTO = new DirectoryWithExtensionsDTO(directory, null);
-        return ResponseEntity.ok(logFileService.getLogFileList(directoryWithExtensionsDTO));
+        return ResponseEntity.ok(logFileService.getLogFileList(directory));
     }
 
     @PostMapping("/files/add")

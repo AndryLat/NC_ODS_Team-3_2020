@@ -126,6 +126,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
     }
 
     private void revalidateServers() {
+        logger.info("Starting check non-active servers");
         List<HierarchyContainer> servers = containerDAO.getNonactiveServers();
         List<Server> serversToSave = new ArrayList<>();
         for (HierarchyContainer serverContainer : servers) {
@@ -144,6 +145,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
     }
 
     private void revalidateActiveServersDirectories() {
+        logger.info("Starting check non-active directories in active servers");
         List<HierarchyContainer> servers = containerDAO.getActiveServersWithNonactiveDirectories();
         List<Directory> directories = new ArrayList<>();
 
@@ -181,6 +183,7 @@ public class ServerManager implements DAOChangeListener, SchedulingConfigurer {
         } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
             serverConnection.setServer(server);
+            serverConnection.disconnect();
         }
     }
 

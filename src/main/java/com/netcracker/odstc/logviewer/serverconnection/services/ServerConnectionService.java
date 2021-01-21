@@ -129,6 +129,21 @@ public class ServerConnectionService {
         return logFiles;
     }
 
+
+    /**
+     * @param server     Server where directory located
+     * @param directory  Folder for listing files
+     * @return list of files as LogFile
+     * @throws ServerConnectionException when list of files cant be received
+     * @see com.netcracker.odstc.logviewer.models.LogFile
+     */
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) throws ServerConnectionException {
+        ServerConnection serverConnection = wrapServerIntoConnection(server);
+        List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory);
+        serverConnection.disconnect();
+        return logFiles;
+    }
+
     public ServerConnection wrapServerIntoConnection(HierarchyContainer serverContainer) {
         Server server = (Server) serverContainer.getOriginal();
         return wrapServerIntoConnection(server);
