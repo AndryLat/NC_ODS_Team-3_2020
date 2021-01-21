@@ -42,7 +42,7 @@
       </div>
       <div class="modal-body">
         <!-- PUT FORM -->
-        <form [formGroup]="form">
+        <form *ngIf="form" [formGroup]="form">
           <div class="form-group">
             <label for="emailInput">Email address</label>
             <input class="form-control" formControlName="email" id="emailInput" name="email"

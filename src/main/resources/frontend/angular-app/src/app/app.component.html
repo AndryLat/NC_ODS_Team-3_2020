@@ -17,6 +17,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" routerLink="/settings" routerLinkActive="active" href="#">Settings</a>
+          <a class="dropdown-item" *ngIf="isAdmin()" routerLink="/global_settings" routerLinkActive="active" href="#">Global Settings</a>
           <a class="dropdown-item" *ngIf="isAdmin()" routerLink="/users" routerLinkActive="active" href="#">Users</a>
           <a class="dropdown-item" (click)="logout()" routerLinkActive="active" href="#">Logout</a>
         </div>

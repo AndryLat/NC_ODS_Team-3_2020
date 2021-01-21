@@ -1,6 +1,8 @@
 package com.netcracker.odstc.logviewer.service;
 
+import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.dao.UserDao;
+import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.service.exceptions.UserServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -18,9 +20,11 @@ public class UserService {
 
     private final Logger logger = LogManager.getLogger(UserService.class.getName());
     private final UserDao userDao;
+    private final EAVObjectDAO eavObjectDAO;
 
-    public UserService(UserDao userDao) {
+    public UserService(UserDao userDao, EAVObjectDAO eavObjectDAO) {
         this.userDao = userDao;
+        this.eavObjectDAO = eavObjectDAO;
     }
 
     public List<User> getUsers() {
@@ -64,9 +68,10 @@ public class UserService {
         User userFromDb = userDao.getByLogin(user.getLogin());
         if(userFromDb == null){
             throwUserServiceExceptionWithMessage("User by login not found.");
+        }else{
+            userFromDb.setPassword(user.getPassword());
+            update(userFromDb);
         }
-        userFromDb.setPassword(user.getPassword());
-        update(userFromDb);
     }
 
     public void save(User user) {
@@ -81,6 +86,23 @@ public class UserService {
             throwUserServiceExceptionWithMessage("User cannot be deleted, user id is invalid.");
         }
         userDao.deleteById(id);
+    }
+
+    public void saveConfig(Config config){
+        if(config == null){
+            throwException("Config cant be save.");
+        }
+        else {
+            logger.info(config);
+            config.setObjectId(BigInteger.ZERO);
+            eavObjectDAO.saveObjectAttributesReferences(config);
+        }
+    }
+
+    public Config getConfig(){
+        Config config = eavObjectDAO.getObjectById(BigInteger.ZERO, Config.class);
+        logger.info(config);
+        return config;
     }
 
     private boolean isIdValid(BigInteger id) {

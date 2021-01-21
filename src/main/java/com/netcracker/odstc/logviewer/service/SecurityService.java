@@ -56,20 +56,6 @@ public class SecurityService {
         return false;
     }
 
-    public String getAppUrl(HttpServletRequest request){
-        String scheme = request.getScheme();
-        String serverName = request.getServerName();
-        int serverPort = request.getServerPort();
-        String contextPath = request.getContextPath();
-        StringBuilder url = new StringBuilder();
-        url.append(scheme).append("://")
-                .append(serverName)
-                .append(":")
-                .append(serverPort)
-                .append(contextPath);
-        return url.toString();
-    }
-
     public String getLoginUserFromToken(String token){
         String login;
         if (token != null) {
@@ -87,5 +73,19 @@ public class SecurityService {
             }
         }
         return null;
+    }
+
+    public String getAppUrl(HttpServletRequest request){
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        String contextPath = request.getContextPath();
+        StringBuilder url = new StringBuilder();
+        url.append(scheme).append("://")
+                .append(serverName)
+                .append(":")
+                .append(serverPort)
+                .append(contextPath);
+        return url.toString();
     }
 }

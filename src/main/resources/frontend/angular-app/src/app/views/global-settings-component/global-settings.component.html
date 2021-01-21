@@ -1,0 +1,37 @@
+<div class="container">
+  <!-- PUT FORM -->
+  <div *ngIf="msg" class="alert alert-info col-6" role="alert">
+    {{msg}}
+  </div>
+  <form *ngIf="insertForm" [formGroup]="insertForm">
+    <div class="form-group">
+      <label for="activityInput">Activity Polling Period</label>
+      <input class="form-control" formControlName="activityPollingPeriod" id="activityInput" name="activityPollingPeriod" placeholder="Activity Polling Period"
+             required
+             type="number">
+      <label for="changesInput">Changes Polling Period</label>
+      <input class="form-control" formControlName="changesPollingPeriod" id="changesInput" name="changesPollingPeriod"
+             placeholder="Changes Polling Period"
+             required type="number">
+      <label for="storageInput">Storage Log Period</label>
+      <input class="form-control" formControlName="storageLogPeriod" id="storageInput" name="storageLogPeriod"
+             placeholder="Storage Log Period"
+             required type="date">
+      <label for="serverInput">Server Activity Period</label>
+      <input class="form-control" formControlName="serverActivityPeriod" id="serverInput" name="serverActivityPeriod"
+             placeholder="Server Activity Period"
+             required type="date">
+      <label for="directoryInput">Directory Activity Period</label>
+      <input class="form-control" formControlName="directoryActivityPeriod" id="directoryInput" name="directoryActivityPeriod"
+             placeholder="Directory Activity Period"
+             required type="date">
+      <hr>
+      <div class="d-flex flex-row">
+        <button (click)="clickForUpdate()" class="btn btn-info col-4" type="button">Change Settings</button>
+      </div>
+      <hr>
+    </div>
+  </form>
+  <!-- PUT FORM -->
+</div>
+

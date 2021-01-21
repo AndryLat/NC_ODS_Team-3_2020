@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.controller;
 
+import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.service.MailService;
 import com.netcracker.odstc.logviewer.service.SecurityService;
@@ -102,6 +103,17 @@ public class UserController {
     public ResponseEntity<User> deleteById(@PathVariable BigInteger id) {
         userService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/updateConfig")
+    public ResponseEntity<Config> updateSettings(@RequestBody Config config){
+        userService.saveConfig(config);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/config")
+    public ResponseEntity<Config> getConfig() {
+        return ResponseEntity.ok(userService.getConfig());
     }
 
 }
