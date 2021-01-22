@@ -53,7 +53,7 @@ public class LogFileService extends AbstractService {
                     logFile.setLastUpdate(new Date());
                     logFile.setLastRow(0);
                     validateObjectType(logFile);
-                    eavObjectDAO.saveObject(logFile);
+                    eavObjectDAO.saveObjectAttributesReferences(logFile);
                 } else {
                     logger.error("Skipping non valid file");
                 }

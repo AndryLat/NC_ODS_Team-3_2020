@@ -4,6 +4,7 @@ import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.dao.UserDao;
 import com.netcracker.odstc.logviewer.models.Config;
 import com.netcracker.odstc.logviewer.models.User;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.service.exceptions.UserServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -95,14 +96,15 @@ public class UserService {
         else {
             logger.info(config);
             config.setObjectId(BigInteger.ZERO);
+            config.setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
             eavObjectDAO.saveObjectAttributesReferences(config);
+            Config.setInstance(config);
         }
     }
 
     public Config getConfig(){
-        Config config = eavObjectDAO.getObjectById(BigInteger.ZERO, Config.class);
-        logger.info(config);
-        return config;
+        logger.info(Config.getInstance());
+        return Config.getInstance();
     }
 
     private boolean isIdValid(BigInteger id) {

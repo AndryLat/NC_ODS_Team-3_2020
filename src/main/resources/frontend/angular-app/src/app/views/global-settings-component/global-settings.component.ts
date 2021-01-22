@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {AuthService} from "../../services/AuthService";
 import {Config} from "../../entity/Config";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import { DatePipe } from '@angular/common';
+import {DatePipe} from '@angular/common';
 
 
 @Component({

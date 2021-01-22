@@ -12,7 +12,7 @@ public class Config extends EAVObject {
 
     public Config() {
         super();
-        setObjectTypeId(BigInteger.valueOf(6));
+        setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 
     public Config(BigInteger objectId) {
