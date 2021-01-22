@@ -1,10 +1,10 @@
 <div class="container-fluid">
   <div class="row">
-    <div *ngIf="msg" class="alert alert-info col-6" role="alert">
+    <div *ngIf="msg" class="alert alert-info d-flex justify-content-center col-12" role="alert">
       {{msg}}
     </div>
     <div class="col-9">
-      <table class="table table-bordered">
+      <table class="table table-bordered table-sm">
         <caption>Logs table</caption>
         <thead>
         <tr>
@@ -75,7 +75,8 @@
             </div>
           </div>
         </div>
-        <button (click)="getLogsByRule(1)" class="btn btn-primary row" type="submit">Apply</button>
+        <hr>
+        <button (click)="getLogsByRule(1)" class="btn btn-primary" type="submit">Apply</button>
       </form>
     </div>
   </div>
