@@ -38,7 +38,7 @@ public class ServerPollManager {
     }
 
     public void addServerToPoll(ServerConnection serverConnection) {
-        if(!activeServerConnections.containsKey(serverConnection)) {
+        if (!activeServerConnections.containsKey(serverConnection)) {
             activeServerConnections.putIfAbsent(serverConnection, service.submit(serverConnection));
         }
     }

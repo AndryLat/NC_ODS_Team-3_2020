@@ -23,11 +23,11 @@ public class RemovedObjectsCollector {
         iterationRemove.put(ObjectTypes.LOGFILE, new ArrayList<>());
     }
 
-    public void addRemovedObjectId(ObjectTypes objectType, BigInteger id){
+    public void addRemovedObjectId(ObjectTypes objectType, BigInteger id) {
         iterationRemove.get(objectType).add(id);
     }
 
-    public void excludeRemovedFromConnections(Collection<ServerConnection> connections){
+    public void excludeRemovedFromConnections(Collection<ServerConnection> connections) {
         for (Iterator<ServerConnection> serverConnectionIterator = connections.iterator(); serverConnectionIterator.hasNext(); ) {
             ServerConnection serverConnection = serverConnectionIterator.next();
             if (iterationRemove.get(ObjectTypes.SERVER).contains(serverConnection.getServer().getObjectId())) {

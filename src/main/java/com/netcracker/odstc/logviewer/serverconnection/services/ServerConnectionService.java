@@ -131,8 +131,8 @@ public class ServerConnectionService {
 
 
     /**
-     * @param server     Server where directory located
-     * @param directory  Folder for listing files
+     * @param server    Server where directory located
+     * @param directory Folder for listing files
      * @return list of files as LogFile
      * @throws ServerConnectionException when list of files cant be received
      * @see com.netcracker.odstc.logviewer.models.LogFile
