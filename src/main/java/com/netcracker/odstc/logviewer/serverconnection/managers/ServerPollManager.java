@@ -5,7 +5,6 @@ import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,11 +21,9 @@ public class ServerPollManager {
     private final ExecutorService service = Executors.newFixedThreadPool(4);
 
     private final Map<ServerConnection, Future<List<Log>>> activeServerConnections;
-    private final Map<BigInteger, ServerConnection> finishedServers;
 
     private ServerPollManager() {
         activeServerConnections = new HashMap<>();
-        finishedServers = new HashMap<>();
     }
 
     public static ServerPollManager getInstance() {
@@ -40,13 +37,10 @@ public class ServerPollManager {
         return activeServerConnections;
     }
 
-    public Map<BigInteger, ServerConnection> getFinishedServers() {
-        return finishedServers;
-    }
-
-    public void executeExtractingLogs(ServerConnection serverConnection) {
-        if (!activeServerConnections.containsKey(serverConnection))
-            activeServerConnections.put(serverConnection, service.submit(serverConnection));
+    public void addServerToPoll(ServerConnection serverConnection) {
+        if(!activeServerConnections.containsKey(serverConnection)) {
+            activeServerConnections.putIfAbsent(serverConnection, service.submit(serverConnection));
+        }
     }
 
     public List<Log> getLogsFromThreads() {
@@ -65,7 +59,6 @@ public class ServerPollManager {
                     future.getKey().getServer().setConnectable(false);
                     logger.error("Thread execution error ", e);
                 }
-                finishedServers.put(future.getKey().getServer().getObjectId(), future.getKey());
                 resultIterator.remove();
             }
         }
