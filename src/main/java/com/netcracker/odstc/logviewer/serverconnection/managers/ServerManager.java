@@ -57,7 +57,7 @@ public class ServerManager implements DAOChangeListener {
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
             BigInteger objectTypeId = (BigInteger) objectChangeEvent.getArgument();
             BigInteger objectId = (BigInteger) objectChangeEvent.getObject();
-            removedObjectsCollector.addRemovedObjectId(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId),objectId);
+            removedObjectsCollector.addRemovedObjectId(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId), objectId);
         } else if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.UPDATE) {
             if (Server.class.isAssignableFrom(objectChangeEvent.getObject().getClass())) {
                 serverChanged(objectChangeEvent);
@@ -133,7 +133,7 @@ public class ServerManager implements DAOChangeListener {
         Server server = (Server) objectChangeEvent.getObject();
         if (!server.isEnabled() && serverConnections.containsKey(server.getObjectId())) {
             serverConnections.remove(server.getObjectId());
-            removedObjectsCollector.addRemovedObjectId(ObjectTypes.SERVER,server.getObjectId());
+            removedObjectsCollector.addRemovedObjectId(ObjectTypes.SERVER, server.getObjectId());
         } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
             serverConnection.setServer(server);
