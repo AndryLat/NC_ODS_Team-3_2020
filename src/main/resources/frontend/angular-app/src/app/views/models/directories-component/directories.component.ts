@@ -7,6 +7,7 @@ import {Directory} from '../../../entity/Directory';
 import {AuthService} from "../../../services/AuthService";
 import {LogFile} from "../../../entity/LogFile";
 import {DirectoryPage} from "../../../pageable/DirectoryPage";
+import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
 
 
 @Component({
@@ -29,7 +30,7 @@ export class DirectoriesComponent implements OnInit {
 
   directoryPage: DirectoryPage;
 
-  serverId: bigint;
+  serverId: string;
   testResult: string;
   getResult: string;
   msg: string;
@@ -45,11 +46,7 @@ export class DirectoriesComponent implements OnInit {
     this.searchForm = this.fb.group({
       searchText: ['', Validators.required]
     });
-    if(this.router.getCurrentNavigation().extras.state === undefined){
-      this.router.navigateByUrl('/servers');
-    }else{
-      this.serverId = this.router.getCurrentNavigation().extras.state['objectId'];
-    }
+    this.serverId = localStorage.getItem(RouteVariableNameConstants.serverToDirectoryVariableName);
   }
 
   getDirectoriesFromPage(pageNumber: number): void {
@@ -71,11 +68,11 @@ export class DirectoriesComponent implements OnInit {
   }
 
 
-  routeToLogs(objectId: bigint): void {
+  routeToLogs(objectId: string): void {
     this.router.navigateByUrl('/logs', {state: {objectId}});
   }
 
-  deleteDirectory(objectId: bigint): void {
+  deleteDirectory(objectId: string): void {
     this.http.delete(GlobalConstants.apiUrl + 'api/directory/delete/' + objectId).subscribe(() => {
       //this.directories = this.directories.filter(item => item.objectId !== objectId);
       //this.directoryPage.content = this.directoryPage.content.filter(item => item.objectId !== objectId);

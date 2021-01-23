@@ -32,7 +32,7 @@ export class UsersComponent {
       role: ['', Validators.required]
     });
   }
-  deleteUser(id: bigint): void{
+  deleteUser(id: string): void{
     this.http.delete(GlobalConstants.apiUrl + 'api/user/delete/' + id).subscribe(() => {
       this.users = this.users.filter(item => item.objectId !== id);
     });

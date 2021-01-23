@@ -9,6 +9,7 @@ import {faCheck, faCogs, faSignInAlt, faTimes, faTrashAlt} from '@fortawesome/fr
 import {matchPattern} from "../../../services/validators/matchPatternValidator";
 import {ServerPage} from "../../../pageable/ServerPage";
 import {EAVObject} from "../../../entity/EAVObject";
+import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
 
 @Component({
   selector: 'app-servers',
@@ -95,14 +96,15 @@ export class ServersComponent implements OnInit {
   routeToDirectories(server: Server): void {
     const objectId = server.objectId;
     this.updateServer(server);
-    this.router.navigateByUrl('/directories', {state: {objectId}});
+    localStorage.setItem(RouteVariableNameConstants.serverToDirectoryVariableName,objectId);
+    this.router.navigateByUrl('/directories');
   }
 
-  deleteServer(objectId: bigint): void {
+  deleteServer(objectId: string): void {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
       this.confirmMessage = "Server deleted successfully";
 
-      let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId == objectId);
+      let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId === objectId);
       let index = this.serverPage.content.indexOf(changedServer);
 
       this.serverPage.content.splice(index, 1);
@@ -185,7 +187,7 @@ export class ServersComponent implements OnInit {
   }
 
   getIndexByObjectIdOfObject(object: EAVObject): number{
-    let changedServer = this.serverPage.content.find(changedElement => changedElement.objectId == object.objectId);
+    let changedServer = this.serverPage.content.find(changedElement => changedElement.objectId === object.objectId);
     return this.serverPage.content.indexOf(changedServer);
   }
 }

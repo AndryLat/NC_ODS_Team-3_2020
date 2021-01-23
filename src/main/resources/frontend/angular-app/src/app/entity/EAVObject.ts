@@ -1,5 +1,5 @@
 export class EAVObject {
-  objectId: bigint;
+  objectId: string;
   name: string;
-  parentId: bigint;
+  parentId: string;
 }

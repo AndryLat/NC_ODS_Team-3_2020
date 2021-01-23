@@ -51,7 +51,7 @@ export class LogsComponent implements OnInit {
     this.getLogsByRule(1);
   }
 
-  deleteLog(objectId: bigint): void {
+  deleteLog(objectId: string): void {
     this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
       this.msg = 'Log successfully deleted';
     }, error => {
