@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LogLevelTest {
 
     @Test
-    void testGetValue() {
+    void testGetValue_providesID_WhenValueIsValid() {
         assertEquals(13, LogLevel.SEVERE.getValue());
         assertEquals(14, LogLevel.WARNING.getValue());
         assertEquals(15, LogLevel.INFO.getValue());
@@ -22,13 +22,13 @@ class LogLevelTest {
     }
 
     @Test
-    void testGetByID() {
+    void testGetByID_providesValue_WhenIdIsValid() {
         assertEquals(LogLevel.ERROR, LogLevel.getByID(22));
         assertThrows(IllegalArgumentException.class, () -> LogLevel.getByID(42));
     }
 
     @Test
-    void testContains(){
+    void testContains_check_WhenValueMatches(){
         assertTrue(LogLevel.contains("DEBUG"));
         assertFalse(LogLevel.contains("DEBAG"));
     }
