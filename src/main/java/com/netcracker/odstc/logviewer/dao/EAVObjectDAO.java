@@ -15,7 +15,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -80,6 +82,8 @@ public class EAVObjectDAO {
     private static final String GET_ATTRIBUTE_BY_LIST_VALUE_QUERY = "select attr.attr_id, attr.object_id, Lists.value\n" +
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
+
+    private static final String GET_OBJECT_BY_OBJECT_ID = "SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?";
 
     protected final JdbcTemplate jdbcTemplate;
 
@@ -155,6 +159,7 @@ public class EAVObjectDAO {
         return getAttribute(listValue, GET_ATTRIBUTE_BY_LIST_VALUE_QUERY);
     }
 
+    @Transactional
     public <T extends EAVObject> void saveObjectAttributesReferences(T eavObject) {
         saveObject(eavObject);
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
@@ -164,6 +169,7 @@ public class EAVObjectDAO {
         DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(eavObject.getObjectTypeId()));
     }
 
+    @Transactional
     public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
         for (EAVObject eavObject : eavObjects) {
             saveObjectAttributesReferences(eavObject);
@@ -208,7 +214,7 @@ public class EAVObjectDAO {
 
     public void deleteById(BigInteger id) {
         try {
-            BigInteger objectTypeId = jdbcTemplate.queryForObject("SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?", BigInteger.class, id);
+            BigInteger objectTypeId = jdbcTemplate.queryForObject(GET_OBJECT_BY_OBJECT_ID, BigInteger.class, id);
             jdbcTemplate.update(DELETE_OBJECT_QUERY, id);
 
             ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);

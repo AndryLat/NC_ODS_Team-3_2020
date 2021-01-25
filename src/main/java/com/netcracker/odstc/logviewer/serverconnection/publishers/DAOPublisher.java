@@ -45,7 +45,9 @@ public class DAOPublisher {
     }
 
     public void removeListener(ObjectTypes objectType, DAOChangeListener daoChangeListener) {
-        listeners.get(objectType).remove(daoChangeListener);
+        if (listeners.containsKey(objectType)) {
+            listeners.get(objectType).remove(daoChangeListener);
+        }
     }
 
     public void notifyListeners(ObjectChangeEvent objectChangeEvent, ObjectTypes objectType) {
@@ -56,8 +58,10 @@ public class DAOPublisher {
                 return;
             }
         }
-        for (DAOChangeListener changeListener : listeners.get(objectType)) {
-            changeListener.objectChanged(objectChangeEvent);
+        if (listeners.containsKey(objectType)) {
+            for (DAOChangeListener changeListener : listeners.get(objectType)) {
+                changeListener.objectChanged(objectChangeEvent);
+            }
         }
     }
 
