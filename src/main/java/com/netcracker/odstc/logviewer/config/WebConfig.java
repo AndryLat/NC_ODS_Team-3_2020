@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
 import javax.sql.DataSource;
 
 @Configuration
@@ -24,11 +23,12 @@ public class WebConfig {
     @Value("${connectionDB.password}")
     private String password;
 
+    @Value("${connectionDB.driverClassName}")
+    private String driverClassName;
+
     @Bean
     public JdbcTemplate getJdbcTemplate() {
-
         return new JdbcTemplate(getDataSource());
-
     }
 
     @Bean
@@ -37,7 +37,7 @@ public class WebConfig {
         dataSource.setUrl(urlDb);
         dataSource.setUsername(login);
         dataSource.setPassword(password);
-        dataSource.setDriverClassName(oracle.jdbc.driver.OracleDriver.class.getName());
+        dataSource.setDriverClassName(driverClassName);
         return dataSource;
     }
 }

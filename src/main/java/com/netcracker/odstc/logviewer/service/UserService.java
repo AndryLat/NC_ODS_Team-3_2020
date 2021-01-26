@@ -11,29 +11,33 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @Service
 public class UserService {
-
     private final Logger logger = LogManager.getLogger(UserService.class.getName());
+
     private final UserDao userDao;
     private final EAVObjectDAO eavObjectDAO;
 
-    public UserService(UserDao userDao, EAVObjectDAO eavObjectDAO) {
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private MailService mailService;
+    private JavaMailSender mailSender;
+
+    public UserService(UserDao userDao, EAVObjectDAO eavObjectDAO, BCryptPasswordEncoder bCryptPasswordEncoder, JavaMailSender mailSender, MailService mailService) {
         this.userDao = userDao;
         this.eavObjectDAO = eavObjectDAO;
-    }
-
-    public List<User> getUsers() {
-        return userDao.getObjectsByObjectTypeId(BigInteger.ONE, User.class);
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.mailSender = mailSender;
+        this.mailService = mailService;
     }
 
     public Page<User> getUsers(Pageable page) {
-        return new PageImpl<User>(userDao.getUsers(page));
+        return new PageImpl<>(userDao.getUsers(page));
     }
 
     public User findById(BigInteger id) {
@@ -44,42 +48,53 @@ public class UserService {
     }
 
     public User findByLogin(String login) {
-        if (login == null || login.equals("")) {
+        if (login == null || login.isEmpty()) {
             throwUserServiceExceptionWithMessage("Login cant be null.");
         }
         User user = userDao.getByLogin(login);
-        if(user == null){
+        if (user == null) {
             throwUserServiceExceptionWithMessage("User by login not found.");
         }
         return user;
     }
 
+    public void create(User user, String login) {
+        if (user == null) {
+            throwUserServiceExceptionWithMessage("User shouldn't be null.");
+        } else {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            User creator = findByLogin(login);
+            user.setCreated(creator.getObjectId());
+            save(user);
+        }
+    }
+
     public void update(User user) {
         if (!isUserValid(user)) {
-            throwUserServiceExceptionWithMessage("User is not valid");
+            throwUserServiceExceptionWithMessage("User is not valid.");
         }
         userDao.saveObjectAttributesReferences(user);
     }
 
     public void updatePassword(User user) {
-        if(user.getPassword() == null && user.getLogin() == null)
-        {
-            throwUserServiceExceptionWithMessage("User is not valid to update password.");
-        }
-        User userFromDb = userDao.getByLogin(user.getLogin());
-        if(userFromDb == null){
-            throwUserServiceExceptionWithMessage("User by login not found.");
-        }else{
-            userFromDb.setPassword(user.getPassword());
-            update(userFromDb);
+        if (user == null) {
+            throwUserServiceExceptionWithMessage("User shouldn't be null.");
+        } else {
+            if (user.getPassword() == null && user.getLogin() == null) {
+                throwUserServiceExceptionWithMessage("User is not valid to update password.");
+            }
+            User userFromDb = userDao.getByLogin(user.getLogin());
+            if (userFromDb == null) {
+                throwUserServiceExceptionWithMessage("User by login not found.");
+            } else {
+                userFromDb.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                update(userFromDb);
+            }
         }
     }
 
-    public void save(User user) {
-        if (!isUserValidForSave(user)) {
-            throwUserServiceExceptionWithMessage("User is not valid for save.");
-        }
-        userDao.saveObjectAttributesReferences(user);
+    public void sendResetToken(String appUrl, String token, User user) {
+        mailSender.send(mailService.constructResetTokenEmail(appUrl, token, user));
     }
 
     public void deleteById(BigInteger id) {
@@ -89,11 +104,10 @@ public class UserService {
         userDao.deleteById(id);
     }
 
-    public void saveConfig(Config config){
-        if(config == null){
+    public void saveConfig(Config config) {
+        if (config == null) {
             throwException("Config cant be save.");
-        }
-        else {
+        } else {
             logger.info(config);
             config.setObjectId(BigInteger.ZERO);
             config.setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
@@ -102,9 +116,25 @@ public class UserService {
         }
     }
 
-    public Config getConfig(){
-        logger.info(Config.getInstance());
-        return Config.getInstance();
+    public Config getConfig() {
+        if (Config.getInstance() == null) {
+            return eavObjectDAO.getObjectById(BigInteger.ZERO, Config.class);
+        } else {
+            return Config.getInstance();
+        }
+    }
+
+    public void throwException(String nameException) {
+        IllegalArgumentException exception = new IllegalArgumentException();
+        logger.error(nameException);
+        throw exception;
+    }
+
+    private void save(User user) {
+        if (!isUserValidForSave(user)) {
+            throwUserServiceExceptionWithMessage("User is not valid for save.");
+        }
+        userDao.saveObjectAttributesReferences(user);
     }
 
     private boolean isIdValid(BigInteger id) {
@@ -114,6 +144,7 @@ public class UserService {
     private boolean isUserValid(User user) {
         if (user != null &&
                 user.getLogin() != null &&
+                user.getEmail() != null &&
                 user.getPassword() != null &&
                 user.getRole() != null) {
             return true;
@@ -129,11 +160,5 @@ public class UserService {
         UserServiceException userServiceException = new UserServiceException(message);
         logger.error(message, userServiceException);
         throw userServiceException;
-    }
-
-    public void throwException(String nameException) {
-        IllegalArgumentException exception = new IllegalArgumentException();
-        logger.error(nameException);
-        throw exception;
     }
 }

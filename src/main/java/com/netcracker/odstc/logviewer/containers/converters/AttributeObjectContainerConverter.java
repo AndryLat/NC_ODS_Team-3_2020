@@ -2,11 +2,8 @@ package com.netcracker.odstc.logviewer.containers.converters;
 
 import com.netcracker.odstc.logviewer.containers.AttributeObjectContainer;
 import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
-import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.LogFile;
-import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
-import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
+import com.netcracker.odstc.logviewer.models.eaventity.factory.EAVObjectFactory;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -15,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AttributeObjectContainerConverter {
+
+    private static final EAVObjectFactory eavObjectFactory = EAVObjectFactory.getInstance();
 
     public Map<BigInteger, HierarchyContainer> convertAttributeObjectContainerToHierarchyContainer(List<AttributeObjectContainer> attributeObjectContainerList) {
 
@@ -28,16 +27,8 @@ public class AttributeObjectContainerConverter {
             }
             BigInteger objectTypeId = attributeObjectContainer.getObjectTypeId();
 
-            EAVObject eavObject;
-            if (objectTypeId.equals(ObjectTypes.DIRECTORY.getObjectTypeID())) {
-                eavObject = new Directory();
-            } else if (objectTypeId.equals(ObjectTypes.LOGFILE.getObjectTypeID())) {
-                eavObject = new LogFile();
-            } else if (objectTypeId.equals(ObjectTypes.SERVER.getObjectTypeID())) {
-                eavObject = new Server();
-            } else {
-                throw new IllegalArgumentException("Object class invalid for containing hierarchy.");
-            }
+            EAVObject eavObject = eavObjectFactory.createEAVObject(objectTypeId);
+
             eavObject.setParentId(attributeObjectContainer.getParentId());
 
             eavObject.setObjectTypeId(objectTypeId);
