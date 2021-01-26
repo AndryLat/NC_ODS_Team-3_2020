@@ -37,30 +37,6 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions) {
-        validateConnection();
-        List<LogFile> logFiles = new ArrayList<>();
-        ChannelSftp channelSftp = getChannelSftp();
-
-        try {
-            List files = channelSftp.ls(directory.getPath());
-            for (Object file : files) {
-                String fileName = ((ChannelSftp.LsEntry) file).getFilename();
-                for (String extension : extensions) {
-                    if (fileName.endsWith(extension)) {
-                        LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
-                        logFiles.add(logFile);
-                    }
-                }
-            }
-        } catch (SftpException e) {
-            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
-            throw new ServerConnectionException("Can't list files from SSH due to error", e);
-        }
-        return logFiles;
-    }
-
-    @Override
     public List<LogFile> getLogFilesFromDirectory(Directory directory) {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
@@ -179,15 +155,15 @@ public class SSHServerConnection extends AbstractServerConnection {
         logFile.setLastUpdate(new Date());
         List<Log> result = new ArrayList<>();
         try {
-            try (InputStream inputStream = channelSftp.get(logFile.getName())) {
+            try (InputStream inputStream = channelSftp.get(logFile.getFileName())) {
                 if (inputStream == null) {
-                    logger.error("Can't reach file {} from {}", logFile.getName(), server.getIp());
+                    logger.error("Can't reach file {} from {}", logFile.getFileName(), server.getIp());
                 } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                 }
             }
         } catch (SftpException | IOException e) {
-            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(), e);
+            logger.error("Error with read file {} from {}", logFile.getFileName(), server.getIp(), e);
         }
         return result;
     }

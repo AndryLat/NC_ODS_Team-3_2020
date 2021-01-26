@@ -28,26 +28,6 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions) {
-        validateConnection();
-        List<LogFile> logFiles = new ArrayList<>();
-        try {
-            for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                for (String extension : extensions) {
-                    if (ftpFile.getName().endsWith(extension)) {
-                        LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
-                        logFiles.add(logFile);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
-            throw new ServerConnectionException("Can't list files from FTP due to error", e);
-        }
-        return logFiles;
-    }
-
-    @Override
     public List<LogFile> getLogFilesFromDirectory(Directory directory) {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
@@ -155,16 +135,16 @@ public class FTPServerConnection extends AbstractServerConnection {
         logFile.setLastUpdate(new Date());
         List<Log> result = new ArrayList<>();
         try {
-            try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
+            try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getFileName())) {
                 if (inputStream == null) {
-                    logger.error("Can't reach file {} from {}", logFile.getName(), server.getIp());
+                    logger.error("Can't reach file {} from {}", logFile.getFileName(), server.getIp());
                 } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                     ftpClient.completePendingCommand();
                 }
             }
         } catch (IOException e) {
-            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(), e);
+            logger.error("Error with read file {} from {}", logFile.getFileName(), server.getIp(), e);
         }
         return result;
     }
