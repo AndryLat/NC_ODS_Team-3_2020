@@ -63,7 +63,7 @@ public class LogFileService extends AbstractService {
 
     private boolean isFileValid(LogFile logFile) {
         if (logFile != null) {
-            return logFile.getName() != null;
+            return logFile.getFileName() != null;
         }
         return false;
     }

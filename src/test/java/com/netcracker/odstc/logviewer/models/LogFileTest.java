@@ -33,8 +33,8 @@ class LogFileTest {
 
     @Test
     void testSetGetName() {
-        logFileUnderTest.setName("name");
-        final String result = logFileUnderTest.getName();
+        logFileUnderTest.setFileName("name");
+        final String result = logFileUnderTest.getFileName();
         assertEquals("name", result);
     }
 

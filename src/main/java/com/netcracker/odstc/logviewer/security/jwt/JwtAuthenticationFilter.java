@@ -64,7 +64,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new RuntimeException("User authorities authentication error:", exp);
         }
 
-
         String token = JWT.create()
                 .withSubject(((JwtUser) authResult.getPrincipal()).getUsername())
                 .withClaim("Role", roleUser)

@@ -47,6 +47,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         return logFiles;
     }
 
+
     @Override
     public List<LogFile> getLogFilesFromDirectory(Directory directory) {
         validateConnection();
@@ -155,16 +156,16 @@ public class FTPServerConnection extends AbstractServerConnection {
         logFile.setLastUpdate(new Date());
         List<Log> result = new ArrayList<>();
         try {
-            try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getName())) {
+            try (InputStream inputStream = ftpClient.retrieveFileStream(logFile.getFileName())) {
                 if (inputStream == null) {
-                    logger.error("Can't reach file {} from {}", logFile.getName(), server.getIp());
+                    logger.error("Can't reach file {} from {}", logFile.getFileName(), server.getIp());
                 } else {
                     result.addAll(extractLogsFromStream(inputStream, logFile));
                     ftpClient.completePendingCommand();
                 }
             }
         } catch (IOException e) {
-            logger.error("Error with read file {} from {}", logFile.getName(), server.getIp(), e);
+            logger.error("Error with read file {} from {}", logFile.getFileName(), server.getIp(), e);
         }
         return result;
     }
