@@ -56,7 +56,7 @@ public class ServerController {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
         Server server = serverService.findById(id);
         return ResponseEntity.ok(server);
