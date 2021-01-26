@@ -80,7 +80,7 @@ public class LogController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Log> findById(@PathVariable BigInteger id) {
         if (id == null || id.equals(BigInteger.valueOf(0))) {
             throwException(logIdNullMessage);
