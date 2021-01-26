@@ -6,17 +6,15 @@ import com.netcracker.odstc.logviewer.mapper.ReferenceMapper;
 import com.netcracker.odstc.logviewer.models.eaventity.Attribute;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
+import com.netcracker.odstc.logviewer.models.eaventity.factory.EAVObjectFactory;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,9 +81,9 @@ public class EAVObjectDAO {
 
     protected final JdbcTemplate jdbcTemplate;
 
-    private final Logger logger = LogManager.getLogger(EAVObjectDAO.class.getName());
-
     private String errorMessage = "id can`t be null";
+
+    private static final EAVObjectFactory eavObjectFactory = EAVObjectFactory.getInstance();
 
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -109,7 +107,7 @@ public class EAVObjectDAO {
 
     public <T extends EAVObject> T getObjectByIdAttrByIds(BigInteger id, Class<T> clazz, List<BigInteger> attributeIds) {
         try {
-            EAVObject eavObject = createEAVObject(id, clazz);
+            EAVObject eavObject = eavObjectFactory.createEAVObject(id, clazz);
             EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), id);
             if (columns != null) {
                 eavObject.setName(columns.getName());
@@ -128,7 +126,7 @@ public class EAVObjectDAO {
 
     public <T extends EAVObject> T getObjectById(BigInteger objectId, Class<T> clazz) {
         try {
-            EAVObject eavObject = createEAVObject(objectId, clazz);
+            EAVObject eavObject = eavObjectFactory.createEAVObject(objectId, clazz);
             EAVObject columns = jdbcTemplate.queryForObject(GET_OBJECT_BY_ID_QUERY, new ObjectMapper(), objectId);
             if (columns != null) {
                 eavObject.setName(columns.getName());
@@ -218,22 +216,6 @@ public class EAVObjectDAO {
         }
     }
 
-    private <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
-        EAVObject eavObject = new EAVObject();
-        try {
-            eavObject = clazz.getConstructor(BigInteger.class).newInstance(objectId);
-        } catch (InstantiationException e) {
-            logger.error(e.getMessage());
-        } catch (IllegalAccessException k) {
-            logger.error("No access", k);
-        } catch (InvocationTargetException j) {
-            logger.error(j.getMessage());
-        } catch (NoSuchMethodException m) {
-            logger.error("No such method", m);
-        }
-        return (T) eavObject;
-    }
-
     private BigInteger nextObjectId(EAVObject eavObject) {
         BigInteger objectId = eavObject.getObjectId();
         if (objectId == null) {
@@ -296,7 +278,7 @@ public class EAVObjectDAO {
         List<EAVObject> eavObjects = new ArrayList<>();
         EAVObject eavObject;
         for (int i = 0; i < objectIds.size(); i++) {
-            eavObject = createEAVObject(objectIds.get(i).getObjectId(), clazz);
+            eavObject = eavObjectFactory.createEAVObject(objectIds.get(i).getObjectId(), clazz);
             eavObject.setName(objectIds.get(i).getName());
             eavObject.setParentId(objectIds.get(i).getParentId());
             eavObjects.add(eavObject);
