@@ -74,8 +74,6 @@ export class DirectoriesComponent implements OnInit {
 
   deleteDirectory(objectId: string): void {
     this.http.delete(GlobalConstants.apiUrl + 'api/directory/delete/' + objectId).subscribe(() => {
-      //this.directories = this.directories.filter(item => item.objectId !== objectId);
-      //this.directoryPage.content = this.directoryPage.content.filter(item => item.objectId !== objectId);
       let deletedDirectory = this.directoryPage.content.find(deletedElement => deletedElement.objectId == objectId);
       let index = this.directoryPage.content.indexOf(deletedDirectory);
       this.directoryPage.content.splice(index, 1);
@@ -109,8 +107,10 @@ export class DirectoriesComponent implements OnInit {
     this.dir.parentId = this.serverId;
     this.dir.path = this.insertForm.value.path
 
-    this.http.post<boolean>(GlobalConstants.apiUrl + 'api/directory/test', this.dir).subscribe(result => {
-      this.testResult = result ? "Connection established" : "Cant connect";
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(this.dir));
+
+    this.http.get<boolean>(GlobalConstants.apiUrl + 'api/directory/test', {params}).subscribe(result => {
+      this.testResult = result ? "Connection established" : "Can't connect";
     }, error => {
       this.testResult = "Error with checking connection";
     })
@@ -118,7 +118,10 @@ export class DirectoriesComponent implements OnInit {
 
   getFiles():void{
     if(this.dir === undefined) this.testDirectory()
-    this.http.post<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', this.dir).subscribe(result => {
+
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(this.dir));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', {params}).subscribe(result => {
       result.forEach(result => result.checked = true)
       this.filesFromDir = this.files = result;
     }, error => {

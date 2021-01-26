@@ -32,16 +32,6 @@ public class LogFile extends EAVObject {
         setParentId(parentId);
     }
 
-    @Override
-    public String getName() {
-        return getAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId());
-    }
-
-    @Override
-    public void setName(String name) {
-        setAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId(), name);
-    }
-
     public String getFileName() {
         return getAttributeValue(Attributes.NAME_OT_LOGFILE.getAttrId());
     }

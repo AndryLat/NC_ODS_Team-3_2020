@@ -34,32 +34,32 @@ public class SecurityService {
         return token;
     }
 
-    public boolean validatePasswordResetToken(String token, BigInteger id){
+    public boolean validatePasswordResetToken(String token, BigInteger id) {
         if (token != null) {
-            try{
+            try {
                 String userLogin = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
                         .build()
                         .verify(token)
                         .getSubject();
                 if (userLogin != null) {
                     User user = userService.findById(id);
-                    if(userLogin.equals(user.getLogin())){
+                    if (userLogin.equals(user.getLogin())) {
                         return true;
                     }
                     logger.error("There are two different users in token and id.");
                 }
-            }catch (TokenExpiredException exp){
-                logger.error("Password reset token expired",exp);
+            } catch (TokenExpiredException exp) {
+                logger.error("Password reset token expired", exp);
                 return false;
             }
         }
         return false;
     }
 
-    public String getLoginUserFromToken(String token){
+    public String getLoginUserFromToken(String token) {
         String login;
         if (token != null) {
-            try{
+            try {
                 login = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
                         .build()
                         .verify(token)
@@ -67,15 +67,15 @@ public class SecurityService {
                 if (login != null) {
                     return login;
                 }
-            }catch (TokenExpiredException exp){
-                logger.error("Password reset token expired",exp);
+            } catch (TokenExpiredException exp) {
+                logger.error("Password reset token expired", exp);
                 return null;
             }
         }
         return null;
     }
 
-    public String getAppUrl(HttpServletRequest request){
+    public String getAppUrl(HttpServletRequest request) {
         String scheme = request.getScheme();
         String serverName = request.getServerName();
         int serverPort = request.getServerPort();
