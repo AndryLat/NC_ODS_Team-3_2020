@@ -14,6 +14,7 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOChangeListe
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
+import com.netcracker.odstc.logviewer.socket.SocketManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -183,7 +184,7 @@ public class ServerManager implements DAOChangeListener {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
-            if (serverConnection.getServer().isConnectable()) {
+            if (serverConnection.getServer().isConnectable()&&serverConnection.getServer().isEnabled()) {
                 serverPollManager.addServerToPoll(serverConnection);
             } else {
                 serverConnectionIterator.remove();

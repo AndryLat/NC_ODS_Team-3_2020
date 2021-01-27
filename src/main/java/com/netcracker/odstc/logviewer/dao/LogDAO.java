@@ -2,6 +2,7 @@ package com.netcracker.odstc.logviewer.dao;
 
 import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.mapper.LogDTOMapper;
+import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.service.RuleContainer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,139 +11,58 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class LogDAO extends EAVObjectDAO {
     @SuppressWarnings({"squid:S1192"})//Suppress duplications in sql
-    private static final String GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY = "WITH files AS (\n" +
-            "    SELECT OBJECT_ID\n" +
-            "    FROM OBJECTS files\n" +
-            "    WHERE PARENT_ID = :directoryId\n" +
-            ")\n" +
-            "select ob.object_id     as id,\n" +
-            "       text.value        as fcl_value,\n" +
-            "       logLevel.LIST_VALUE_ID as log_level_value,\n" +
-            "       creationDate.date_value as log_timestamp_value\n" +
-            "from objects ob\n" +
-            "         left join attributes text on text.object_id = ob.object_id\n" +
-            "         left join attributes logLevel on logLevel.object_id = ob.object_id\n" +
-            "         left join attributes creationDate on creationDate.object_id = ob.object_id\n" +
-            "where ob.object_type_id = 5\n" +
-            "  and text.attr_id = 23 /* Full content of log */\n" +
-            "  and logLevel.attr_id = 24 /* Log level */\n" +
-            "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
-            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
-            "  and text.value like '%' || :text || '%'\n" +
-            "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
-            "  and (\n" +
-            "        (\n" +
-            "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
-            "                    + :V_FINEST + :V_DEBUG + :V_TRACE + :V_ERROR + :V_FATAL = 0\n" +
-            "            )\n" +
-            "        or\n" +
-            "        (\n" +
-            "                (:V_SEVERE = 1 and logLevel.LIST_VALUE_ID = 13)\n" +
-            "                or (:V_WARNING = 1 and logLevel.LIST_VALUE_ID = 14)\n" +
-            "                or (:V_INFO = 1 and logLevel.LIST_VALUE_ID = 15)\n" +
-            "                or (:V_CONFIG = 1 and logLevel.LIST_VALUE_ID = 16)\n" +
-            "                or (:V_FINE = 1 and logLevel.LIST_VALUE_ID = 17)\n" +
-            "                or (:V_FINER = 1 and logLevel.LIST_VALUE_ID = 18)\n" +
-            "                or (:V_FINEST = 1 and logLevel.LIST_VALUE_ID = 19)\n" +
-            "                or (:V_DEBUG = 1 and logLevel.LIST_VALUE_ID = 20)\n" +
-            "                or (:V_TRACE = 1 and logLevel.LIST_VALUE_ID = 21)\n" +
-            "                or (:V_ERROR = 1 and logLevel.LIST_VALUE_ID = 22)\n" +
-            "                or (:V_FATAL = 1 and logLevel.LIST_VALUE_ID = 23)\n" +
-            "            )\n" +
-            "    )\n" +
-            "order by logLevel.list_value_id, creationDate.date_value asc\n" +
-            "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY\n";
-    private static final String GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY = "WITH files AS (\n" +
-            "    SELECT OBJECT_ID\n" +
-            "    FROM OBJECTS files\n" +
-            "    WHERE PARENT_ID = :directoryId\n" +
-            ")\n" +
-            "select ob.object_id     as id,\n" +
-            "       text.value        as fcl_value,\n" +
-            "       logLevel.LIST_VALUE_ID as log_level_value,\n" +
-            "       creationDate.date_value as log_timestamp_value\n" +
-            "from objects ob\n" +
-            "         left join attributes text on text.object_id = ob.object_id\n" +
-            "         left join attributes logLevel on logLevel.object_id = ob.object_id\n" +
-            "         left join attributes creationDate on creationDate.object_id = ob.object_id\n" +
-            "where ob.object_type_id = 5\n" +
-            "  and text.attr_id = 23 /* Full content of log */\n" +
-            "  and logLevel.attr_id = 24 /* Log level */\n" +
-            "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
-            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
-            "  and text.value like '%' || :text || '%'\n" +
-            "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
-            "  and (\n" +
-            "        (\n" +
-            "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
-            "                    + :V_FINEST + :V_DEBUG + :V_TRACE + :V_ERROR + :V_FATAL = 0\n" +
-            "            )\n" +
-            "        or\n" +
-            "        (\n" +
-            "                (:V_SEVERE = 1 and logLevel.LIST_VALUE_ID = 13)\n" +
-            "                or (:V_WARNING = 1 and logLevel.LIST_VALUE_ID = 14)\n" +
-            "                or (:V_INFO = 1 and logLevel.LIST_VALUE_ID = 15)\n" +
-            "                or (:V_CONFIG = 1 and logLevel.LIST_VALUE_ID = 16)\n" +
-            "                or (:V_FINE = 1 and logLevel.LIST_VALUE_ID = 17)\n" +
-            "                or (:V_FINER = 1 and logLevel.LIST_VALUE_ID = 18)\n" +
-            "                or (:V_FINEST = 1 and logLevel.LIST_VALUE_ID = 19)\n" +
-            "                or (:V_DEBUG = 1 and logLevel.LIST_VALUE_ID = 20)\n" +
-            "                or (:V_TRACE = 1 and logLevel.LIST_VALUE_ID = 21)\n" +
-            "                or (:V_ERROR = 1 and logLevel.LIST_VALUE_ID = 22)\n" +
-            "                or (:V_FATAL = 1 and logLevel.LIST_VALUE_ID = 23)\n" +
-            "            )\n" +
-            "    )\n" +
-            "order by creationDate.DATE_VALUE\n" +
+    private static final String GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY = "SELECT /*+ index(A3 for2) index(a2 forobval) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
+            "FROM OBJECTS\n" +
+            "         JOIN ATTRIBUTES logText\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "         JOIN ATTRIBUTES logLevel\n" +
+            "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
+            "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
+            "                                    creationDate.date_value BETWEEN nvl(:startDate,creationDate.date_value) and nvl(:endDate,creationDate.date_value)\n" +
+            "WHERE OBJECTS.PARENT_ID IN (SELECT OBJECT_ID\n" +
+            "                            FROM OBJECTS files\n" +
+            "                            WHERE PARENT_ID = :directoryId)\n" +
+            "order by logLevel.LIST_VALUE_ID,creationDate.date_value\n" +
             "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY";
-    private static final String GET_TOTAL_COUNT_LOGS_QUERY = "WITH files AS (\n" +
-            "    SELECT OBJECT_ID\n" +
-            "    FROM OBJECTS files\n" +
-            "    WHERE PARENT_ID = :directoryId\n" +
-            ")\n" +
-            "select COUNT(*)\n" +
-            "from objects ob\n" +
-            "         left join attributes text on text.object_id = ob.object_id\n" +
-            "         left join attributes logLevel on logLevel.object_id = ob.object_id\n" +
-            "         left join attributes creationDate on creationDate.object_id = ob.object_id\n" +
-            "where ob.object_type_id = 5\n" +
-            "  and text.attr_id = 23 /* Full content of log */\n" +
-            "  and logLevel.attr_id = 24 /* Log level */\n" +
-            "  and creationDate.attr_id = 25 /* Log timestamp */\n" +
-            "  and ob.PARENT_ID IN (SELECT OBJECT_ID FROM files)\n" +
-            "  and text.value like '%' || :text || '%'\n" +
-            "  and creationDate.date_value BETWEEN  nvl(:startDate, creationDate.date_value) and nvl(:endDate, creationDate.date_value)\n" +
-            "  and (\n" +
-            "        (\n" +
-            "                    :V_SEVERE + :V_WARNING + :V_INFO + :V_CONFIG + :V_FINE + :V_FINER\n" +
-            "                    + :V_FINEST + :V_DEBUG + :V_TRACE + :V_ERROR + :V_FATAL = 0\n" +
-            "            )\n" +
-            "        or\n" +
-            "        (\n" +
-            "                (:V_SEVERE = 1 and logLevel.LIST_VALUE_ID = 13)\n" +
-            "                or (:V_WARNING = 1 and logLevel.LIST_VALUE_ID = 14)\n" +
-            "                or (:V_INFO = 1 and logLevel.LIST_VALUE_ID = 15)\n" +
-            "                or (:V_CONFIG = 1 and logLevel.LIST_VALUE_ID = 16)\n" +
-            "                or (:V_FINE = 1 and logLevel.LIST_VALUE_ID = 17)\n" +
-            "                or (:V_FINER = 1 and logLevel.LIST_VALUE_ID = 18)\n" +
-            "                or (:V_FINEST = 1 and logLevel.LIST_VALUE_ID = 19)\n" +
-            "                or (:V_DEBUG = 1 and logLevel.LIST_VALUE_ID = 20)\n" +
-            "                or (:V_TRACE = 1 and logLevel.LIST_VALUE_ID = 21)\n" +
-            "                or (:V_ERROR = 1 and logLevel.LIST_VALUE_ID = 22)\n" +
-            "                or (:V_FATAL = 1 and logLevel.LIST_VALUE_ID = 23)\n" +
-            "            )\n" +
-            "    )";
+    private static final String GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY = "SELECT /*+ index(A3 for2) index(a2 forobval) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
+            "FROM OBJECTS\n" +
+            "         JOIN ATTRIBUTES logText\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "         JOIN ATTRIBUTES logLevel\n" +
+            "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
+            "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
+            "                                    creationDate.date_value BETWEEN nvl(:startDate,creationDate.date_value) and nvl(:endDate,creationDate.date_value)\n" +
+            "WHERE OBJECTS.PARENT_ID IN (SELECT OBJECT_ID\n" +
+            "                            FROM OBJECTS files\n" +
+            "                            WHERE PARENT_ID = :directoryId)\n" +
+            "order by creationDate.date_value\n" +
+            "OFFSET :offset ROWS FETCH NEXT :pageSize ROWS ONLY";
+    private static final String GET_TOTAL_COUNT_LOGS_QUERY = "SELECT /*+ index(A3 for2) index(a2 forobval) */ COUNT(*)\n" +
+            "FROM OBJECTS\n" +
+            "         JOIN ATTRIBUTES logText\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "         JOIN ATTRIBUTES logLevel\n" +
+            "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
+            "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
+            "                                    creationDate.date_value BETWEEN nvl(:startDate,creationDate.date_value) and nvl(:endDate,creationDate.date_value)\n" +
+            "WHERE OBJECTS.PARENT_ID IN (SELECT OBJECT_ID\n" +
+            "                            FROM OBJECTS files\n" +
+            "                            WHERE PARENT_ID = :directoryId)";
 
     public LogDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
+    @Transactional
     public Page<LogDTO> getLogByAll(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 
@@ -151,23 +71,14 @@ public class LogDAO extends EAVObjectDAO {
                 .addValue("text", ruleContainer.getText())
                 .addValue("startDate", ruleContainer.getDat1())
                 .addValue("endDate", ruleContainer.getDat2())
-                .addValue("V_SEVERE", ruleContainer.getSevere())
-                .addValue("V_WARNING", ruleContainer.getWarning())
-                .addValue("V_INFO", ruleContainer.getInfo())
-                .addValue("V_CONFIG", ruleContainer.getConfig())
-                .addValue("V_FINE", ruleContainer.getFine())
-                .addValue("V_FINER", ruleContainer.getFiner())
-                .addValue("V_FINEST", ruleContainer.getFinest())
-                .addValue("V_DEBUG", ruleContainer.getDebug())
-                .addValue("V_TRACE", ruleContainer.getTrace())
-                .addValue("V_ERROR", ruleContainer.getError())
-                .addValue("V_FATAL", ruleContainer.getFatal());
+                .addValue("levels", convertEnumListToIntList(ruleContainer.getLevels()));
 
         MapSqlParameterSource parameterSourceForObject = new MapSqlParameterSource(parameterSourceCount.getValues())
                 .addValue("offset", pageable.getOffset())
                 .addValue("pageSize", pageable.getPageSize());
 
         String query = ruleContainer.getSort() == 0 ? GET_ALL_BY_RULE_AND_DATE_SORTED_QUERY : GET_ALL_BY_RULE_AND_LEVEL_SORTED_QUERY;
+
         List<LogDTO> content = namedParameterJdbcTemplate.query(query, parameterSourceForObject, new LogDTOMapper());
 
         BigInteger totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_COUNT_LOGS_QUERY, parameterSourceCount, BigInteger.class);
@@ -177,5 +88,13 @@ public class LogDAO extends EAVObjectDAO {
         }
 
         return new PageImpl<>(content, pageable, totalRows.longValue());
+    }
+    private List<Integer> convertEnumListToIntList(List<LogLevel> levels){
+        List<Integer> levelsInInt = new ArrayList<>(levels.size());
+        for (LogLevel level :
+                levels) {
+            levelsInInt.add(level.getValue());
+        }
+        return levelsInInt;
     }
 }
