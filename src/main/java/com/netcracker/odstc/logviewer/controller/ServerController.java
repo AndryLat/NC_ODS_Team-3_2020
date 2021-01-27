@@ -37,6 +37,7 @@ public class ServerController {
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageRequest = PageRequest.of(page-1, pageSize);
         User user = userService.findByLogin(principal.getName());
+        logger.info("GET: Request all servers by parentId{}", (user.getParentId() != null ? user.getParentId(): "null"));
         List<Server> servers = serverService.showAllServersByPagination(pageRequest, user);
         return new PageImpl<>(servers);
     }
@@ -45,27 +46,28 @@ public class ServerController {
     public ResponseEntity<BigInteger> add(@RequestBody Server server, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         serverService.add(server, user.getObjectId());
-        logger.info("Server added");
+        logger.info("POST: Request adding a new server with id{}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.ok(server.getObjectId());
     }
 
     @PutMapping("/update")
     public ResponseEntity<Server> update(@RequestBody Server server) {
         serverService.update(server);
-        logger.info("Server update");
+        logger.info("PUT: Request updating for server id{}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
         Server server = serverService.findById(id);
+        logger.info("GET: Requested server by Id{}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.ok(server);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
         serverService.deleteById(id);
-        logger.info("Server delete");
+        logger.info("DELETE: Request deleting for server id{}", (id != null ? id: "null"));
         return ResponseEntity.noContent().build();
     }
 
