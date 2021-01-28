@@ -80,10 +80,20 @@ public class UserController {
         return ResponseEntity.ok(login);
     }
 
+    @PostMapping("/checkPassword")
+    public ResponseEntity<Boolean> checkPassword (@RequestParam User user){
+        return ResponseEntity.ok(userService.checkPassword(user));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<User> findById(@PathVariable BigInteger id) {
         logger.info("GET: Requested user with id {}", (id != null ? id : "null"));
         return ResponseEntity.ok(userService.findById(id));
+    }
+    @GetMapping("/getInfo")
+    public ResponseEntity<User> getCurrentUser(Principal principal){
+        User currentUser = userService.findByLogin(principal.getName());
+        return ResponseEntity.ok(currentUser);
     }
 
     @DeleteMapping("/delete/{id}")

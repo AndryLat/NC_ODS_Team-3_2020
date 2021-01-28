@@ -1,18 +1,40 @@
-<div *ngIf="user"  class="container">
-  <p>Unique ID: {{user.objectId}}</p>
-  <p>Email: {{user.email}}</p>
-  <p>Login: {{user.login}}</p>
-  <p>Role: {{user.role}}</p>
-  <form>
-    <p>Change password</p>
+<div class="container">
+  <div class="card bg-light mb-3">
+    <h5 class="card-header">Account Information</h5>
+    <div class="card-body">
+      <p class="card-text">Email: {{user.email}}</p>
+      <p class="card-text">Login: {{user.login}}</p>
+      <p class="card-text">Role: {{user.role}}</p>
+    </div>
+  </div>
+  <hr>
+  <form [formGroup]="form">
+    <h3>Change password</h3>
     <div class="form-group">
-      <label for="changePasswordInput">Password</label>
-      <input class="form-control" id="changePasswordInput" placeholder="Password" type="password">
+      <label for="oldPasswordInput">Old password</label>
+      <input class="form-control" id="oldPasswordInput" type="password" formControlName="oldPassword">
     </div>
     <div class="form-group">
-      <label for="repeatPasswordInput">Password</label>
-      <input class="form-control" id="repeatPasswordInput" placeholder="Password" type="password">
+      <label for="newPasswordInput">New password</label>
+      <input class="form-control" id="newPasswordInput" type="password" formControlName="newPassword">
     </div>
-    <button class="btn btn-primary" type="submit">Submit</button>
+    <div class="form-group">
+      <label for="repeatPasswordInput">Repeat new password</label>
+      <input class="form-control" id="repeatPasswordInput" type="password" formControlName="repeatPassword">
+    </div>
+    <button class="btn btn-primary" type="submit">Update</button>
+    <a [routerLink]="['/resetPassword']" class="badge badge-dark  ml-2">Forgot password?</a>
   </form>
+  <hr>
+  <h3>Account deleting</h3>
+  <br>
+  <button *ngIf="!deletePressed" (click)="deletePres()" type="button" class="btn btn-danger">Delete account</button>
+  <div *ngIf="deletePressed" class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Are you sure?</h4>
+    <p>This process are irreversible!</p>
+    <div class="row">
+      <button (click)="deleteNo()" type="button" class="btn btn-secondary ml-3">No, let me think</button>
+      <button (click)="deleteYes()" type="button" class="btn btn-danger ml-5">Yes</button>
+    </div>
+  </div>
 </div>

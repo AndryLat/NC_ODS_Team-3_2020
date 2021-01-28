@@ -93,6 +93,25 @@ public class UserService {
         }
     }
 
+    public boolean checkPassword(User user) {
+        if (user == null) {
+            throwUserServiceExceptionWithMessage("User shouldn't be null.");
+            return false;
+        } else {
+            if (user.getPassword() == null && user.getLogin() == null) {
+                throwUserServiceExceptionWithMessage("User is not valid to check password.");
+                return false;
+            }
+            User userFromDb = userDao.getByLogin(user.getLogin());
+            if (userFromDb == null) {
+                throwUserServiceExceptionWithMessage("User by login not found.");
+                return false;
+            } else {
+                return bCryptPasswordEncoder.matches(user.getPassword(), bCryptPasswordEncoder.encode(userFromDb.getPassword()));
+            }
+        }
+    }
+
     public void sendResetToken(String appUrl, String token, User user) {
         mailSender.send(mailService.constructResetTokenEmail(appUrl, token, user));
     }
