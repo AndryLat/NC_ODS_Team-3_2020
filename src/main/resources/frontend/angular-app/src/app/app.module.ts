@@ -11,6 +11,7 @@ import {DirectoriesComponent} from './views/models/directories-component/directo
 import {LogsComponent} from './views/models/logs-component/logs.component';
 import {UserSettingsComponent} from './views/user-settings-component/user-settings.component';
 import {PasswordRecoveryComponent} from './views/password-recovery-component/password-recovery.component';
+import {PasswordSettingComponent} from './views/password-setting-component/password-setting.component';
 import {GlobalSettingsComponent} from "./views/global-settings-component/global-settings.component";
 import {AuthService} from "./services/AuthService";
 import {AuthInterceptor} from "./services/AuthInterceptor";
@@ -32,6 +33,7 @@ import {NgxPaginationModule} from "ngx-pagination";
     UserSettingsComponent,
     OverlaySpinnerComponent,
     PasswordRecoveryComponent,
+    PasswordSettingComponent,
     GlobalSettingsComponent
   ],
   imports: [

@@ -57,7 +57,7 @@ public class UserController {
     public ResponseEntity<User> updatePassword(@RequestBody User user) {
         logger.info("PUT: Requested update password for user with id {}", (user.getObjectId() != null ? user.getObjectId() : "null"));
         userService.updatePassword(user);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/resetPassword")
@@ -72,7 +72,7 @@ public class UserController {
 
     @GetMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestParam("id") BigInteger id, @RequestParam("token") String token) {
-        if (securityService.validatePasswordResetToken(token, id)) {
+        if (!securityService.validatePasswordResetToken(token, id)) {
             userService.throwException("Password reset is not available.");
         }
         String login = securityService.getLoginUserFromToken(token);
