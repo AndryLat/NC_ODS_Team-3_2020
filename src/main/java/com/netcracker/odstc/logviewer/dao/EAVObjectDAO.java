@@ -80,8 +80,6 @@ public class EAVObjectDAO {
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
 
-    private static final String GET_OBJECT_BY_OBJECT_ID = "SELECT OBJECT_TYPE_ID FROM OBJECTS WHERE OBJECT_ID = ?";
-
     protected final JdbcTemplate jdbcTemplate;
 
     private String errorMessage = "id can`t be null";
