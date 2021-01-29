@@ -1,9 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from '@angular/common/http';
 import jwt_decode from "jwt-decode";
-import {Subscription} from "rxjs";
 import {User} from "../entity/User";
-import {GlobalConstants} from "../constants/global-constants";
 import {Router} from "@angular/router";
 
 export const TOKEN_NAME:string = 'jwt_token';
@@ -11,7 +9,6 @@ export const TOKEN_NAME:string = 'jwt_token';
 @Injectable()
 export class AuthService {
 
-  private url:string = 'login';
   private currentUser:User;
 
   constructor(private http:HttpClient, private router:Router) {}
@@ -67,12 +64,6 @@ export class AuthService {
     }
 
     return !(date.valueOf()>new Date().valueOf());
-  }
-
-  login(login: string, password: string ):Subscription{
-    return this.http
-      .post(GlobalConstants.apiUrl + this.url ,{login, password},{observe: 'response'})
-      .subscribe(res => this.setToken(res.headers.get('Authorization')));
   }
 
   logout(): void {
