@@ -8,6 +8,7 @@ import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnection
 import com.netcracker.odstc.logviewer.service.exceptions.LogFileServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class LogFileService extends AbstractService {
 
     private final Logger logger = LogManager.getLogger(LogFileService.class.getName());
 
+    private static final String INVALID_DIRECTORY_MESSAGE = "Got invalid directory. Can't check invalid directory";
+    private static final String PARENT_NULL_MESSAGE = "Can't check connection with directory without parentId";
+
     private final EAVObjectDAO eavObjectDAO;
 
     private final ServerConnectionService serverConnectionService;
@@ -31,10 +35,10 @@ public class LogFileService extends AbstractService {
 
     public List<LogFile> getLogFileList(Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
+            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
+            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
         return serverConnectionService.getLogFilesFromDirectory(server, directory);
@@ -42,21 +46,20 @@ public class LogFileService extends AbstractService {
 
     public List<LogFile> getLogFileListFromDB(Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
+            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
+            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
-        List<LogFile> logFiles = eavObjectDAO.getObjectsByParentId(directory.getObjectId(), LogFile.class);;
-        return logFiles;
+        return eavObjectDAO.getObjectsByParentId(directory.getObjectId(), LogFile.class);
     }
 
-    public List<LogFile> getLogFileListByPage(PageRequest pageRequest, Directory directory) {
+    public Page<LogFile> getLogFileListByPage(PageRequest pageRequest, Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
+            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
+            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
         return eavObjectDAO.getObjectsByParentId(pageRequest, directory.getObjectId(), LogFile.class);
     }

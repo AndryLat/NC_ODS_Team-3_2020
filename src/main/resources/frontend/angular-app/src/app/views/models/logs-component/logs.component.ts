@@ -28,7 +28,6 @@ export class LogsComponent implements OnInit {
   operationForm: FormGroup;
 
   localApi: string = GlobalConstants.apiUrl + 'api/log';
-  x: any;
 
   constructor(private authService: AuthService,
               private router: Router,

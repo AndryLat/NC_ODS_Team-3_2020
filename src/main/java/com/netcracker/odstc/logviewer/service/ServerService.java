@@ -6,12 +6,12 @@ import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.service.exceptions.ServerServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class ServerService extends AbstractService {
@@ -34,7 +34,7 @@ public class ServerService extends AbstractService {
         return eavObjectDAO.getObjectById(id, serverClass);
     }
 
-    public List<Server> showAllServersByPagination(PageRequest pageRequest, User user) {
+    public Page<Server> showAllServersByPagination(PageRequest pageRequest, User user) {
         return eavObjectDAO.getObjectsByParentId(pageRequest, user.getObjectId(), Server.class);
     }
 
@@ -85,10 +85,7 @@ public class ServerService extends AbstractService {
     }
 
     private boolean isStringHaveAnythingExceptSpacesValid(String string) {
-        if (string == null || string.trim().length() == 0) {
-            return true;
-        }
-        return false;
+        return string == null || string.trim().length() == 0;
     }
 
     private void throwServerServiceExceptionWithMessage(String message) {

@@ -8,14 +8,12 @@ import com.netcracker.odstc.logviewer.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.security.Principal;
-import java.util.List;
 
 @RequestMapping("/api/server")
 @RestController
@@ -35,10 +33,9 @@ public class ServerController {
     public Page<Server> showAllServers(Principal principal,
                                        @RequestParam(value = "page", defaultValue = "0") int page,
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
-        PageRequest pageRequest = PageRequest.of(page-1, pageSize);
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         User user = userService.findByLogin(principal.getName());
-        List<Server> servers = serverService.showAllServersByPagination(pageRequest, user);
-        return new PageImpl<>(servers);
+        return serverService.showAllServersByPagination(pageRequest, user);
     }
 
     @PostMapping("/add")

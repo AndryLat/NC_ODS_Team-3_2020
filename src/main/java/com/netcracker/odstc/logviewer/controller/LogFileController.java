@@ -9,7 +9,6 @@ import com.netcracker.odstc.logviewer.service.LogFileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +36,7 @@ public class LogFileController {
                                          @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         Directory directory = directoryService.findById(new BigInteger(directoryId));
-        List<LogFile> logFiles = logFileService.getLogFileListByPage(pageRequest, directory);
-        return new PageImpl<>(logFiles);
+        return logFileService.getLogFileListByPage(pageRequest, directory);
     }
 
     @GetMapping("/files")
