@@ -5,6 +5,7 @@ import {AuthService} from "../../services/AuthService";
 import {Config} from "../../entity/Config";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DatePipe} from '@angular/common';
+import {faQuestion} from "@fortawesome/free-solid-svg-icons/faQuestion";
 
 
 @Component({
@@ -17,6 +18,8 @@ export class GlobalSettingsComponent{
   insertForm: FormGroup;
   config: Config;
   msg: string;
+
+  qIcon = faQuestion;
 
   constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private datePipe : DatePipe) {
     http.get<Config>(GlobalConstants.apiUrl + 'api/user/config').subscribe(result => {
@@ -37,7 +40,7 @@ export class GlobalSettingsComponent{
   });
   }
 
-  private getValidDate(date:Date){
+  private getValidDate(date:string):string{
     const dt = this.datePipe.transform(date, 'yyyy-MM-dd')
     console.log(dt)
     return dt;

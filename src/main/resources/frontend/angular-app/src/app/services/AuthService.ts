@@ -72,7 +72,7 @@ export class AuthService {
 
   login(login: string, password: string ):Subscription{
     return this.http
-      .post(GlobalConstants.apiUrl + this.url ,{login, password, role: 'USER'},{observe: 'response'})
+      .post(GlobalConstants.apiUrl + this.url ,{login, password},{observe: 'response'})
       .subscribe(res => this.setToken(res.headers.get('Authorization')));
   }
 

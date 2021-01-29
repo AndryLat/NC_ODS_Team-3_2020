@@ -48,6 +48,13 @@ public class LogFileController {
         return ResponseEntity.ok(logFileService.getLogFileList(directory));
     }
 
+    @GetMapping("/filesDB")
+    public ResponseEntity<List<LogFile>> getLogFilesFromDirectoryFromDB(@RequestParam String directoryInString) throws JsonProcessingException {
+        logger.info("GET: Requested file listing from directory from DB");
+        Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
+        return ResponseEntity.ok(logFileService.getLogFileListFromDB(directory));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LogFile> getLogFileById(@PathVariable BigInteger id) {
         logger.info("GET: Requested file of logs with id {}", (id != null ? id : "null"));

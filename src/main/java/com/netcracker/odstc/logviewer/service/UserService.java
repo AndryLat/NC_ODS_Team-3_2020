@@ -125,7 +125,7 @@ public class UserService {
 
     public void saveConfig(Config config) {
         if (config == null) {
-            throwException("Config cant be save.");
+            throwUserServiceExceptionWithMessage("Config cant be save.");
         } else {
             logger.info(config);
             config.setObjectId(BigInteger.ZERO);

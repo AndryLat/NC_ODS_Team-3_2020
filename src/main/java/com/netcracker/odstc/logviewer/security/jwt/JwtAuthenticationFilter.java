@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String roleUser;
         try {
             roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
-        } catch (Exception exp) {
+        } catch (IllegalArgumentException exp) {
             logger.error("User authorities authentication error:", exp);
             throw new RuntimeException("User authorities authentication error:", exp);
         }

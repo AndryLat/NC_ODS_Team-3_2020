@@ -17,10 +17,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String GENERAL_ENDPOINT = "/*";
     private static final String LOGIN_ENDPOINT = "/login";
-    private static final String USER_RESET_ENDPOINT = "/user/resetPassword**";
-    private static final String USER_CHANGE_PASSWORD_ENDPOINT = "/user/changePassword**";
-    private static final String ADMIN_ENDPOINT = "/user/*";
+    private static final String USER_RESET_ENDPOINT = "/api/user/resetPassword**";
+    private static final String USER_CHANGE_PASSWORD_ENDPOINT = "/api/user/changePassword**";
+    private static final String USER_UPDATE_PASSWORD_ENDPOINT = "/api/user/updatePassword**";
+    private static final String ADMIN_ENDPOINT = "/api/user/*";
 
     private UserDetailsServiceImpl userDetailsService;
 
@@ -44,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT,GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT,USER_UPDATE_PASSWORD_ENDPOINT).permitAll()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()

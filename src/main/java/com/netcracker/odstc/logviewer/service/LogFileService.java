@@ -40,6 +40,17 @@ public class LogFileService extends AbstractService {
         return serverConnectionService.getLogFilesFromDirectory(server, directory);
     }
 
+    public List<LogFile> getLogFileListFromDB(Directory directory) {
+        if (directory == null) {
+            throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");
+        }
+        if (directory.getParentId() == null) {
+            throwLogFilesServiceExceptionWithMessage("Can't check connection with directory without parentId");
+        }
+        List<LogFile> logFiles = eavObjectDAO.getObjectsByParentId(directory.getObjectId(), LogFile.class);;
+        return logFiles;
+    }
+
     public List<LogFile> getLogFileListByPage(PageRequest pageRequest, Directory directory) {
         if (directory == null) {
             throwLogFilesServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory");

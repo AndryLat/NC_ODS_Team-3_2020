@@ -8,6 +8,7 @@ import {AuthService} from "../../../services/AuthService";
 import {LogFile} from "../../../entity/LogFile";
 import {DirectoryPage} from "../../../pageable/DirectoryPage";
 import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
+import {faRedoAlt, faSignInAlt, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 
 
 @Component({
@@ -15,6 +16,10 @@ import {RouteVariableNameConstants} from "../../../constants/route-variable-name
   templateUrl: './directories.component.html'
 })
 export class DirectoriesComponent implements OnInit {
+
+  proceedIcon = faSignInAlt;
+  deleteIcon = faTrashAlt;
+  updateIcon = faRedoAlt;
 
   insertForm: FormGroup;
   searchForm: FormGroup;
@@ -27,6 +32,13 @@ export class DirectoriesComponent implements OnInit {
   files: LogFile[] = [];
   filesFromDir: LogFile[] = [];
   addingFiles: LogFile[];
+
+  filesFromDB: LogFile[];
+  filesFromServer: LogFile[];
+  filesForUpdate: LogFile[] = [];
+
+  flag:boolean = true;
+
 
   directoryPage: DirectoryPage;
 
@@ -68,8 +80,16 @@ export class DirectoriesComponent implements OnInit {
   }
 
 
-  routeToLogs(objectId: string): void {
-    this.router.navigateByUrl('/logs', {state: {objectId}});
+  routeToLogs(dir: Directory): void {
+    const objectId = dir.objectId
+    this.updateDirectory(dir);
+    localStorage.setItem(RouteVariableNameConstants.directoryToLogsVariableName,objectId);
+    this.router.navigateByUrl('/logs');
+  }
+
+  updateDirectory(dir: Directory) {
+    dir.lastExistenceCheck = new Date();
+    this.http.put(GlobalConstants.apiUrl + 'api/directory/update', dir).subscribe()
   }
 
   deleteDirectory(objectId: string): void {
@@ -147,8 +167,92 @@ export class DirectoriesComponent implements OnInit {
     }
   }
 
-  changeStatusFile(name:String){
-    this.files.find(f => f.name == name).checked = !this.files.find(f => f.name == name).checked;
+  getFilesFromDB(dir: Directory):void{
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/filesDB', {params}).subscribe(result => {
+      result.forEach(result => result.checked = true)
+      this.filesFromDB = result
+      console.log(this.filesFromDB)
+    }, error => {
+    })
+  }
+
+  getFilesFromServer(dir: Directory):void{
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', {params}).subscribe(result => {
+      result.forEach(result => {
+        result.checked = false
+        result.parentId = dir.objectId
+      })
+      this.filesFromServer = result
+      console.log(this.filesFromServer)
+    }, error => {
+      //this.Result = 'Error with receiving files';
+    })
+  }
+
+  getFilesForUpdate(dir: Directory):void{
+    //dir.lastExistenceCheck = null;
+    const directory = new Directory()
+    directory.objectId = dir.objectId
+    directory.parentId = dir.parentId
+    directory.path = dir.path
+    if(this.filesFromDB === undefined) {this.getFilesFromDB(directory)}
+    if(this.filesFromServer === undefined) {this.getFilesFromServer(directory)}
+  }
+
+  splitFilesServerBD(logFilesFromDB: LogFile[], logFilesFromServer: LogFile[]){
+    if(logFilesFromDB && logFilesFromServer){
+      logFilesFromServer.forEach(result =>{
+        logFilesFromDB.forEach(res =>{
+          if(result.fileName == res.fileName){
+            if(res.checked){
+              result.checked = true
+            } else {
+              result.checked = false
+            }
+          }
+        });
+        this.filesForUpdate.push(result)
+      });
+      console.log(this.filesForUpdate)
+    }
+  }
+
+  closeUpdateFiles():void{
+    this.filesFromDB = undefined
+    this.filesFromServer = undefined
+    this.filesForUpdate = []
+  }
+
+  updateFiles(){
+    this.filesForUpdate.forEach(result => {
+      this.filesFromDB.forEach(res =>{
+        if(result.fileName == res.fileName){
+          if(result.checked != res.checked){
+            //delete result
+            this.http.delete(GlobalConstants.apiUrl + 'api/logFile/delete/' + res.objectId).subscribe(() => {
+              //
+            });
+          }else{result.checked = false;}
+        }
+      })
+      if((result.checked == true)){
+        //adding result
+        this.http.post<LogFile>(GlobalConstants.apiUrl + 'api/logFile/file/add', result).subscribe(result => {
+          console.log('Adding ',result);
+        }, error => {
+          //msg = 'Something went wrong with files';
+        });
+        //
+      }
+    })
+  }
+
+  changeStatusFile(name:String, files:LogFile[]){
+    files.find(f => f.name == name).checked = !files.find(f => f.name == name).checked;
   }
 
   closeDir():void{

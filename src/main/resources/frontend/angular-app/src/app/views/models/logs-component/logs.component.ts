@@ -8,6 +8,7 @@ import {AuthService} from "../../../services/AuthService";
 import {faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {RuleContainer} from "../../../containers/RuleContainer";
 import {LogPage} from "../../../pageable/LogPage";
+import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
 
 @Component({
   selector: 'app-logs',
@@ -41,7 +42,7 @@ export class LogsComponent implements OnInit {
       this.operationForm.addControl(level, this.fb.control(''));
     }
 
-    this.directoryId = this.router.getCurrentNavigation().extras.state['objectId'].toString();
+    this.directoryId =localStorage.getItem(RouteVariableNameConstants.directoryToLogsVariableName);
 
   }
 
