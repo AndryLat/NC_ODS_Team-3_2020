@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {GlobalConstants} from '../../constants/global-constants';
 import {HttpClient} from '@angular/common/http';
@@ -9,33 +9,49 @@ import {User} from "../../entity/User";
   selector: 'app-password-setting',
   templateUrl: './password-setting.component.html'
 })
-export class PasswordSettingComponent {
+export class PasswordSettingComponent implements OnInit{
 
   form: FormGroup;
   private url: string = 'api/user/changePassword';
   user: User;
+  id: string;
+  token: string;
   differentPasswords: boolean = false;
 
 
   constructor(private fb: FormBuilder, private http: HttpClient, private actRoute: ActivatedRoute) {
-    this.user = new User();
+    this.user = new User()
     this.form = this.fb.group({
       newPassword: ['', Validators.required],
       repeatNewPassword: ['', Validators.required]
     });
-    const id: string = this.actRoute.snapshot.params.id;
-    const token: string = this.actRoute.snapshot.params.token;
-    this.http.get(GlobalConstants.apiUrl + this.url + "?id=" + id + "&token=" + token)
-      .subscribe(res => {
-        console.log(res);
-        this.user.login = (res as string);
-      });
+    this.id = this.actRoute.snapshot.params.id;
+    this.token= this.actRoute.snapshot.params.token;
+  }
+
+  ngOnInit(): void {
+    fetch(GlobalConstants.apiUrl + this.url + "?id=" + this.id + "&token=" + this.token)
+      .then(res =>{
+        if(res.ok){
+          return res
+        } else{
+          throw new Error(res.statusText)
+        }}
+      )
+      .then(res =>res.text()
+      )
+      .then(text => {
+        console.log(text)
+        this.user.login = text
+      })
   }
 
   updatePassword(): void {
     if (this.form.value.newPassword != null && this.form.value.newPassword == this.form.value.repeatNewPassword) {
       this.differentPasswords = false;
-      this.user.password = this.form.value.newPassword;
+      const val = this.form.value
+      this.user.password = val.newPassword;
+      console.log(this.user)
       this.http
         .put(GlobalConstants.apiUrl + "api/user/updatePassword", this.user, {observe: 'response'})
         .subscribe(res => {
