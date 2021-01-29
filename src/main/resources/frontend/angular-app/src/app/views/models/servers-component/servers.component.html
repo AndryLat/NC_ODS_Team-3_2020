@@ -36,7 +36,7 @@
         <td>{{server.port}}</td>
         <td>{{server.lastAccessByJob | date: 'short'}}</td>
         <td class="text-center">
-          <fa-icon [icon]="server.canConnect?enabledIcon:disabledIcon" class="h3"></fa-icon>
+          <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
         <td class="text-center">
           <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>

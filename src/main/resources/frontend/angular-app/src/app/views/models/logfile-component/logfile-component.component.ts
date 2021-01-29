@@ -5,6 +5,9 @@ import {RouteVariableNameConstants} from "../../../constants/route-variable-name
 import {Router} from "@angular/router";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {faEye, faSignInAlt, faStream, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {GlobalConstants} from "../../../constants/global-constants";
+import {Directory} from "../../../entity/Directory";
+import {FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'app-logfile-component',
@@ -22,10 +25,23 @@ export class LogfileComponentComponent implements OnInit {
   deleteIcon = faTrashAlt;
   realTimeIcon = faEye;
 
-  directoryId: string;
+  searchForm: FormGroup;
+  insertForm: FormGroup;
+
+
+  directory: Directory;
+
+  files: LogFile[] = [];
+  filesFromDir: LogFile[] = [];
+
+  filesFromDB: LogFile[];
+  filesFromServer: LogFile[];
+  filesForUpdate: LogFile[] = [];
+
+  getResult: string;
 
   constructor(private router:Router,private http: HttpClient) {
-    this.directoryId = localStorage.getItem(RouteVariableNameConstants.directoryToLogFilesVariableName);
+    this.directory = JSON.parse(localStorage.getItem(RouteVariableNameConstants.directoryToLogFilesVariableName));
   }
 
   ngOnInit(): void {
@@ -54,7 +70,7 @@ export class LogfileComponentComponent implements OnInit {
 
   getFilesFromPage(pageNumber: number) {
     let params = new HttpParams()
-      .set("directoryId", this.directoryId)
+      .set("directoryId", this.directory.objectId)
       .set("page", pageNumber.toString());
 
     this.http.get<LogFilePage>(this.localApi+'/', {params}).subscribe(result => {
@@ -68,5 +84,115 @@ export class LogfileComponentComponent implements OnInit {
   routeToRealtime(objectId: string) {
     localStorage.setItem(RouteVariableNameConstants.logFileToRealTimeVariableName,objectId);
     this.router.navigateByUrl('/realtime');
+  }
+
+  getFiles():void{
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(this.directory));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files', {params}).subscribe(result => {
+      result.forEach(result => result.checked = true)
+      this.filesFromDir = this.files = result;
+    }, error => {
+      this.getResult = 'Error with receiving files';
+    })
+  }
+
+  search():void{
+    const val = this.searchForm.value
+    if(val.searchText){
+      this.files = []
+      this.filesFromDir.forEach(result => {
+        if(result.fileName.includes(val.searchText)){
+          this.files.push(result)
+        }
+      })
+    }
+  }
+
+  closeUpdateFiles():void{
+    this.filesFromDB = undefined
+    this.filesFromServer = undefined
+    this.filesForUpdate = []
+  }
+
+  splitFilesServerBD(logFilesFromDB: LogFile[], logFilesFromServer: LogFile[]){
+    if(logFilesFromDB && logFilesFromServer){
+      logFilesFromServer.forEach(result =>{
+        logFilesFromDB.forEach(res =>{
+          if(result.fileName == res.fileName){
+            if(res.checked){
+              result.checked = true
+            } else {
+              result.checked = false
+            }
+          }
+        });
+        this.filesForUpdate.push(result)
+      });
+      console.log(this.filesForUpdate)
+    }
+  }
+
+  updateFiles(){
+    this.filesForUpdate.forEach(result => {
+      this.filesFromDB.forEach(res =>{
+        if(result.fileName == res.fileName){
+          if(result.checked != res.checked){
+            //delete result
+            this.http.delete(GlobalConstants.apiUrl + 'api/logFile/delete/' + res.objectId).subscribe(() => {
+              //
+            });
+          }else{result.checked = false;}
+        }
+      })
+      if((result.checked == true)){
+        //adding result
+        this.http.post<LogFile>(GlobalConstants.apiUrl + 'api/logFile/file/add', result).subscribe(result => {
+          console.log('Adding ',result);
+        }, error => {
+          //msg = 'Something went wrong with files';
+        });
+        //
+      }
+    })
+  }
+
+  getFilesForUpdate():void{
+    const directory = new Directory()
+    directory.objectId = this.directory.objectId
+    directory.parentId = this.directory.parentId
+    directory.path = this.directory.path
+    if(this.filesFromDB === undefined) {this.getFilesFromDB(directory)}
+    if(this.filesFromServer === undefined) {this.getFilesFromServer(directory)}
+  }
+
+  getFilesFromServer(dir: Directory):void{
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', {params}).subscribe(result => {
+      result.forEach(result => {
+        result.checked = false
+        result.parentId = dir.objectId
+      })
+      this.filesFromServer = result
+      console.log(this.filesFromServer)
+    }, error => {
+      //this.Result = 'Error with receiving files';
+    })
+  }
+
+  getFilesFromDB(dir: Directory):void{
+    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/filesDB', {params}).subscribe(result => {
+      result.forEach(result => result.checked = true)
+      this.filesFromDB = result
+      console.log(this.filesFromDB)
+    }, error => {
+    })
+  }
+
+  changeStatusFile(name:String, files:LogFile[]){
+    files.find(f => f.name == name).checked = !files.find(f => f.name == name).checked;
   }
 }

@@ -88,8 +88,8 @@ export class DirectoriesComponent implements OnInit {
     this.router.navigateByUrl('/logs');
   }
 
-  routeToLogFiles(objectId: string): void {
-    localStorage.setItem(RouteVariableNameConstants.directoryToLogFilesVariableName,objectId);
+  routeToLogFiles(directory: Directory): void {
+    localStorage.setItem(RouteVariableNameConstants.directoryToLogFilesVariableName,JSON.stringify(directory));
     this.router.navigateByUrl('/logFiles');
   }
   updateDirectory(dir: Directory) {

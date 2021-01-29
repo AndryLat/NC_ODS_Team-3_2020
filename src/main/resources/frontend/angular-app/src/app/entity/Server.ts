@@ -5,7 +5,7 @@ export class Server extends EAVObject{
   port: number;
   protocol: string;
   enabled: boolean;
-  canConnect: boolean;
+  connectable: boolean;
   login: string;
   password: string;
   lastAccessByUser: Date;
