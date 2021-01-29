@@ -1,0 +1,43 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div *ngIf="errorMessage" class="alert alert-danger col-6" role="alert">
+      {{errorMessage}}
+    </div>
+    <div *ngIf="confirmMessage" class="alert alert-success col-6" role="alert">
+      {{confirmMessage}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="container-fluid col-11">
+      <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new server</button>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <table class="table table-bordered">
+      <caption>Files table</caption>
+      <thead>
+      <tr>
+        <th scope="col" style="width: 75%">Name</th>
+        <th scope="col" style="width: 15%">Last Access By Job</th>
+        <th scope="col" style="width: 10%">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let file of logFilePage?.content | paginate: {id: 'servers', itemsPerPage: logFilePage?.size,currentPage: logFilePage?.number, totalItems: logFilePage?.totalElements}">
+        <td>{{file.name}}</td>
+        <td>{{file.lastUpdate | date: 'short'}}</td>
+        <td class="text-center">
+          <fa-icon (click)="routeToLogs(file)" [icon]="logsIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="routeToRealtime(file.objectId)" [icon]="realTimeIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="deleteFile(file.objectId)" [icon]="deleteIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <pagination-controls (pageChange)="getFilesFromPage($event)" id="servers"></pagination-controls>
+  </div>
+</div>

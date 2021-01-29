@@ -56,8 +56,9 @@ export class ServersComponent implements OnInit {
     });
 
     this.updateForm = this.fb.group({
-      objectId: [''],
-      parentId: [''],
+      objectId: [''],//hidden
+      parentId: [''],//hidden
+      lastAccessByJob: [''],//hidden
       name: ['', Validators.required],
       ip: [''],
       port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed")]],
@@ -140,6 +141,7 @@ export class ServersComponent implements OnInit {
   showSettings(server: Server): void {
     this.updateForm.controls.objectId.setValue(server.objectId);
     this.updateForm.controls.parentId.setValue(server.parentId);
+    this.updateForm.controls.lastAccessByJob.setValue(server.lastAccessByUser);
     this.updateForm.controls.name.setValue(server.name);
     this.updateForm.controls.ip.setValue(server.ip);
     this.updateForm.controls.port.setValue(server.port);

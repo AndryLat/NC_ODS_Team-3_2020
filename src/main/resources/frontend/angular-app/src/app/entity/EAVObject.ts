@@ -1,4 +1,4 @@
-export class EAVObject {
+export abstract class EAVObject {
   objectId: string;
   name: string;
   parentId: string;

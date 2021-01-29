@@ -8,6 +8,7 @@
     <div class="navbar-nav mr-auto">
       <a *ngIf="!isLoginned()" class="nav-item nav-link" routerLink="/login" routerLinkActive="active">Login Page</a>
       <a *ngIf="isLoginned()" class="nav-item nav-link" routerLink="/servers" routerLinkActive="active">Servers</a>
+      <a *ngIf="isLoginned()" class="nav-item nav-link" routerLink="/realtime" routerLinkActive="active">Realtime</a>
     </div>
     <div class="navbar-nav">
       <a *ngIf="isLoginned()" class="nav-item dropdown">

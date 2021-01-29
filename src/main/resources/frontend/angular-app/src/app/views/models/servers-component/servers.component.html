@@ -22,8 +22,9 @@
         <th scope="col" style="width: 25%">IP</th>
         <th scope="col" style="width: 10%">Protocol</th>
         <th scope="col" style="width: 15%">Port</th>
-        <th scope="col" style="width: 17%">Last Log Check</th>
-        <th scope="col" style="width: 8%">Enabled?</th>
+        <th scope="col" style="width: 15%">Last Log Check</th>
+        <th scope="col" style="width: 5%">Connected<abbr class="initialism" title="Is Server currently connected and can provide logs">?</abbr> </th>
+        <th scope="col" style="width: 5%">Enabled</th>
         <th scope="col" style="width: 10%">Actions</th>
       </tr>
       </thead>
@@ -34,6 +35,9 @@
         <td>{{server.protocol}}</td>
         <td>{{server.port}}</td>
         <td>{{server.lastAccessByJob | date: 'short'}}</td>
+        <td class="text-center">
+          <fa-icon [icon]="server.canConnect?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        </td>
         <td class="text-center">
           <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
@@ -165,6 +169,7 @@
         <form [formGroup]="updateForm">
           <input formControlName="objectId" id="objectIdInputUpdate" name="objectId" type="hidden">
           <input formControlName="parentId" id="parentIdInputUpdate" name="parentId" type="hidden">
+          <input formControlName="lastAccessByJob" id="lastAccessByJob" name="lastAccessByJob" type="hidden">
           <div class="form-group">
             <label for="nameInputUpdate">Server name</label>
             <input class="form-control" formControlName="name" id="nameInputUpdate" name="name"

@@ -17,7 +17,9 @@ import {RouteVariableNameConstants} from "../../../constants/route-variable-name
 export class LogsComponent implements OnInit {
   deleteIcon = faTrashAlt;
   rule: RuleContainer;
-  directoryId: string;
+
+  parentType: string;
+  parentId: string;
 
   msg: string;
 
@@ -42,13 +44,21 @@ export class LogsComponent implements OnInit {
       this.operationForm.addControl(level, this.fb.control(''));
     }
 
-    this.directoryId =localStorage.getItem(RouteVariableNameConstants.directoryToLogsVariableName);
+    let logFileId = localStorage.getItem(RouteVariableNameConstants.logFileToLogsVariableName);
+    if(logFileId!=null){
+      this.parentId = logFileId;
+      this.parentType = "logFileId"
+    }else {
+      this.parentId = localStorage.getItem(RouteVariableNameConstants.directoryToLogsVariableName);
+      this.parentType = "directoryId";
+    }
+
+
 
   }
 
   ngOnInit(): void {
-    this.rule = new RuleContainer("", null, null, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0);
+    this.rule = new RuleContainer("", null, null, 0);
     this.getLogsByRule(1);
   }
 
@@ -92,7 +102,7 @@ export class LogsComponent implements OnInit {
   }
 
   getLogsByRule(pageNumber: number): void {
-    console.log(this.directoryId);
+    console.log(this.parentId);
 
     console.log(this.rule);
 
@@ -101,18 +111,17 @@ export class LogsComponent implements OnInit {
     this.rule.dat2 = this.operationForm.controls['dat2'].value;
     this.rule.sort = this.operationForm.controls['vSort'].value;
 
+    this.rule.levels = [];
     for (let level of this.keys()) {
       if (this.operationForm.controls[level].value) {
-        this.rule[level.toLowerCase()] = 1;
-      } else {
-        this.rule[level.toLowerCase()] = 0;
+        this.rule.levels.push(LogLevel[level]-13);
       }
     }
 
     console.log(this.rule)
     let params = new HttpParams()
       .set("rule", JSON.stringify(this.rule))
-      .set("directoryId", this.directoryId)
+      .set(this.parentType, this.parentId)
       .set("page", pageNumber.toString());
 
     this.http.get<LogPage>(this.localApi + '/', {params}).subscribe(result => {
@@ -134,5 +143,9 @@ export class LogsComponent implements OnInit {
 
   private findIndexToUpdate(newItem) {
     return newItem.objectId === this;
+  }
+
+  handleMessage(message: any) {
+    console.log(message);
   }
 }

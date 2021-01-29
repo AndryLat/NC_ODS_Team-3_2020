@@ -8,7 +8,7 @@ import {AuthService} from "../../../services/AuthService";
 import {LogFile} from "../../../entity/LogFile";
 import {DirectoryPage} from "../../../pageable/DirectoryPage";
 import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
-import {faRedoAlt, faSignInAlt, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
+import {faRedoAlt, faSignInAlt, faStream, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -17,6 +17,7 @@ import {faRedoAlt, faSignInAlt, faTrashAlt} from "@fortawesome/free-solid-svg-ic
 })
 export class DirectoriesComponent implements OnInit {
 
+  logsIcon = faStream;
   proceedIcon = faSignInAlt;
   deleteIcon = faTrashAlt;
   updateIcon = faRedoAlt;
@@ -81,12 +82,16 @@ export class DirectoriesComponent implements OnInit {
 
 
   routeToLogs(dir: Directory): void {
-    const objectId = dir.objectId
+    localStorage.setItem(RouteVariableNameConstants.directoryToLogsVariableName,dir.objectId);
+    localStorage.removeItem(RouteVariableNameConstants.logFileToLogsVariableName);
     this.updateDirectory(dir);
-    localStorage.setItem(RouteVariableNameConstants.directoryToLogsVariableName,objectId);
     this.router.navigateByUrl('/logs');
   }
 
+  routeToLogFiles(objectId: string): void {
+    localStorage.setItem(RouteVariableNameConstants.directoryToLogFilesVariableName,objectId);
+    this.router.navigateByUrl('/logFiles');
+  }
   updateDirectory(dir: Directory) {
     dir.lastExistenceCheck = new Date();
     this.http.put(GlobalConstants.apiUrl + 'api/directory/update', dir).subscribe()

@@ -24,13 +24,14 @@
       <td>{{directory.enabled}}</td>
       <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
       <td class="d-flex justify-content-around">
-        <fa-icon (click)="routeToLogs(directory)" [icon]="proceedIcon"
+        <fa-icon (click)="routeToLogs(directory)" [icon]="logsIcon"
+                 class="btn fas fa-2x pointer-event"></fa-icon>
+        <fa-icon (click)="routeToLogFiles(directory.objectId)" [icon]="proceedIcon"
                  class="btn fas fa-2x pointer-event"></fa-icon>
         <fa-icon (click)="getFilesForUpdate(directory)" data-target="#updateFilesModal" data-toggle="modal" [icon]="updateIcon"
                   class="btn fas fa-2x pointer-event"></fa-icon>
         <fa-icon (click)="deleteDirectory(directory.objectId)" [icon]="deleteIcon"
                  class="btn fas fa-2x pointer-event"></fa-icon>
-        <!--<button class="btn btn-primary" data-target="#updateFilesModal" data-toggle="modal">Add new Directory</button>-->
       </td>
     </tr>
     </tbody>
