@@ -81,7 +81,7 @@ public class UserController {
     }
 
     @PostMapping("/checkPassword")
-    public ResponseEntity<Boolean> checkPassword (@RequestParam User user){
+    public ResponseEntity<Boolean> checkPassword (@RequestBody User user){
         return ResponseEntity.ok(userService.checkPassword(user));
     }
 

@@ -107,7 +107,7 @@ public class UserService {
                 throwUserServiceExceptionWithMessage("User by login not found.");
                 return false;
             } else {
-                return bCryptPasswordEncoder.matches(user.getPassword(), bCryptPasswordEncoder.encode(userFromDb.getPassword()));
+                return bCryptPasswordEncoder.matches(user.getPassword(), userFromDb.getPassword());
             }
         }
     }
