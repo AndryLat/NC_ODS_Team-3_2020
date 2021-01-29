@@ -3,6 +3,7 @@ package com.netcracker.odstc.logviewer.service;
 import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.dao.LogDAO;
 import com.netcracker.odstc.logviewer.models.Log;
+import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.service.exceptions.LogServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -24,9 +26,17 @@ public class LogService extends AbstractService {
 
     public Page<LogDTO> getAllLogsByAllValues(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
         if (isIdValid(directoryId) && ruleContainer != null && pageable != null) {
+            if(ruleContainer.getLevels()!=null){
+                if(ruleContainer.getLevels().isEmpty()){
+                    ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+                }
+            }else{
+                ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+            }
             return logDAO.getLogByAll(directoryId, ruleContainer, pageable);
-        } else
+        } else {
             throwLogServiceExceptionWithMessage("Values сan't be null");
+        }
         return null;
     }
 
