@@ -49,7 +49,6 @@ export class AuthService {
 
   getTokenExpirationTime(token:string):Date{
     const decoded = jwt_decode<JWTToken>(token);
-    console.log(decoded);
 
     if(decoded.exp === undefined) return null;
 

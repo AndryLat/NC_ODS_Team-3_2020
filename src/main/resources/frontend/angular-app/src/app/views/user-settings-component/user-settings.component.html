@@ -22,8 +22,11 @@
       <label for="repeatPasswordInput">Repeat new password</label>
       <input class="form-control" id="repeatPasswordInput" type="password" formControlName="repeatPassword">
     </div>
-    <button class="btn btn-primary" type="submit">Update</button>
+    <button (click)="updatePassword()" class="btn btn-primary" type="submit">Update</button>
     <a [routerLink]="['/resetPassword']" class="badge badge-dark  ml-2">Forgot password?</a>
+    <div *ngIf="differentPasswords" class="alert alert-danger mt-3" role="alert">Passwords do not match!</div>
+    <div *ngIf="passChangeSuccess" class="alert alert-success mt-3" role="alert">Password successfully changed!</div>
+    <div *ngIf="passChangeSuccess == false" class="alert alert-warning mt-3" role="alert">Something went wrong</div>
   </form>
   <hr>
   <h3>Account deleting</h3>
