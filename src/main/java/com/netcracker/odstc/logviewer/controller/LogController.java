@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.service.LogService;
-import com.netcracker.odstc.logviewer.service.RuleContainer;
+import com.netcracker.odstc.logviewer.containers.RuleContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -29,8 +29,6 @@ import java.util.List;
 public class LogController {
     private final Logger logger = LogManager.getLogger(LogController.class.getName());
     private static final String DEFAULT_PAGE_SIZE = "20";
-    private static final String logNullMessage = "Log shouldn't be 0 or null";
-    private static final String logIdNullMessage = "Log shouldn't be 0 or null";
 
     private LogService logService;
 
@@ -50,9 +48,6 @@ public class LogController {
 
     @PostMapping("/add")
     public ResponseEntity<Log> add(@RequestBody Log log) {
-        if (log == null) {
-            throwException(logNullMessage);
-        }
         logger.info("Save log");
         logService.save(log);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -60,9 +55,6 @@ public class LogController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Log> deleteById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            throwException(logIdNullMessage);
-        }
         logger.info("Delete log");
         logService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -70,11 +62,6 @@ public class LogController {
 
     @DeleteMapping("/deletes/{ids}")
     public ResponseEntity<Log> deleteByIds(@PathVariable List<BigInteger> ids) {
-        for (BigInteger id : ids) {
-            if (id == null || id.equals(BigInteger.valueOf(0))) {
-                throwException(logIdNullMessage);
-            }
-        }
         logger.info("Delete logs");
         logService.deleteByIds(ids);
         return ResponseEntity.noContent().build();
@@ -82,15 +69,7 @@ public class LogController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Log> findById(@PathVariable BigInteger id) {
-        if (id == null || id.equals(BigInteger.valueOf(0))) {
-            throwException(logIdNullMessage);
-        }
         return ResponseEntity.ok(logService.findById(id));
     }
 
-    private void throwException(String nameException) {
-        IllegalArgumentException exception = new IllegalArgumentException();
-        logger.error(nameException);
-        throw exception;
-    }
 }

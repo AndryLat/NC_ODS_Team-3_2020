@@ -1,4 +1,4 @@
-package com.netcracker.odstc.logviewer.service;
+package com.netcracker.odstc.logviewer.containers;
 
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 

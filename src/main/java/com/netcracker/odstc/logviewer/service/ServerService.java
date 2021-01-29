@@ -69,19 +69,26 @@ public class ServerService extends AbstractService {
         if (server == null) {
             return false;
         }
-        if (server.getIp() == null || server.getIp().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getIp())) {
             return false;
         }
-        if (server.getLogin() == null || server.getLogin().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getLogin())) {
             return false;
         }
-        if (server.getPassword() == null || server.getPassword().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getPassword())) {
             return false;
         }
         if (server.getProtocol() == null) {
             return false;
         }
         return server.getPort() != 0;
+    }
+
+    private boolean isStringHaveAnythingExceptSpacesValid(String string) {
+        if (string == null || string.trim().length() == 0) {
+            return true;
+        }
+        return false;
     }
 
     private void throwServerServiceExceptionWithMessage(String message) {

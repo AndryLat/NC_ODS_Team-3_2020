@@ -82,7 +82,7 @@ public class EAVObjectDAO {
 
     protected final JdbcTemplate jdbcTemplate;
 
-    private String errorMessage = "id can`t be null";
+    private static final String ERROR_MESSAGE = "id can`t be null";
 
     private static final EAVObjectFactory eavObjectFactory = EAVObjectFactory.getInstance();
 
@@ -121,7 +121,7 @@ public class EAVObjectDAO {
             eavObject.setReferences(getReference(id));
             return (T) eavObject;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -138,7 +138,7 @@ public class EAVObjectDAO {
             }
             return (T) eavObject;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -215,7 +215,7 @@ public class EAVObjectDAO {
             ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);
             DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -239,7 +239,7 @@ public class EAVObjectDAO {
             }
             return references;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -255,7 +255,7 @@ public class EAVObjectDAO {
             }
             return attributes;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or attribute query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + "or attribute query can't be null", e);
         }
     }
 
@@ -264,7 +264,7 @@ public class EAVObjectDAO {
             List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
             return getObjectsByIds(objectIds, clazz);
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or object query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + "or object query can't be null", e);
         }
     }
 
@@ -273,7 +273,7 @@ public class EAVObjectDAO {
             List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id, page.getOffset(), page.getPageSize());
             return getObjectsByIds(objectIds, clazz);
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or object query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + "or object query can't be null", e);
         }
     }
 

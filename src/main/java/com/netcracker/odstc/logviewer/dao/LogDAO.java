@@ -3,7 +3,7 @@ package com.netcracker.odstc.logviewer.dao;
 import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.mapper.LogDTOMapper;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
-import com.netcracker.odstc.logviewer.service.RuleContainer;
+import com.netcracker.odstc.logviewer.containers.RuleContainer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
