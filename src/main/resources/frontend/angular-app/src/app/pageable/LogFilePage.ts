@@ -1,4 +1,4 @@
-import {LogFile} from "../entity/LogFile";
+import {LogFile} from '../entity/LogFile';
 
 export class LogFilePage {
   content: LogFile[];

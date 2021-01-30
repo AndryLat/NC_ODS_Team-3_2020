@@ -4,12 +4,12 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
-import {AuthService} from "../../../services/AuthService";
+import {AuthService} from '../../../services/AuthService';
 import {faCheck, faCogs, faSignInAlt, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
-import {matchPattern} from "../../../services/validators/matchPatternValidator";
-import {ServerPage} from "../../../pageable/ServerPage";
-import {EAVObject} from "../../../entity/EAVObject";
-import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
+import {matchPattern} from '../../../services/validators/matchPatternValidator';
+import {ServerPage} from '../../../pageable/ServerPage';
+import {EAVObject} from '../../../entity/EAVObject';
+import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
 
 @Component({
   selector: 'app-servers',
@@ -24,7 +24,7 @@ export class ServersComponent implements OnInit {
   disabledIcon = faTimes;
 
 
-  localApi: string = GlobalConstants.apiUrl + 'api/server'
+  localApi: string = GlobalConstants.apiUrl + 'api/server';
 
   insertForm: FormGroup;
   updateForm: FormGroup;
@@ -47,11 +47,11 @@ export class ServersComponent implements OnInit {
               private fb: FormBuilder,) {
 
     this.insertForm = this.fb.group({
-      name: ['', [Validators.required,Validators.maxLength(64)]],
-      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.]+$/, "Special characters is not allowed"),Validators.maxLength(128)]],
-      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed"),Validators.maxLength(5)]],
-      login: ['', [Validators.required,Validators.maxLength(64)]],
-      password: ['', [Validators.required,Validators.maxLength(128)]],
+      name: ['', [Validators.required, Validators.maxLength(64)]],
+      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.]+$/, 'Special characters is not allowed'), Validators.maxLength(128)]],
+      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, 'Only numbers allowed'), Validators.maxLength(5)]],
+      login: ['', [Validators.required, Validators.maxLength(64)]],
+      password: ['', [Validators.required, Validators.maxLength(128)]],
       protocol: ['', Validators.required]
     });
 
@@ -61,7 +61,7 @@ export class ServersComponent implements OnInit {
       lastAccessByJob: [''],//hidden
       name: ['', Validators.required],
       ip: [''],
-      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, "Only numbers allowed")]],
+      port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, 'Only numbers allowed')]],
       login: ['', Validators.required],
       password: ['', Validators.required],
       protocol: ['', Validators.required],
@@ -82,7 +82,7 @@ export class ServersComponent implements OnInit {
     if (errors.min) {
       return 'Specified number is lower than min allowed: ' + errors.min.min;
     }
-    if(errors.maxLength){
+    if (errors.maxLength) {
       return 'Max allowed length: ' + errors.maxLength.requiredLength;
     }
     if (errors.required) {
@@ -97,29 +97,29 @@ export class ServersComponent implements OnInit {
   routeToDirectories(server: Server): void {
     const objectId = server.objectId;
     this.updateServer(server);
-    localStorage.setItem(RouteVariableNameConstants.serverToDirectoryVariableName,objectId);
+    localStorage.setItem(RouteVariableNameConstants.serverToDirectoryVariableName, objectId);
     this.router.navigateByUrl('/directories');
   }
 
   deleteServer(objectId: string): void {
-    this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
-      this.confirmMessage = "Server deleted successfully";
+    this.http.delete(this.localApi + '/delete/' + objectId).subscribe(result => {
+      this.confirmMessage = 'Server deleted successfully';
 
       let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId === objectId);
       let index = this.serverPage.content.indexOf(changedServer);
 
       this.serverPage.content.splice(index, 1);
     }, error => {
-      this.errorMessage = "Error with deleting server";
-    })
+      this.errorMessage = 'Error with deleting server';
+    });
   }
 
   testConnection(): void {
     this.http.post<boolean>(this.localApi + '/testConnection', this.insertForm.value).subscribe(result => {
-      this.testResult = result ? "Connection established" : "Can't connect to server";
+      this.testResult = result ? 'Connection established' : 'Can\'t connect to server';
     }, error => {
-      this.testResult = "Error with checking connection";
-    })
+      this.testResult = 'Error with checking connection';
+    });
   }
 
   addServer(): void {
@@ -128,14 +128,14 @@ export class ServersComponent implements OnInit {
     if (!this.insertForm.valid) {
       return;
     }
-    this.http.post(this.localApi + "/add", server).subscribe(result => {
-      this.confirmMessage = "Server added";
+    this.http.post(this.localApi + '/add', server).subscribe(result => {
+      this.confirmMessage = 'Server added';
       server['objectId'] = result;
       this.getServersFromPage(1);
       this.insertForm.reset({});
     }, error => {
-      this.inputError = "Сan't add server";
-    })
+      this.inputError = 'Сan\'t add server';
+    });
   }
 
   showSettings(server: Server): void {
@@ -157,30 +157,30 @@ export class ServersComponent implements OnInit {
     }
     const server = this.updateForm.value;
 
-    this.http.put(this.localApi + "/update", server).subscribe(result => {
-      this.confirmMessage = "Server updated";
+    this.http.put(this.localApi + '/update', server).subscribe(result => {
+      this.confirmMessage = 'Server updated';
 
       let index = this.getIndexByObjectIdOfObject(server);
       this.serverPage.content.splice(index, 1, server);
 
     }, error => {
-      alert("Сan't update server");
-    })
+      alert('Сan\'t update server');
+    });
   }
 
   updateServer(server: Server) {
     server.lastAccessByUser = new Date();
-    this.http.put(this.localApi + "/update", server).subscribe(result => {
+    this.http.put(this.localApi + '/update', server).subscribe(result => {
     }, error => {
-    })
+    });
   }
 
   getServersFromPage(pageNumber: number): void {
 
     let params = new HttpParams()
-      .set("page", pageNumber.toString());
+      .set('page', pageNumber.toString());
 
-    this.http.get<ServerPage>(this.localApi+'/', {params}).subscribe(result => {
+    this.http.get<ServerPage>(this.localApi + '/', {params}).subscribe(result => {
       console.log(result);
       this.serverPage = result;
       this.serverPage.number = this.serverPage.number + 1;// In Spring pages start from 0.
@@ -188,7 +188,7 @@ export class ServersComponent implements OnInit {
     });
   }
 
-  getIndexByObjectIdOfObject(object: EAVObject): number{
+  getIndexByObjectIdOfObject(object: EAVObject): number {
     let changedServer = this.serverPage.content.find(changedElement => changedElement.objectId === object.objectId);
     return this.serverPage.content.indexOf(changedServer);
   }

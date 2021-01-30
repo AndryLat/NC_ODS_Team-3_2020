@@ -5,7 +5,6 @@ import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.containers.converters.AttributeObjectContainerConverter;
 import com.netcracker.odstc.logviewer.mapper.AttributeObjectMapper;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -185,7 +184,6 @@ public class ContainerDAO extends EAVObjectDAO {
     public ContainerDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
         attributeObjectContainerConverter = new AttributeObjectContainerConverter();
-        DAOPublisher.getInstance().addIgnoredClass(this.getClass());
     }
 
     public List<HierarchyContainer> getActiveServersWithChildren() {

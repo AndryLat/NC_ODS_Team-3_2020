@@ -1,8 +1,8 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from "../../services/AuthService";
-import {GlobalConstants} from "../../constants/global-constants";
+import {AuthService} from '../../services/AuthService';
+import {GlobalConstants} from '../../constants/global-constants';
 import {HttpClient} from '@angular/common/http';
 
 @Component({
@@ -22,7 +22,7 @@ export class LoginComponent {
               private authService: AuthService,
               private router: Router) {
     if (authService.isLoggedIn()) {
-      this.router.navigateByUrl("/");
+      this.router.navigateByUrl('/');
     }
     this.form = this.fb.group({
       login: ['', Validators.required],
@@ -39,7 +39,7 @@ export class LoginComponent {
         .post(GlobalConstants.apiUrl + this.url, {login, password}, {observe: 'response'})
         .subscribe(res => {
             this.badLogin = false;
-            this.authService.setToken(res.headers.get('Authorization'))
+            this.authService.setToken(res.headers.get('Authorization'));
             this.router.navigateByUrl('/');
           },
           error => {

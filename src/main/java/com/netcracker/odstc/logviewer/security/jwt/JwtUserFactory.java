@@ -4,14 +4,17 @@ import com.netcracker.odstc.logviewer.models.User;
 
 public class JwtUserFactory {
 
+    private JwtUserFactory() {
+    }
+
     public static JwtUser create(User user) {
         JwtUser jwtUser;
-        try{
+        try {
             jwtUser = new JwtUser(user.getObjectId(),
                     user.getLogin(),
                     user.getPassword(),
                     user.getRole().name());
-        }catch(Exception exp){
+        } catch (Exception exp) {
             jwtUser = new JwtUser(user.getObjectId(),
                     user.getLogin(),
                     user.getPassword());

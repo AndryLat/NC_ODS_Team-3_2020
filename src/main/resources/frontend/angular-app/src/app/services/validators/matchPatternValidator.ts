@@ -1,4 +1,4 @@
-import {AbstractControl, ValidatorFn} from "@angular/forms";
+import {AbstractControl, ValidatorFn} from '@angular/forms';
 
 export function matchPattern(pattern: RegExp, errorName: string): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {

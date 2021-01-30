@@ -1,6 +1,6 @@
-import {EAVObject} from "./EAVObject";
+import {EAVObject} from './EAVObject';
 
-export class User extends EAVObject{
+export class User extends EAVObject {
   email: string;
   login: string;
   password: string;

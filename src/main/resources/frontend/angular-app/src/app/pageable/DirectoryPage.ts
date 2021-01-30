@@ -1,4 +1,4 @@
-import {Directory} from "../entity/Directory";
+import {Directory} from '../entity/Directory';
 
 export class DirectoryPage {
   content: Directory[];

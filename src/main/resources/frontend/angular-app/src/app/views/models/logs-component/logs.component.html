@@ -8,8 +8,9 @@
         <caption>Logs table</caption>
         <thead>
         <tr>
-          <th scope="col" style="width: 5%"><input type="checkbox" [checked]="isAllCheckBoxChecked()"
-                                                   (change)="checkAllCheckBox($event)"></th>
+          <th scope="col" style="width: 5%"><input (change)="checkAllCheckBox($event)"
+                                                   [checked]="isAllCheckBoxChecked()"
+                                                   type="checkbox"></th>
           <th scope="col" style="width: 90%">Text</th>
           <th scope="col" style="width: 5%">
             <fa-icon (click)="deleteSelectedLogs()" [icon]="deleteIcon"
@@ -20,7 +21,7 @@
         <tbody>
         <tr
           *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
-          <td><input type="checkbox" value="{{log.objectId}}" [(ngModel)]="logPage?.content[i].checked"></td>
+          <td><input [(ngModel)]="logPage?.content[i].checked" type="checkbox" value="{{log.objectId}}"></td>
           <td>{{log.text}}</td>
           <td class="text-center">
             <fa-icon (click)="deleteLog(log.objectId)" [icon]="deleteIcon"
@@ -64,9 +65,9 @@
             <p>Filtration</p>
             <hr>
             <label for="dat1">Start date</label>
-            <input class="form-control" type="datetime-local" formControlName="dat1" id="dat1" name="dat1">
+            <input class="form-control" formControlName="dat1" id="dat1" name="dat1" type="datetime-local">
             <label for="dat2">End date</label>
-            <input class="form-control" type="datetime-local" formControlName="dat2" id="dat2" name="dat2">
+            <input class="form-control" formControlName="dat2" id="dat2" name="dat2" type="datetime-local">
             <hr>
             <div *ngFor="let key of keys()" class="row">
               <label class="col-10" for="logLevel">{{key}}</label>

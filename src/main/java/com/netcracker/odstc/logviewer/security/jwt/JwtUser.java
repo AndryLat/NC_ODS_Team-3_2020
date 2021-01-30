@@ -38,6 +38,10 @@ public class JwtUser implements UserDetails {
         this.authorities = new ArrayList<>();
     }
 
+    public BigInteger getId() {
+        return id;
+    }
+
     public String getRole() {
         return role;
     }

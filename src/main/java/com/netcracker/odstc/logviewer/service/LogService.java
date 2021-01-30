@@ -18,8 +18,7 @@ import java.util.List;
 
 @Service
 public class LogService extends AbstractService {
-
-    private final Logger logger = LogManager.getLogger(LogService.class.getName());
+    private static final Logger logger = LogManager.getLogger(LogService.class.getName());
     private static final String LOG_NULL_MESSAGE = "Log shouldn't be 0 or null";
     private static final String LOG_ID_NULL_MESSAGE = "Log shouldn't be 0 or null";
     private final LogDAO logDAO;
@@ -29,29 +28,29 @@ public class LogService extends AbstractService {
     }
 
     public Page<LogDTO> getAllLogsByAllValues(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
-        if (!isIdValid(directoryId) && ruleContainer != null && pageable != null) {
-            throwLogServiceExceptionWithMessage("Values сan't be null");
+        if (!isIdValid(directoryId) || ruleContainer == null || pageable == null) {
+            throw buildLogServiceExceptionWithMessage("Values сan't be null");
         }
-        if(ruleContainer.getLevels()!=null){
-            if(ruleContainer.getLevels().isEmpty()){
+        if (ruleContainer.getLevels() != null) {
+            if (ruleContainer.getLevels().isEmpty()) {
                 ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
             }
-        }else{
+        } else {
             ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
         }
-        return logDAO.getLogByAll(directoryId, ruleContainer, pageable);
+        return logDAO.getLogByDirectoryId(directoryId, ruleContainer, pageable);
     }
 
     public void deleteById(BigInteger id) {
         if (isIdValid(id)) {
             logDAO.deleteById(id);
         }
-        throwLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
+        throw buildLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
     }
 
     public Log findById(BigInteger id) {
         if (id == null || id.equals(BigInteger.valueOf(0))) {
-            throwLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
+            throw buildLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
         }
         return logDAO.getObjectById(id, Log.class);
     }
@@ -60,22 +59,22 @@ public class LogService extends AbstractService {
         if (isLogValid(log)) {
             logDAO.saveObjectAttributesReferences(log);
         }
-        throwLogServiceExceptionWithMessage(LOG_NULL_MESSAGE);
+        throw buildLogServiceExceptionWithMessage(LOG_NULL_MESSAGE);
     }
 
     public void deleteByIds(List<BigInteger> ids) {
-         for (BigInteger id : ids) {
+        for (BigInteger id : ids) {
             if (id == null || id.equals(BigInteger.valueOf(0))) {
                 logDAO.deleteById(id);
-                throwLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
+                throw buildLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
             }
         }
     }
 
-    private void throwLogServiceExceptionWithMessage(String message) {
+    private LogServiceException buildLogServiceExceptionWithMessage(String message) {
         LogServiceException logServiceException = new LogServiceException(message);
         logger.error(message, logServiceException);
-        throw logServiceException;
+        return logServiceException;
     }
 
     private boolean isLogValid(Log log) {

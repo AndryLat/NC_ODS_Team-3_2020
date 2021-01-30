@@ -26,6 +26,6 @@ export class PasswordRecoveryComponent {
       .subscribe(res => {
         console.log(res);
       });
-    alert("Check your email :)");
+    alert('Check your email :)');
   }
 }

@@ -2,7 +2,6 @@ package com.netcracker.odstc.logviewer.security;
 
 import com.netcracker.odstc.logviewer.dao.UserDao;
 import com.netcracker.odstc.logviewer.models.User;
-import com.netcracker.odstc.logviewer.security.jwt.JwtUser;
 import com.netcracker.odstc.logviewer.security.jwt.JwtUserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,13 +21,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String name) {
         User user = userDao.getByLogin(name);
         if (user == null) {
             throw new UsernameNotFoundException("User with login:" + name + " was not found.");
         }
 
-        JwtUser jwtUser = JwtUserFactory.create(user);
-        return jwtUser;
+        return JwtUserFactory.create(user);
     }
 }

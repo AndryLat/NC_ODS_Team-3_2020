@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {AuthService} from "./services/AuthService";
+import {AuthService} from './services/AuthService';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,7 @@ export class AppComponent {
     return this.authService.isAdmin();
   }
 
-  logout(): void{
+  logout(): void {
     this.authService.logout();
   }
 }

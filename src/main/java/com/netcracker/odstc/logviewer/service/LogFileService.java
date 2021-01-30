@@ -5,6 +5,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
+import com.netcracker.odstc.logviewer.serverconnection.services.exceptions.ServerConnectionServiceException;
 import com.netcracker.odstc.logviewer.service.exceptions.LogFileServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +19,9 @@ import java.util.List;
 
 @Service
 public class LogFileService extends AbstractService {
-
     private final Logger logger = LogManager.getLogger(LogFileService.class.getName());
-
     private static final String INVALID_DIRECTORY_MESSAGE = "Got invalid directory. Can't check invalid directory";
     private static final String PARENT_NULL_MESSAGE = "Can't check connection with directory without parentId";
-
     private final EAVObjectDAO eavObjectDAO;
 
     private final ServerConnectionService serverConnectionService;
@@ -35,51 +33,49 @@ public class LogFileService extends AbstractService {
 
     public List<LogFile> getLogFileList(Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
-        return serverConnectionService.getLogFilesFromDirectory(server, directory);
+        try {
+            return serverConnectionService.getLogFilesFromDirectory(server, directory);
+        } catch (ServerConnectionServiceException e) {
+            throw buildLogFilesServiceExceptionWithMessage(e.getMessage(), e);
+        }
     }
 
     public List<LogFile> getLogFileListFromDB(Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
         return eavObjectDAO.getObjectsByParentId(directory.getObjectId(), LogFile.class);
     }
 
     public Page<LogFile> getLogFileListByPage(PageRequest pageRequest, Directory directory) {
         if (directory == null) {
-            throwLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
         }
         if (directory.getParentId() == null) {
-            throwLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
+            throw buildLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
         }
         return eavObjectDAO.getObjectsByParentId(pageRequest, directory.getObjectId(), LogFile.class);
     }
 
     public LogFile findById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwLogFilesServiceExceptionWithMessage("Id is not valid. Can't get file of logs");
+            throw buildLogFilesServiceExceptionWithMessage("Id is not valid. Can't get file of logs");
         }
         return eavObjectDAO.getObjectById(id, LogFile.class);
     }
 
-    private void throwLogFilesServiceExceptionWithMessage(String message) {
-        LogFileServiceException logFileServiceException = new LogFileServiceException(message);
-        logger.error(message, logFileServiceException);
-        throw logFileServiceException;
-    }
-
     public void addLogFile(LogFile logFile) {
         if (logFile == null) {
-            throwLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
+            throw buildLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
         } else {
             if (isFileValid(logFile)) {
                 logFile.setLastUpdate(new Date());
@@ -94,7 +90,7 @@ public class LogFileService extends AbstractService {
 
     public void addLogFileList(List<LogFile> logFiles) {
         if (logFiles == null) {
-            throwLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
+            throw buildLogFilesServiceExceptionWithMessage("List of log files cant be equals null");
         } else {
             for (LogFile logFile : logFiles) {
                 if (isFileValid(logFile)) {
@@ -111,7 +107,7 @@ public class LogFileService extends AbstractService {
 
     public void deleteById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwLogFilesServiceExceptionWithMessage("Id shouldn't be 0 or null");
+            throw buildLogFilesServiceExceptionWithMessage("Id shouldn't be 0 or null");
         }
         eavObjectDAO.deleteById(id);
     }
@@ -121,5 +117,17 @@ public class LogFileService extends AbstractService {
             return logFile.getFileName() != null;
         }
         return false;
+    }
+
+    private LogFileServiceException buildLogFilesServiceExceptionWithMessage(String message) {
+        LogFileServiceException logFileServiceException = new LogFileServiceException(message);
+        logger.error(message, logFileServiceException);
+        return logFileServiceException;
+    }
+
+    private LogFileServiceException buildLogFilesServiceExceptionWithMessage(String message, Throwable throwable) {
+        LogFileServiceException logFileServiceException = new LogFileServiceException(message, throwable);
+        logger.error(message, logFileServiceException);
+        return logFileServiceException;
     }
 }

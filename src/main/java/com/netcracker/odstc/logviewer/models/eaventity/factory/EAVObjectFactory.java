@@ -16,20 +16,30 @@ public class EAVObjectFactory {
 
     private static EAVObjectFactory eavObjectFactory;
 
-    private EAVObjectFactory(){
+    private EAVObjectFactory() {
     }
 
-    public <T extends EAVObject> T createEAVObject(BigInteger objectTypeId){
+    public static EAVObjectFactory getInstance() {
+        if (eavObjectFactory == null) {
+            eavObjectFactory = new EAVObjectFactory();
+        }
+        return eavObjectFactory;
+    }
+
+    public <T extends EAVObject> T createEAVObject(BigInteger objectTypeId) {
         return createEAVObject(ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
     }
-    public <T extends EAVObject> T createEAVObject(ObjectTypes objectType){
+
+    public <T extends EAVObject> T createEAVObject(ObjectTypes objectType) {
         return (T) createEAVObject(objectType.getObjectClass());
     }
+
     public <T extends EAVObject> T createEAVObject(BigInteger objectId, Class<T> clazz) {
         EAVObject eavObject = createEAVObject(clazz);
         eavObject.setObjectId(objectId);
         return (T) eavObject;
     }
+
     public <T extends EAVObject> T createEAVObject(Class<T> clazz) {
         EAVObject eavObject;
         if (Log.class.isAssignableFrom(clazz)) {
@@ -45,15 +55,8 @@ public class EAVObjectFactory {
         } else if (Config.class.isAssignableFrom(clazz)) {
             eavObject = new Config();
         } else {
-            throw new UnsupportedObjectTypeException("Cant instantinate object for class: "+clazz.getName());
+            throw new UnsupportedObjectTypeException("Cant instantinate object for class: " + clazz.getName());
         }
         return (T) eavObject;
-    }
-
-    public static EAVObjectFactory getInstance() {
-        if(eavObjectFactory==null){
-            eavObjectFactory = new EAVObjectFactory();
-        }
-        return eavObjectFactory;
     }
 }

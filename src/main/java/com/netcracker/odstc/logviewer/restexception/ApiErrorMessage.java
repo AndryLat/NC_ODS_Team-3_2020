@@ -4,16 +4,16 @@ import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 
-public class ApiException {
+public class ApiErrorMessage {
     private final String message;
     private final Throwable throwable;
     private final HttpStatus status;
     private final ZonedDateTime timestamp;
 
-    public ApiException(String message,
-                        Throwable throwable,
-                        HttpStatus status,
-                        ZonedDateTime timestamp) {
+    public ApiErrorMessage(String message,
+                           Throwable throwable,
+                           HttpStatus status,
+                           ZonedDateTime timestamp) {
         this.message = message;
         this.throwable = throwable;
         this.status = status;
@@ -38,7 +38,7 @@ public class ApiException {
 
     @Override
     public String toString() {
-        return "ApiException{" +
+        return "ApiErrorMessage{" +
                 "message='" + message + '\'' +
                 ", throwable=" + throwable +
                 ", status=" + status +

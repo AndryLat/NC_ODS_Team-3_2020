@@ -10,7 +10,15 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
 import java.security.Principal;
@@ -18,11 +26,10 @@ import java.security.Principal;
 @RequestMapping("/api/server")
 @RestController
 public class ServerController {
-
+    private final Logger logger = LogManager.getLogger(ServerController.class.getName());
+    private static final String DEFAULT_PAGE_SIZE = "10";
     private final ServerService serverService;
     private final UserService userService;
-    private static final String DEFAULT_PAGE_SIZE = "10";
-    private final Logger logger = LogManager.getLogger(ServerController.class.getName());
 
     public ServerController(ServerService serverService, UserService userService) {
         this.serverService = serverService;

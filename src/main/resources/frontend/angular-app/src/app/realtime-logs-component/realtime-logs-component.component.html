@@ -2,7 +2,7 @@
 <div class="container-fluid">
   <div class="form-group">
     <label for="logArea">Realtime logs</label>
-    <textarea class="form-control" id="logArea" rows="30" [ngModel]="getLogs()" disabled>
+    <textarea [ngModel]="getLogs()" class="form-control" disabled id="logArea" rows="30">
     </textarea>
   </div>
 </div>

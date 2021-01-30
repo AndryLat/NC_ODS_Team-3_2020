@@ -9,7 +9,9 @@
   </div>
   <div class="row">
     <div class="container-fluid col-11">
-      <button (click)="getFilesForUpdate()"  class="btn btn-primary" data-target="#updateFilesModal" data-toggle="modal">Add new File</button>
+      <button (click)="getFilesForUpdate()" class="btn btn-primary" data-target="#updateFilesModal" data-toggle="modal">
+        Add new File
+      </button>
     </div>
   </div>
   <hr>
@@ -24,7 +26,8 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let file of logFilePage?.content | paginate: {id: 'servers', itemsPerPage: logFilePage?.size,currentPage: logFilePage?.number, totalItems: logFilePage?.totalElements}">
+      <tr
+        *ngFor="let file of logFilePage?.content | paginate: {id: 'servers', itemsPerPage: logFilePage?.size,currentPage: logFilePage?.number, totalItems: logFilePage?.totalElements}">
         <td>{{file.name}}</td>
         <td>{{file.lastUpdate | date: 'short'}}</td>
         <td class="text-center">
@@ -54,7 +57,9 @@
       </div>
       <div class="modal-body">
         <div class="d-flex flex-row">
-          <button (click)="splitFilesServerBD(filesFromDB, filesFromServer)" class="btn btn-info col-4" type="button">Files</button>
+          <button (click)="splitFilesServerBD(filesFromDB, filesFromServer)" class="btn btn-info col-4" type="button">
+            Files
+          </button>
         </div>
         <hr>
         <!-- PUT FORM -->
@@ -70,7 +75,8 @@
           <tr *ngFor="let file of filesForUpdate;">
             <td>{{file.name}}</td>
             <td>
-              <input class="form-control" [checked]="file.checked" (change)="changeStatusFile(file.name, filesForUpdate)" type="checkbox">
+              <input (change)="changeStatusFile(file.name, filesForUpdate)" [checked]="file.checked"
+                     class="form-control" type="checkbox">
             </td>
           </tr>
           </tbody>
@@ -78,7 +84,7 @@
         <!-- PUT FORM -->
       </div>
       <div class="modal-footer">
-        <button (click)="updateFiles()" data-dismiss="modal" class="btn btn-primary" type="submit">Update files</button>
+        <button (click)="updateFiles()" class="btn btn-primary" data-dismiss="modal" type="submit">Update files</button>
       </div>
     </div>
   </div>

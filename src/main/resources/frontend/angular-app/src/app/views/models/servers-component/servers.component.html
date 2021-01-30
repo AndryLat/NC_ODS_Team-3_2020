@@ -23,13 +23,16 @@
         <th scope="col" style="width: 10%">Protocol</th>
         <th scope="col" style="width: 15%">Port</th>
         <th scope="col" style="width: 15%">Last Log Check</th>
-        <th scope="col" style="width: 5%">Connected<abbr class="initialism" title="Is Server currently connected and can provide logs">?</abbr> </th>
+        <th scope="col" style="width: 5%">Connected<abbr class="initialism"
+                                                         title="Is Server currently connected and can provide logs">?</abbr>
+        </th>
         <th scope="col" style="width: 5%">Enabled</th>
         <th scope="col" style="width: 10%">Actions</th>
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
+      <tr
+        *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
         <td>{{server.name}}</td>
         <td>{{server.ip}}</td>
         <td>{{server.protocol}}</td>

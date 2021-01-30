@@ -19,7 +19,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Primary
 @Repository
@@ -83,12 +87,9 @@ public class EAVObjectDAO {
     private static final String GET_ATTRIBUTE_BY_LIST_VALUE_QUERY = "select attr.attr_id, attr.object_id, Lists.value\n" +
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
-
-    protected final JdbcTemplate jdbcTemplate;
-
     private static final String ERROR_MESSAGE = "id can`t be null";
-
     private static final EAVObjectFactory eavObjectFactory = EAVObjectFactory.getInstance();
+    protected final JdbcTemplate jdbcTemplate;
 
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

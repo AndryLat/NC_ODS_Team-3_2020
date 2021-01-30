@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {User} from '../../entity/User';
-import {AuthService} from "../../services/AuthService";
+import {AuthService} from '../../services/AuthService';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {GlobalConstants} from "../../constants/global-constants";
+import {GlobalConstants} from '../../constants/global-constants';
 
 
 @Component({
@@ -28,7 +28,7 @@ export class UserSettingsComponent {
     });
     this.user = new User();
     this.httpClient = http;
-    this.httpClient.get<User>("api/user/getInfo").subscribe(result => {
+    this.httpClient.get<User>('api/user/getInfo').subscribe(result => {
       this.user = result;
     });
   }
@@ -39,16 +39,18 @@ export class UserSettingsComponent {
       let userCheck: User = new User();
       userCheck.login = this.user.login;
       userCheck.password = this.form.value.oldPassword;
-      this.httpClient.post("api/user/checkPassword", userCheck, {observe: 'response'}).subscribe(res => {
+      this.httpClient.post('api/user/checkPassword', userCheck, {observe: 'response'}).subscribe(res => {
         if (res.body as boolean) {
           this.user.password = this.form.value.newPassword;
-          this.httpClient.put(GlobalConstants.apiUrl + "api/user/updatePassword", this.user, {observe: 'response'}).subscribe(result => {
+          this.httpClient.put(GlobalConstants.apiUrl + 'api/user/updatePassword', this.user, {observe: 'response'}).subscribe(result => {
             this.passChangeSuccess = (result.status == 204);
-          })
+          });
         }
-      })
+      });
 
-    } else this.differentPasswords = true;
+    } else {
+      this.differentPasswords = true;
+    }
   }
 
   deletePres() {
@@ -60,10 +62,10 @@ export class UserSettingsComponent {
   }
 
   deleteYes() {
-    this.httpClient.delete("api/user/delete/" + this.user.objectId).subscribe(res => {
+    this.httpClient.delete('api/user/delete/' + this.user.objectId).subscribe(res => {
       console.log(res);
       this.authService.logout();
       this.router.navigateByUrl('/');
-    })
+    });
   }
 }

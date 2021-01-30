@@ -15,12 +15,12 @@ import java.util.Date;
 
 @Service
 public class ServerService extends AbstractService {
-
-    private final Logger logger = LogManager.getLogger(ServerService.class.getName());
-    private final EAVObjectDAO eavObjectDAO;
+    private static final Logger logger = LogManager.getLogger(ServerService.class.getName());
     private static final Class<Server> serverClass = Server.class;
     private static final String SERVER_NOT_NULL_MESSAGE = "Server shouldn't be null";
     private static final String ID_NOT_NULL_MESSAGE = "Id shouldn't be 0 or null";
+
+    private final EAVObjectDAO eavObjectDAO;
 
     public ServerService(EAVObjectDAO eavObjectDAO) {
         this.eavObjectDAO = eavObjectDAO;

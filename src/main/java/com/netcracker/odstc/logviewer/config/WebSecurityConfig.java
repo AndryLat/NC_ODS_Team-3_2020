@@ -24,7 +24,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER_UPDATE_PASSWORD_ENDPOINT = "/api/user/updatePassword**";
     private static final String ADMIN_ENDPOINT = "/api/user/*";
 
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
@@ -33,8 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder;
+        return new BCryptPasswordEncoder();
     }
 
     @Autowired
@@ -46,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT,GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT,USER_UPDATE_PASSWORD_ENDPOINT).permitAll()
+                .antMatchers("/ws/**").permitAll()// Will be secured through WebSocketSecurity
+                .antMatchers(LOGIN_ENDPOINT, GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT, USER_UPDATE_PASSWORD_ENDPOINT).permitAll()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()

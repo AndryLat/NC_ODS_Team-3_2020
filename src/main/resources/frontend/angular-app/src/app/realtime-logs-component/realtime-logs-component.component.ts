@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WebSocketMessageHandler} from "../socket-service/WebSocketMessageHandler";
-import {WebSocketService} from "../socket-service/WebSocketService";
-import {Log} from "../entity/Log";
-import {RouteVariableNameConstants} from "../constants/route-variable-names-constants";
+import {WebSocketMessageHandler} from '../socket-service/WebSocketMessageHandler';
+import {WebSocketService} from '../socket-service/WebSocketService';
+import {Log} from '../entity/Log';
+import {RouteVariableNameConstants} from '../constants/route-variable-names-constants';
 
 @Component({
   selector: 'app-realtime-logs-component',
@@ -18,12 +18,12 @@ export class RealtimeLogsComponentComponent implements OnInit, OnDestroy, WebSoc
 
   constructor(private webSocketService: WebSocketService) {
     this.objectId = localStorage.getItem(RouteVariableNameConstants.logFileToRealTimeVariableName);
-    webSocketService.addHandler(this,this.objectId);
+    webSocketService.addHandler(this, this.objectId);
   }
 
   ngOnInit(): void {
     let newLog = new Log();
-    newLog.text = "Test log from ts";
+    newLog.text = 'Test log from ts';
     this.logs.push(newLog);
   }
 
@@ -32,10 +32,10 @@ export class RealtimeLogsComponentComponent implements OnInit, OnDestroy, WebSoc
   }
 
   getLogs(): string {
-    let res:string = "";
+    let res: string = '';
 
-    this.logs.forEach(log=>{
-      res = res + log.text+'\n';
+    this.logs.forEach(log => {
+      res = res + log.text + '\n';
     });
     console.log(res);
 

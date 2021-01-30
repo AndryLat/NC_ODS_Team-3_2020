@@ -2,13 +2,13 @@ package com.netcracker.odstc.logviewer.models.eaventity.constants;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AttributesTest {
 
     @Test
     void testValues_idNotNull_allValuesHaveId() {
-        for(Attributes attributes:Attributes.values()){
+        for (Attributes attributes : Attributes.values()) {
             assertNotNull(attributes.getAttrId());
         }
     }

@@ -1,9 +1,9 @@
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Injectable} from '@angular/core';
-import {OverlaySpinnerComponent} from "./overlay-spinner.component";
-import {defer, NEVER} from "rxjs";
-import {finalize, share} from "rxjs/operators";
+import {OverlaySpinnerComponent} from './overlay-spinner.component';
+import {defer, NEVER} from 'rxjs';
+import {finalize, share} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',

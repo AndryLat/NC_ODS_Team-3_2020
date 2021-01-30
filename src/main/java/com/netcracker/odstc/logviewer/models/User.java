@@ -86,4 +86,14 @@ public class User extends EAVObject {
     public void setCreated(BigInteger created) {
         setReference(Attributes.CREATED_OT_USER.getAttrId(), created);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

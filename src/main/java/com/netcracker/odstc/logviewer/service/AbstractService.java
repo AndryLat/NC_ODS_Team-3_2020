@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.math.BigInteger;
 
 public abstract class AbstractService {
-    private final Logger logger = LogManager.getLogger(AbstractService.class.getName());
+    private static final Logger logger = LogManager.getLogger(AbstractService.class.getName());
 
     protected boolean isIdValid(BigInteger id) {
         return id != null && !id.equals(BigInteger.valueOf(0));
@@ -22,15 +22,15 @@ public abstract class AbstractService {
     protected void validateObjectType(EAVObject eavObject) {
         if (eavObject instanceof Directory) {
             eavObject.setObjectTypeId(ObjectTypes.DIRECTORY.getObjectTypeID());
-        }else if (eavObject instanceof LogFile) {
+        } else if (eavObject instanceof LogFile) {
             eavObject.setObjectTypeId(ObjectTypes.LOGFILE.getObjectTypeID());
-        }else if (eavObject instanceof User) {
+        } else if (eavObject instanceof User) {
             eavObject.setObjectTypeId(ObjectTypes.USER.getObjectTypeID());
-        }else if (eavObject instanceof Server) {
+        } else if (eavObject instanceof Server) {
             eavObject.setObjectTypeId(ObjectTypes.SERVER.getObjectTypeID());
-        }else if (eavObject instanceof Log) {
+        } else if (eavObject instanceof Log) {
             eavObject.setObjectTypeId(ObjectTypes.LOG.getObjectTypeID());
-        }else {
+        } else {
             logger.warn("Get EAVObject that not listed in validations");
         }
     }

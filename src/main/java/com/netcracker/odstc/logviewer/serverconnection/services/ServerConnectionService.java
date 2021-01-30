@@ -10,6 +10,7 @@ import com.netcracker.odstc.logviewer.serverconnection.FTPServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.SSHServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
+import com.netcracker.odstc.logviewer.serverconnection.services.exceptions.ServerConnectionServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -119,13 +120,18 @@ public class ServerConnectionService {
      * @param directory  Folder for listing files
      * @param extensions Extensions of files to include in results
      * @return list of files as LogFile
-     * @throws ServerConnectionException when list of files cant be received
+     * @throws ServerConnectionServiceException when list of files cant be received due to server error
      * @see com.netcracker.odstc.logviewer.models.LogFile
      */
-    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory, String[] extensions) throws ServerConnectionException {
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory, String[] extensions) throws ServerConnectionServiceException {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
-        List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory, extensions);
-        serverConnection.disconnect();
+        List<LogFile> logFiles;
+        try {
+            logFiles = serverConnection.getLogFilesFromDirectory(directory, extensions);
+            serverConnection.disconnect();
+        } catch (ServerConnectionException exception) {
+            throw new ServerConnectionServiceException("Connection error with " + server.getIp() + ". When getting file list from directory: " + directory.getPath());
+        }
         return logFiles;
     }
 
@@ -134,13 +140,18 @@ public class ServerConnectionService {
      * @param server    Server where directory located
      * @param directory Folder for listing files
      * @return list of files as LogFile
-     * @throws ServerConnectionException when list of files cant be received
+     * @throws ServerConnectionServiceException when list of files cant be received due to server error
      * @see com.netcracker.odstc.logviewer.models.LogFile
      */
-    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) throws ServerConnectionException {
+    public List<LogFile> getLogFilesFromDirectory(Server server, Directory directory) throws ServerConnectionServiceException {
         ServerConnection serverConnection = wrapServerIntoConnection(server);
-        List<LogFile> logFiles = serverConnection.getLogFilesFromDirectory(directory);
-        serverConnection.disconnect();
+        List<LogFile> logFiles;
+        try {
+            logFiles = serverConnection.getLogFilesFromDirectory(directory);
+            serverConnection.disconnect();
+        } catch (ServerConnectionException exception) {
+            throw new ServerConnectionServiceException("Connection error with " + server.getIp() + ". When getting file list from directory: " + directory.getPath());
+        }
         return logFiles;
     }
 

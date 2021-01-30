@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("api/directory")
 @RestController
 public class DirectoryController {
-    private final static Logger logger = LogManager.getLogger(DirectoryController.class);
+    private static final Logger logger = LogManager.getLogger(DirectoryController.class);
     private static final String DEFAULT_PAGE_SIZE = "10";
     private final DirectoryService directoryService;
     private final LogFileService logFileService;
@@ -77,7 +77,7 @@ public class DirectoryController {
     @GetMapping("/test")
     public ResponseEntity<Boolean> testConnectionToDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
         logger.info("GET: Requested test connection to directory");
-        Directory directory = new ObjectMapper().readValue(directoryInString,Directory.class);
+        Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
         Directory dir = new Directory(directory.getPath());
         dir.setParentId(directory.getParentId());
         return ResponseEntity.ok(directoryService.testConnection(dir));
@@ -86,7 +86,7 @@ public class DirectoryController {
     @GetMapping("/files")
     public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
         logger.info("GET: Requested file listing from directory");
-        Directory directory = new ObjectMapper().readValue(directoryInString,Directory.class);
+        Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
         return ResponseEntity.ok(logFileService.getLogFileList(directory));
     }
 

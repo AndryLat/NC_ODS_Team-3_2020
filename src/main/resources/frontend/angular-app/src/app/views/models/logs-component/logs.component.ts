@@ -4,11 +4,11 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {LogLevel} from '../../../entity/list/LogLevel';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {AuthService} from "../../../services/AuthService";
-import {faTrashAlt} from "@fortawesome/free-solid-svg-icons";
-import {RuleContainer} from "../../../containers/RuleContainer";
-import {LogPage} from "../../../pageable/LogPage";
-import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
+import {AuthService} from '../../../services/AuthService';
+import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {RuleContainer} from '../../../containers/RuleContainer';
+import {LogPage} from '../../../pageable/LogPage';
+import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
 
 @Component({
   selector: 'app-logs',
@@ -44,36 +44,35 @@ export class LogsComponent implements OnInit {
     }
 
     let logFileId = localStorage.getItem(RouteVariableNameConstants.logFileToLogsVariableName);
-    if(logFileId!=null){
+    if (logFileId != null) {
       this.parentId = logFileId;
-      this.parentType = "logFileId"
-    }else {
+      this.parentType = 'logFileId';
+    } else {
       this.parentId = localStorage.getItem(RouteVariableNameConstants.directoryToLogsVariableName);
-      this.parentType = "directoryId";
+      this.parentType = 'directoryId';
     }
-
 
 
   }
 
   ngOnInit(): void {
-    this.rule = new RuleContainer("", null, null, 0);
+    this.rule = new RuleContainer('', null, null, 0);
     this.getLogsByRule(1);
   }
 
   deleteLog(objectId: string): void {
-    this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
+    this.http.delete(this.localApi + '/delete/' + objectId).subscribe(result => {
       this.msg = 'Log successfully deleted';
     }, error => {
       this.msg = 'Something went wrong during deleting logs';
-    })
+    });
     let changedServer = this.logPage.content.find(deletedLog => deletedLog.objectId == objectId);
     let index = this.logPage.content.indexOf(changedServer);
     this.logPage.content.splice(index, 1);
   }
 
   checkAllCheckBox(ev) {
-    this.logPage?.content.forEach(x => x.checked = ev.target.checked)
+    this.logPage?.content.forEach(x => x.checked = ev.target.checked);
   }
 
   isAllCheckBoxChecked() {
@@ -83,7 +82,7 @@ export class LogsComponent implements OnInit {
   deleteSelectedLogs(): void {
     const selectedProducts = this.logPage?.content.filter(product => product.checked).map(p => p.objectId);
     if (selectedProducts && selectedProducts.length > 0) {
-      this.http.delete(this.localApi + "/deletes/" + selectedProducts)
+      this.http.delete(this.localApi + '/deletes/' + selectedProducts)
         .subscribe(result => {
             this.msg = 'Logs successfully deleted';
             for (let i = 0; i < selectedProducts.length; i++) {
@@ -113,15 +112,15 @@ export class LogsComponent implements OnInit {
     this.rule.levels = [];
     for (let level of this.keys()) {
       if (this.operationForm.controls[level].value) {
-        this.rule.levels.push(LogLevel[level]-13);
+        this.rule.levels.push(LogLevel[level] - 13);
       }
     }
 
-    console.log(this.rule)
+    console.log(this.rule);
     let params = new HttpParams()
-      .set("rule", JSON.stringify(this.rule))
+      .set('rule', JSON.stringify(this.rule))
       .set(this.parentType, this.parentId)
-      .set("page", pageNumber.toString());
+      .set('page', pageNumber.toString());
 
     this.http.get<LogPage>(this.localApi + '/', {params}).subscribe(result => {
       console.log(result);
@@ -134,14 +133,6 @@ export class LogsComponent implements OnInit {
   keys(): Array<string> {
     let keys = Object.keys(LogLevel);
     return keys.slice(keys.length / 2);
-  }
-
-  formatLevel(level: LogLevel): string {
-    return LogLevel[level];
-  }
-
-  private findIndexToUpdate(newItem) {
-    return newItem.objectId === this;
   }
 
   handleMessage(message: any) {

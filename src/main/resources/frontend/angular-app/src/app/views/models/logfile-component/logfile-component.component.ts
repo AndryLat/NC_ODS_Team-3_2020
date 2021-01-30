@@ -1,24 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import {LogFilePage} from "../../../pageable/LogFilePage";
-import {LogFile} from "../../../entity/LogFile";
-import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
-import {Router} from "@angular/router";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {Component, OnInit} from '@angular/core';
+import {LogFilePage} from '../../../pageable/LogFilePage';
+import {LogFile} from '../../../entity/LogFile';
+import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
+import {Router} from '@angular/router';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {faEye, faSignInAlt, faStream, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
-import {GlobalConstants} from "../../../constants/global-constants";
-import {Directory} from "../../../entity/Directory";
-import {FormGroup} from "@angular/forms";
+import {GlobalConstants} from '../../../constants/global-constants';
+import {Directory} from '../../../entity/Directory';
+import {FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-logfile-component',
-  templateUrl: './logfile-component.component.html',
-  styleUrls: ['./logfile-component.component.css']
+  templateUrl: './logfile-component.component.html'
 })
 export class LogfileComponentComponent implements OnInit {
   errorMessage: string;
   confirmMessage: string;
   logFilePage: LogFilePage;
-  localApi: string = "api/logFile";
+  localApi: string = 'api/logFile';
 
   logsIcon = faStream;
   proceedIcon = faSignInAlt;
@@ -40,7 +39,7 @@ export class LogfileComponentComponent implements OnInit {
 
   getResult: string;
 
-  constructor(private router:Router,private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient) {
     this.directory = JSON.parse(localStorage.getItem(RouteVariableNameConstants.directoryToLogFilesVariableName));
   }
 
@@ -50,30 +49,30 @@ export class LogfileComponentComponent implements OnInit {
 
   routeToLogs(file: LogFile) {
     const objectId = file.objectId;
-    localStorage.setItem(RouteVariableNameConstants.logFileToLogsVariableName,objectId);
+    localStorage.setItem(RouteVariableNameConstants.logFileToLogsVariableName, objectId);
     localStorage.removeItem(RouteVariableNameConstants.directoryToLogsVariableName);
     this.router.navigateByUrl('/logs');
   }
 
   deleteFile(objectId: string) {
-    this.http.delete(this.localApi + "/delete/" + objectId).subscribe(result => {
-      this.confirmMessage = "File deleted successfully";
+    this.http.delete(this.localApi + '/delete/' + objectId).subscribe(result => {
+      this.confirmMessage = 'File deleted successfully';
 
       let changedServer = this.logFilePage.content.find(deletedElement => deletedElement.objectId === objectId);
       let index = this.logFilePage.content.indexOf(changedServer);
 
       this.logFilePage.content.splice(index, 1);
     }, error => {
-      this.errorMessage = "Error with deleting file";
-    })
+      this.errorMessage = 'Error with deleting file';
+    });
   }
 
   getFilesFromPage(pageNumber: number) {
     let params = new HttpParams()
-      .set("directoryId", this.directory.objectId)
-      .set("page", pageNumber.toString());
+      .set('directoryId', this.directory.objectId)
+      .set('page', pageNumber.toString());
 
-    this.http.get<LogFilePage>(this.localApi+'/', {params}).subscribe(result => {
+    this.http.get<LogFilePage>(this.localApi + '/', {params}).subscribe(result => {
       console.log(result);
       this.logFilePage = result;
       this.logFilePage.number = this.logFilePage.number + 1;// In Spring pages start from 0.
@@ -82,117 +81,123 @@ export class LogfileComponentComponent implements OnInit {
   }
 
   routeToRealtime(objectId: string) {
-    localStorage.setItem(RouteVariableNameConstants.logFileToRealTimeVariableName,objectId);
+    localStorage.setItem(RouteVariableNameConstants.logFileToRealTimeVariableName, objectId);
     this.router.navigateByUrl('/realtime');
   }
 
-  getFiles():void{
-    let params =  new HttpParams().set("directoryInString", JSON.stringify(this.directory));
+  getFiles(): void {
+    let params = new HttpParams().set('directoryInString', JSON.stringify(this.directory));
 
     this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files', {params}).subscribe(result => {
-      result.forEach(result => result.checked = true)
+      result.forEach(result => result.checked = true);
       this.filesFromDir = this.files = result;
     }, error => {
       this.getResult = 'Error with receiving files';
-    })
+    });
   }
 
-  search():void{
-    const val = this.searchForm.value
-    if(val.searchText){
-      this.files = []
+  search(): void {
+    const val = this.searchForm.value;
+    if (val.searchText) {
+      this.files = [];
       this.filesFromDir.forEach(result => {
-        if(result.fileName.includes(val.searchText)){
-          this.files.push(result)
+        if (result.fileName.includes(val.searchText)) {
+          this.files.push(result);
         }
-      })
+      });
     }
   }
 
-  closeUpdateFiles():void{
-    this.filesFromDB = undefined
-    this.filesFromServer = undefined
-    this.filesForUpdate = []
+  closeUpdateFiles(): void {
+    this.filesFromDB = undefined;
+    this.filesFromServer = undefined;
+    this.filesForUpdate = [];
   }
 
-  splitFilesServerBD(logFilesFromDB: LogFile[], logFilesFromServer: LogFile[]){
-    if(logFilesFromDB && logFilesFromServer){
-      logFilesFromServer.forEach(result =>{
-        logFilesFromDB.forEach(res =>{
-          if(result.fileName == res.fileName){
-            if(res.checked){
-              result.checked = true
+  splitFilesServerBD(logFilesFromDB: LogFile[], logFilesFromServer: LogFile[]) {
+    if (logFilesFromDB && logFilesFromServer) {
+      logFilesFromServer.forEach(result => {
+        logFilesFromDB.forEach(res => {
+          if (result.fileName == res.fileName) {
+            if (res.checked) {
+              result.checked = true;
             } else {
-              result.checked = false
+              result.checked = false;
             }
           }
         });
-        this.filesForUpdate.push(result)
+        this.filesForUpdate.push(result);
       });
-      console.log(this.filesForUpdate)
+      console.log(this.filesForUpdate);
     }
   }
 
-  updateFiles(){
+  updateFiles() {
     this.filesForUpdate.forEach(result => {
-      this.filesFromDB.forEach(res =>{
-        if(result.fileName == res.fileName){
-          if(result.checked != res.checked){
+      this.filesFromDB.forEach(res => {
+        if (result.fileName == res.fileName) {
+          if (result.checked != res.checked) {
             //delete result
             this.http.delete(GlobalConstants.apiUrl + 'api/logFile/delete/' + res.objectId).subscribe(() => {
               //
             });
-          }else{result.checked = false;}
+          } else {
+            result.checked = false;
+          }
         }
-      })
-      if((result.checked == true)){
+      });
+      if ((result.checked == true)) {
         //adding result
         this.http.post<LogFile>(GlobalConstants.apiUrl + 'api/logFile/file/add', result).subscribe(result => {
-          console.log('Adding ',result);
+          console.log('Adding ', result);
         }, error => {
           //msg = 'Something went wrong with files';
         });
         //
       }
-    })
+    });
   }
 
-  getFilesForUpdate():void{
-    const directory = new Directory()
-    directory.objectId = this.directory.objectId
-    directory.parentId = this.directory.parentId
-    directory.path = this.directory.path
-    if(this.filesFromDB === undefined) {this.getFilesFromDB(directory)}
-    if(this.filesFromServer === undefined) {this.getFilesFromServer(directory)}
+  getFilesForUpdate(): void {
+    const directory = new Directory();
+    directory.objectId = this.directory.objectId;
+    directory.parentId = this.directory.parentId;
+    directory.path = this.directory.path;
+    if (this.filesFromDB === undefined) {
+      this.getFilesFromDB(directory);
+    }
+    if (this.filesFromServer === undefined) {
+      this.getFilesFromServer(directory);
+    }
   }
 
-  getFilesFromServer(dir: Directory):void{
-    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+  getFilesFromServer(dir: Directory): void {
+    let params = new HttpParams().set('directoryInString', JSON.stringify(dir));
 
     this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', {params}).subscribe(result => {
       result.forEach(result => {
-        result.checked = false
-        result.parentId = dir.objectId
-      })
-      this.filesFromServer = result
-      console.log(this.filesFromServer)
+        result.checked = false;
+        result.parentId = dir.objectId;
+      });
+      this.filesFromServer = result;
+      console.log(this.filesFromServer);
     }, error => {
       //this.Result = 'Error with receiving files';
-    })
+    });
   }
 
-  getFilesFromDB(dir: Directory):void{
-    let params =  new HttpParams().set("directoryInString", JSON.stringify(dir));
+  getFilesFromDB(dir: Directory): void {
+    let params = new HttpParams().set('directoryInString', JSON.stringify(dir));
 
     this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/filesDB', {params}).subscribe(result => {
-      result.forEach(result => result.checked = true)
-      this.filesFromDB = result
-      console.log(this.filesFromDB)
+      result.forEach(result => result.checked = true);
+      this.filesFromDB = result;
+      console.log(this.filesFromDB);
     }, error => {
-    })
+    });
   }
 
-  changeStatusFile(name:String, files:LogFile[]){
+  changeStatusFile(name: string, files: LogFile[]) {
     files.find(f => f.name == name).checked = !files.find(f => f.name == name).checked;
   }
 }

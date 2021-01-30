@@ -5,7 +5,7 @@ import {User} from '../../../entity/User';
 import {UserPage} from '../../../pageable/UserPage';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {Router} from '@angular/router';
-import {AuthService} from "../../../services/AuthService";
+import {AuthService} from '../../../services/AuthService';
 
 @Component({
   selector: 'app-users-component',
@@ -20,7 +20,7 @@ export class UsersComponent {
     'USER', 'ADMIN'
   ];
 
-  constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router){
+  constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router) {
     http.get<UserPage>(GlobalConstants.apiUrl + 'api/user/').subscribe(result => {
       this.users = result.content;
     });
@@ -32,7 +32,8 @@ export class UsersComponent {
       role: ['', Validators.required]
     });
   }
-  deleteUser(id: string): void{
+
+  deleteUser(id: string): void {
     this.http.delete(GlobalConstants.apiUrl + 'api/user/delete/' + id).subscribe(() => {
       this.users = this.users.filter(item => item.objectId !== id);
     });

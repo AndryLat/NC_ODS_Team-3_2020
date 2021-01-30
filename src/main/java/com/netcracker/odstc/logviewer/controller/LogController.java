@@ -2,10 +2,10 @@ package com.netcracker.odstc.logviewer.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netcracker.odstc.logviewer.containers.RuleContainer;
 import com.netcracker.odstc.logviewer.containers.dto.LogDTO;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.service.LogService;
-import com.netcracker.odstc.logviewer.containers.RuleContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -29,8 +29,7 @@ import java.util.List;
 public class LogController {
     private final Logger logger = LogManager.getLogger(LogController.class.getName());
     private static final String DEFAULT_PAGE_SIZE = "20";
-
-    private LogService logService;
+    private final LogService logService;
 
     public LogController(LogService logService) {
         this.logService = logService;

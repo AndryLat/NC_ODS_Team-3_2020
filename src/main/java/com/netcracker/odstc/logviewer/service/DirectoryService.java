@@ -16,8 +16,8 @@ import java.util.Date;
 
 @Service
 public class DirectoryService extends AbstractService {
+    private static final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
     private static final Class<Directory> directoryClass = Directory.class;
-    private final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
     private final EAVObjectDAO eavObjectDAO;
     private final ServerConnectionService serverConnectionService;
 
