@@ -55,14 +55,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-
-        String roleUser;
-        try {
-            roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
-        } catch (Exception exp) {
-            logger.error("User authorities authentication error:", exp);
-            throw new RuntimeException("User authorities authentication error:", exp);
-        }
+        String roleUser = ((JwtUser) authResult.getPrincipal()).getAuthorities().toArray()[0].toString();
 
         String token = JWT.create()
                 .withSubject(((JwtUser) authResult.getPrincipal()).getUsername())

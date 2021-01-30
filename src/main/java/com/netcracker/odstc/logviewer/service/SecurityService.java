@@ -34,6 +34,14 @@ public class SecurityService {
         return token;
     }
 
+    public String getLogin(String token,BigInteger id){
+        if (!validatePasswordResetToken(token, id)) {
+            logger.error("Password reset is not available.");
+            throw new IllegalArgumentException("Password reset is not available.");
+        }
+        return getLoginUserFromToken(token);
+    }
+
     public boolean validatePasswordResetToken(String token, BigInteger id) {
         if (token != null) {
             try {

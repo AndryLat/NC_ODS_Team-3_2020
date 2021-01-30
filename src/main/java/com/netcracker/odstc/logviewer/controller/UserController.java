@@ -72,10 +72,7 @@ public class UserController {
 
     @GetMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestParam("id") BigInteger id, @RequestParam("token") String token) {
-        if (securityService.validatePasswordResetToken(token, id)) {
-            userService.throwException("Password reset is not available.");
-        }
-        String login = securityService.getLoginUserFromToken(token);
+        String login = securityService.getLogin(token, id);
         logger.info("GET: Requested check resetPasswordToken for user with login {}", (login != null ? login : "null"));
         return ResponseEntity.ok(login);
     }
