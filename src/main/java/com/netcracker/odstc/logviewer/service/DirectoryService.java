@@ -28,21 +28,21 @@ public class DirectoryService extends AbstractService {
 
     public Page<Directory> findByParentId(BigInteger id, Pageable pageable) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
+            throw buildDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
         }
         return eavObjectDAO.getObjectsByParentId(pageable, id, directoryClass);
     }
 
     public Directory findById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directory");
+            throw buildDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directory");
         }
         return eavObjectDAO.getObjectById(id, directoryClass);
     }
 
     public void add(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
         directory.setLastExistenceCheck(new Date());
         directory.setLastAccessByUser(new Date());
@@ -54,21 +54,21 @@ public class DirectoryService extends AbstractService {
 
     public void update(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
         eavObjectDAO.saveObjectAttributesReferences(directory);
     }
 
     public void deleteById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid id. Can't delete directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid id. Can't delete directory");
         }
         eavObjectDAO.deleteById(id);
     }
 
     public boolean testConnection(Directory directory) {
         if (!isDirectoryValid(directory) || directory.getParentId() == null) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
         }
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
         return serverConnectionService.isDirectoryAvailable(server, directory);
@@ -81,9 +81,9 @@ public class DirectoryService extends AbstractService {
             return false;
     }
 
-    private void throwDirectoryServiceExceptionWithMessage(String message) {
+    private DirectoryServiceException buildDirectoryServiceExceptionWithMessage(String message) {
         DirectoryServiceException directoryServiceException = new DirectoryServiceException(message);
         logger.error(message, directoryServiceException);
-        throw directoryServiceException;
+        return directoryServiceException;
     }
 }

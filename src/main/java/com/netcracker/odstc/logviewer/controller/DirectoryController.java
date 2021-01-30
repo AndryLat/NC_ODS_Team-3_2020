@@ -3,9 +3,7 @@ package com.netcracker.odstc.logviewer.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netcracker.odstc.logviewer.models.Directory;
-import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.service.DirectoryService;
-import com.netcracker.odstc.logviewer.service.LogFileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @RequestMapping("api/directory")
 @RestController
@@ -31,11 +28,9 @@ public class DirectoryController {
     private static final Logger logger = LogManager.getLogger(DirectoryController.class);
     private static final String DEFAULT_PAGE_SIZE = "10";
     private final DirectoryService directoryService;
-    private final LogFileService logFileService;
 
-    public DirectoryController(DirectoryService directoryService, LogFileService logFileService) {
+    public DirectoryController(DirectoryService directoryService) {
         this.directoryService = directoryService;
-        this.logFileService = logFileService;
     }
 
     @GetMapping("/")
@@ -78,25 +73,6 @@ public class DirectoryController {
     public ResponseEntity<Boolean> testConnectionToDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
         logger.info("GET: Requested test connection to directory");
         Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
-        Directory dir = new Directory(directory.getPath());
-        dir.setParentId(directory.getParentId());
-        return ResponseEntity.ok(directoryService.testConnection(dir));
-    }
-
-    @GetMapping("/files")
-    public ResponseEntity<List<LogFile>> getLogFilesFromDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
-        logger.info("GET: Requested file listing from directory");
-        Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
-        return ResponseEntity.ok(logFileService.getLogFileList(directory));
-    }
-
-    @PostMapping("/files/add")
-    public ResponseEntity<Directory> addLogFiles(@RequestBody List<LogFile> logFiles) {
-        if (logger.isInfoEnabled()) {
-            String size = logFiles == null ? "null array" : String.valueOf(logFiles.size());
-            logger.info("POST: Requested saving {} files", size);
-        }
-        logFileService.addLogFileList(logFiles);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(directoryService.testConnection(directory));
     }
 }
