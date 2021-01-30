@@ -34,6 +34,21 @@ public class SecurityService {
         return token;
     }
 
+    public boolean validateToken(String token) {
+        if (token != null) {
+            try {
+                JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                        .build()
+                        .verify(token);
+                return true;
+            } catch (TokenExpiredException exp) {
+                logger.error("Token expired ", exp);
+                return false;
+            }
+        }
+        return false;
+    }
+
     public boolean validatePasswordResetToken(String token, BigInteger id) {
         if (token != null) {
             try {
@@ -54,6 +69,14 @@ public class SecurityService {
             }
         }
         return false;
+    }
+
+    public String getLogin(String token,BigInteger id){
+        if (!validatePasswordResetToken(token, id)) {
+            logger.error("Password reset is not available.");
+            throw new IllegalArgumentException("Password reset is not available.");
+        }
+        return getLoginUserFromToken(token);
     }
 
     public String getLoginUserFromToken(String token) {

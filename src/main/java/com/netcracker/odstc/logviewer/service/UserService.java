@@ -143,12 +143,6 @@ public class UserService {
         }
     }
 
-    public void throwException(String nameException) {
-        IllegalArgumentException exception = new IllegalArgumentException();
-        logger.error(nameException);
-        throw exception;
-    }
-
     private void save(User user) {
         if (!isUserValidForSave(user)) {
             throwUserServiceExceptionWithMessage("User is not valid for save.");
