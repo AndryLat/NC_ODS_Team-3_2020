@@ -41,6 +41,20 @@ public class LogService extends AbstractService {
         return logDAO.getLogByDirectoryId(directoryId, ruleContainer, pageable);
     }
 
+    public Page<LogDTO> getLogByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
+        if (!isIdValid(fileId) || ruleContainer == null || pageable == null) {
+            throw buildLogServiceExceptionWithMessage("Values сan't be null");
+        }
+        if (ruleContainer.getLevels() != null) {
+            if (ruleContainer.getLevels().isEmpty()) {
+                ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+            }
+        } else {
+            ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+        }
+        return logDAO.getLogByFileId(fileId, ruleContainer, pageable);
+    }
+
     public void deleteById(BigInteger id) {
         if (isIdValid(id)) {
             logDAO.deleteById(id);
