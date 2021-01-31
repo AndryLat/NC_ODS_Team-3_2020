@@ -19,6 +19,7 @@ export class UserSettingsComponent {
   deletePressed: boolean = false;
   differentPasswords: boolean = false;
   passChangeSuccess: boolean;
+  wrongPassword: boolean = false;
 
   constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({
@@ -41,10 +42,13 @@ export class UserSettingsComponent {
       userCheck.password = this.form.value.oldPassword;
       this.httpClient.post('api/user/checkPassword', userCheck, {observe: 'response'}).subscribe(res => {
         if (res.body as boolean) {
+          this.wrongPassword = false;
           this.user.password = this.form.value.newPassword;
           this.httpClient.put(GlobalConstants.apiUrl + 'api/user/updatePassword', this.user, {observe: 'response'}).subscribe(result => {
             this.passChangeSuccess = (result.status == 204);
           });
+        } else {
+          this.wrongPassword = true;
         }
       });
 
