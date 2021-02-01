@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WebSocketMessageHandler} from '../socket-service/WebSocketMessageHandler';
-import {WebSocketService} from '../socket-service/WebSocketService';
-import {Log} from '../entity/Log';
-import {RouteVariableNameConstants} from '../constants/route-variable-names-constants';
+import {WebSocketMessageHandler} from '../../socket-service/WebSocketMessageHandler';
+import {WebSocketService} from '../../socket-service/WebSocketService';
+import {Log} from '../../entity/Log';
+import {RouteVariableNameConstants} from '../../constants/route-variable-names-constants';
 
 @Component({
   selector: 'app-realtime-logs-component',
@@ -18,7 +18,8 @@ export class RealtimeLogsComponentComponent implements OnInit, OnDestroy, WebSoc
 
   constructor(private webSocketService: WebSocketService) {
     this.objectId = localStorage.getItem(RouteVariableNameConstants.logFileToRealTimeVariableName);
-    webSocketService.addHandler(this, this.objectId);
+    webSocketService.addHandler(this);
+    webSocketService.addFileToListen(this.objectId);
   }
 
   ngOnInit(): void {

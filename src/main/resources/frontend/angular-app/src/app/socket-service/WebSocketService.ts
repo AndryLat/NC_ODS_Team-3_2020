@@ -14,8 +14,11 @@ export class WebSocketService {
   constructor(private authService: AuthService) {
   }
 
-  addHandler(webSocketMessageHandler: WebSocketMessageHandler, fileId: string) {
+  addHandler(webSocketMessageHandler: WebSocketMessageHandler) {
     this.handlers.push(webSocketMessageHandler);
+  }
+
+  addFileToListen(fileId: string) {
     this._connect(fileId);
   }
 
@@ -32,9 +35,8 @@ export class WebSocketService {
     });
   }
 
-  private _connect(fileId: string) {//{'Authorization': _this.authService.getToken()}
+  private _connect(fileId: string) {
     console.log('Initialize WebSocket Connection');
-    console.log('Send token: ' + this.authService.getToken());
     let ws = new SockJS(this.webSocketEndPoint);
     this.stompClient = Stomp.over(ws);
     const _this = this;

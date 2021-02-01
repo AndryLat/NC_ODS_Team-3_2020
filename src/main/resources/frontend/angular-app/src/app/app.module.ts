@@ -23,8 +23,21 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {WebSocketService} from './socket-service/WebSocketService';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RealtimeLogsComponentComponent} from './realtime-logs-component/realtime-logs-component.component';
+import {RealtimeLogsComponentComponent} from './views/realtime-logs-component/realtime-logs-component.component';
 import {LogfileComponentComponent} from './views/models/logfile-component/logfile-component.component';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatButtonModule} from '@angular/material/button';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {NgxMatDatetimePickerModule, NgxMatNativeDateModule, NgxMatTimepickerModule} from '@angular-material-components/datetime-picker';
+import {ErrorCheckInputComponent} from './services/inputs/error-check-input/error-check-input.component';
+import {ErrorCheckSelectComponent} from './services/inputs/error-check-select/error-check-select.component';
+import {ServerInputFormModalComponent} from './views/models/servers-component/server-input-form-modal/server-input-form-modal.component';
+import {ServerUpdateFormModalComponent} from './views/models/servers-component/server-update-form-modal/server-update-form-modal.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {AlertBarService} from './services/AlertBarService';
 
 @NgModule({
   declarations: [
@@ -40,17 +53,32 @@ import {LogfileComponentComponent} from './views/models/logfile-component/logfil
     PasswordSettingComponent,
     GlobalSettingsComponent,
     RealtimeLogsComponentComponent,
-    LogfileComponentComponent
+    LogfileComponentComponent,
+    ErrorCheckInputComponent,
+    ErrorCheckSelectComponent,
+    ErrorCheckSelectComponent,
+    ServerInputFormModalComponent,
+    ServerUpdateFormModalComponent
   ],
   imports: [
     OverlayModule,
     BrowserModule,
+    BrowserAnimationsModule,
+    MatTooltipModule,
     HttpClientModule,
     AppRoutingModule,
     FormsModule, ReactiveFormsModule,
     FontAwesomeModule,
     NgxPaginationModule,
-    BrowserAnimationsModule
+    MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    NgxMatTimepickerModule,
+    NgxMatDatetimePickerModule,
+    NgxMatNativeDateModule,
+    MatDialogModule
   ],
   providers: [
     AuthService,
@@ -62,8 +90,10 @@ import {LogfileComponentComponent} from './views/models/logfile-component/logfil
     },
     SpinnerService,
     AuthGuard,
-    WebSocketService],
-  bootstrap: [AppComponent]
+    WebSocketService,
+    AlertBarService],
+  bootstrap: [AppComponent],
+  entryComponents: [ServerInputFormModalComponent, ServerUpdateFormModalComponent]
 })
 export class AppModule {
   constructor() {

@@ -1,30 +1,26 @@
 <div class="container-fluid">
-  <div class="row justify-content-center">
-    <div *ngIf="errorMessage" class="alert alert-danger col-6" role="alert">
-      {{errorMessage}}
-    </div>
-    <div *ngIf="confirmMessage" class="alert alert-success col-6" role="alert">
-      {{confirmMessage}}
-    </div>
-  </div>
+  <div class="mb-4"></div>
+  <br>
   <div class="row">
     <div class="container-fluid col-11">
-      <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new server</button>
+      <button (click)="openInsert()" class="btn btn-primary">
+        <fa-icon [icon]="plusIcon"></fa-icon>
+        Add new server
+      </button>
     </div>
   </div>
-  <hr>
+  <br>
   <div class="row">
     <table class="table table-bordered">
       <caption>Servers table</caption>
-      <thead>
+      <thead class="thead-light">
       <tr>
         <th scope="col" style="width: 15%">Name</th>
         <th scope="col" style="width: 25%">IP</th>
         <th scope="col" style="width: 10%">Protocol</th>
         <th scope="col" style="width: 15%">Port</th>
-        <th scope="col" style="width: 15%">Last Log Check</th>
-        <th scope="col" style="width: 5%">Connected<abbr class="initialism"
-                                                         title="Is Server currently connected and can provide logs">?</abbr>
+        <th matTooltip="Last time when server provide logs" scope="col" style="width: 15%">Last Logs</th>
+        <th matTooltip="Is Server currently connected and can provide logs" scope="col" style="width: 5%">Connected
         </th>
         <th scope="col" style="width: 5%">Enabled</th>
         <th scope="col" style="width: 10%">Actions</th>
@@ -47,7 +43,7 @@
         <td class="text-center">
           <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="showSettings(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
+          <fa-icon (click)="openUpdate(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
                    data-target="#updateModal" data-toggle="modal"></fa-icon>
           <fa-icon (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>
@@ -56,188 +52,5 @@
       </tbody>
     </table>
     <pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></pagination-controls>
-  </div>
-</div>
-
-
-<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Adding new server</h5>
-        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- INSERT FORM -->
-        <div *ngIf="inputError" class="alert alert-danger col-12" role="alert">
-          {{inputError}}
-        </div>
-
-        <form [formGroup]="insertForm">
-          <div class="form-group">
-            <label for="nameInput">Server name</label>
-            <input class="form-control" formControlName="name" id="nameInput" name="name" placeholder="Server Name"
-                   required
-                   type="text">
-            <div
-              *ngIf="this.insertForm.controls['name'].invalid && (this.insertForm.controls['name'].dirty || this.insertForm.controls['name'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['name'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="ipInput">IP address</label>
-            <input class="form-control" formControlName="ip" id="ipInput" name="ip" placeholder="127.0.0.1" type="text">
-            <div
-              *ngIf="this.insertForm.controls['ip'].invalid && (this.insertForm.controls['ip'].dirty || this.insertForm.controls['ip'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['ip'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="portInput">Port</label>
-            <input class="form-control" formControlName="port" id="portInput" name="port" placeholder="65535"
-                   type="number">
-            <div
-              *ngIf="this.insertForm.controls['port'].errors && (this.insertForm.controls['port'].dirty || this.insertForm.controls['port'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['port'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="loginInput">Login</label>
-            <input class="form-control" formControlName="login" id="loginInput" name="login" placeholder="login"
-                   type="text">
-            <div
-              *ngIf="this.insertForm.controls['login'].invalid && (this.insertForm.controls['login'].dirty || this.insertForm.controls['login'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['login'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="passwordInput">Password</label>
-            <input class="form-control" formControlName="password" id="passwordInput" name="password"
-                   placeholder="password"
-                   type="text">
-            <div
-              *ngIf="this.insertForm.controls['password'].invalid && (this.insertForm.controls['password'].dirty || this.insertForm.controls['password'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['password'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="protocolSelect">Protocol</label>
-            <select class="form-control" formControlName="protocol" id="protocolSelect" name="protocol">
-              <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
-            </select>
-            <div
-              *ngIf="this.insertForm.controls['protocol'].invalid && (this.insertForm.controls['protocol'].dirty || this.insertForm.controls['protocol'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.insertForm.controls['protocol'])}}
-            </div>
-          </div>
-        </form>
-        <!-- INSERT FORM -->
-        <div class="d-flex flex-row">
-          <button (click)="testConnection()" class="btn btn-info col-4" type="button">Test connection</button>
-          <div *ngIf="!(testResult===null)" class="col-8">{{testResult}}</div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button (click)="insertForm.reset();testResult=null" class="btn btn-secondary" data-dismiss="modal"
-                type="button">Close
-        </button>
-        <button (click)="insertForm.markAllAsTouched();addServer()" class="btn btn-primary" type="submit">Add Server
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="updateModal" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="updateModalLabel">Settings of server</h5>
-        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- UPDATE FORM -->
-        <form [formGroup]="updateForm">
-          <input formControlName="objectId" id="objectIdInputUpdate" name="objectId" type="hidden">
-          <input formControlName="parentId" id="parentIdInputUpdate" name="parentId" type="hidden">
-          <input formControlName="lastAccessByJob" id="lastAccessByJob" name="lastAccessByJob" type="hidden">
-          <div class="form-group">
-            <label for="nameInputUpdate">Server name</label>
-            <input class="form-control" formControlName="name" id="nameInputUpdate" name="name"
-                   placeholder="Server Name"
-                   type="text">
-            <div
-              *ngIf="this.updateForm.controls['name'].invalid && (this.updateForm.controls['name'].dirty || this.updateForm.controls['name'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.updateForm.controls['name'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="portInputUpdate">Port</label>
-            <input class="form-control" formControlName="port" id="portInputUpdate" name="port" placeholder="65535"
-                   type="text">
-            <div
-              *ngIf="this.updateForm.controls['port'].invalid && (this.updateForm.controls['port'].dirty || this.updateForm.controls['port'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.updateForm.controls['port'])}}
-            </div>
-          </div>
-          <input formControlName="ip" id="ipInputUpdate" name="ip" type="hidden">
-          <div class="form-group">
-            <label for="loginInputUpdate">Login</label>
-            <input class="form-control" formControlName="login" id="loginInputUpdate" name="login" placeholder="login"
-                   type="text">
-            <div
-              *ngIf="this.updateForm.controls['login'].invalid && (this.updateForm.controls['login'].dirty || this.updateForm.controls['login'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.updateForm.controls['login'])}}
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="passwordInputUpdate">Password</label>
-            <input class="form-control" formControlName="password" id="passwordInputUpdate" name="password"
-                   placeholder="password"
-                   type="text">
-          </div>
-          <div class="form-group">
-            <label for="protocolSelectUpdate">Protocol</label>
-            <select class="form-control" formControlName="protocol" id="protocolSelectUpdate" name="protocol">
-              <option *ngFor="let protocol of protocols" [ngValue]="protocol">{{protocol}}</option>
-            </select>
-            <div
-              *ngIf="this.updateForm.controls['protocol'].invalid && (this.updateForm.controls['protocol'].dirty || this.updateForm.controls['protocol'].touched)"
-              class="alert alert-danger">
-              {{getErrorByControlName(this.updateForm.controls['protocol'])}}
-            </div>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" formControlName="enabled" id="enabledSelectUpdate" name="enabled"
-                   type="checkbox">
-            <label class="form-check-label" for="enabledSelectUpdate">Enabled</label>
-          </div>
-        </form>
-        <!-- UPDATE FORM -->
-      </div>
-      <div class="modal-footer">
-        <button (click)="updateForm.reset()" class="btn btn-secondary" data-dismiss="modal"
-                type="button">Close
-        </button>
-        <button (click)="updateForm.markAllAsTouched();updateServerByForm()" class="btn btn-primary" type="submit">
-          Update Server
-        </button>
-      </div>
-    </div>
   </div>
 </div>
