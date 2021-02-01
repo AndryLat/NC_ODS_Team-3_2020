@@ -15,6 +15,7 @@ export class LoginComponent {
   form: FormGroup;
   badLogin: boolean = false;
   private url: string = 'login';
+  submitted: boolean = false;
 
 
   constructor(private http: HttpClient,
@@ -30,22 +31,32 @@ export class LoginComponent {
     });
   }
 
+  onSubmit() {
+    this.submitted = true;
+    if (this.form.invalid) {
+      return;
+    }
+    this.login();
+  }
+
+  get f() {
+    return this.form.controls;
+  }
+
   login(): void {
     const login = this.form.value.login;
     const password = this.form.value.password;
 
-    if (login && password) {
-      this.http
-        .post(GlobalConstants.apiUrl + this.url, {login, password}, {observe: 'response'})
-        .subscribe(res => {
-            this.badLogin = false;
-            this.authService.setToken(res.headers.get('Authorization'));
-            this.router.navigateByUrl('/');
-          },
-          error => {
-            this.badLogin = (error.status == 401);
-          });
-    }
+    this.http
+      .post(GlobalConstants.apiUrl + this.url, {login, password}, {observe: 'response'})
+      .subscribe(res => {
+          this.badLogin = false;
+          this.authService.setToken(res.headers.get('Authorization'));
+          this.router.navigateByUrl('/');
+        },
+        error => {
+          this.badLogin = (error.status == 401);
+        });
 
 
   }

@@ -16,7 +16,6 @@ export class UserSettingsComponent {
 
   user: User;
   form: FormGroup;
-  httpClient: HttpClient;
   deletePressed: boolean = false;
   passChangeSuccess: boolean;
   wrongPassword: boolean = false;
@@ -32,8 +31,7 @@ export class UserSettingsComponent {
       validator: MustMatch('newPassword', 'confirmPassword'),
     });
     this.user = new User();
-    this.httpClient = http;
-    this.httpClient.get<User>('api/user/getInfo').subscribe(result => {
+    this.http.get<User>('api/user/getInfo').subscribe(result => {
       this.user = result;
     });
   }
@@ -59,11 +57,11 @@ export class UserSettingsComponent {
     let userCheck: User = new User();
     userCheck.login = this.user.login;
     userCheck.password = this.form.value.oldPassword;
-    this.httpClient.post('api/user/checkPassword', userCheck, {observe: 'response'}).subscribe(res => {
+    this.http.post('api/user/checkPassword', userCheck, {observe: 'response'}).subscribe(res => {
       if (res.body as boolean) {
         this.wrongPassword = false;
         this.user.password = this.form.value.newPassword;
-        this.httpClient.put(GlobalConstants.apiUrl + 'api/user/updatePassword', this.user, {observe: 'response'}).subscribe(result => {
+        this.http.put(GlobalConstants.apiUrl + 'api/user/updatePassword', this.user, {observe: 'response'}).subscribe(result => {
           this.passChangeSuccess = (result.status == 204);
         });
       } else {
@@ -81,7 +79,7 @@ export class UserSettingsComponent {
   }
 
   deleteYes() {
-    this.httpClient.delete('api/user/delete/' + this.user.objectId).subscribe(res => {
+    this.http.delete('api/user/delete/' + this.user.objectId).subscribe(res => {
       console.log(res);
       this.authService.logout();
       this.router.navigateByUrl('/');

@@ -12,6 +12,9 @@ export class PasswordRecoveryComponent {
 
   form: FormGroup;
   private url: string = 'api/user/resetPassword';
+  submitted: boolean = false;
+  sendSuccess: boolean = false;
+  badLogin: boolean = false;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
@@ -19,13 +22,28 @@ export class PasswordRecoveryComponent {
     });
   }
 
+  onSubmit() {
+    this.submitted = true;
+    if (this.form.invalid) {
+      return;
+    }
+    this.send();
+  }
+
+  get f() {
+    return this.form.controls;
+  }
+
   send(): void {
-    const login = this.form.value.login;
     this.http
-      .post(GlobalConstants.apiUrl + this.url, login, {observe: 'response'})
+      .post(GlobalConstants.apiUrl + this.url, this.form.value.login, {observe: 'response'})
       .subscribe(res => {
-        console.log(res);
-      });
-    alert('Check your email :)');
+          this.badLogin = false;
+          this.sendSuccess = true;
+        },
+        error => {
+          this.sendSuccess = false;
+          this.badLogin = true;
+        });
   }
 }
