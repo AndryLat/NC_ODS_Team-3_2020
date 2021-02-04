@@ -39,6 +39,7 @@ export class ServerUpdateFormModalComponent implements OnInit {
       protocol: ['', Validators.required],
       enabled: ['', Validators.required]
     });
+    console.log(this.currentServer);
     this.showSettings(this.currentServer);
   }
 
@@ -68,7 +69,6 @@ export class ServerUpdateFormModalComponent implements OnInit {
 
   getErrorByControlName(control: AbstractControl): string {
     let errors = control.errors;
-    console.log(errors);
     if (errors.max) {
       return 'Specified number is greater than max allowed: ' + errors.max.max;
     }
@@ -98,7 +98,11 @@ export class ServerUpdateFormModalComponent implements OnInit {
     if (!this.updateForm.valid) {
       return;
     }
+    console.log(this.updateForm.value);
     const server = this.updateForm.value;
+    if (server.enabled) {
+      server.connectable = true;
+    }
 
     this.http.put(this.localApi + '/update', server).subscribe(result => {
       this.dialogRef.close(server);

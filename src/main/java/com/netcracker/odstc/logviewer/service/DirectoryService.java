@@ -56,6 +56,9 @@ public class DirectoryService extends AbstractService {
         if (!isDirectoryValid(directory)) {
             throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
+        if (directory.isEnabled()) {
+            directory.setConnectable(true);
+        }
         eavObjectDAO.saveObjectAttributesReferences(directory);
     }
 

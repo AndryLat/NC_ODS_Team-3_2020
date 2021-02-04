@@ -55,6 +55,9 @@ public class ServerService extends AbstractService {
         if (!isServerValid(server)) {
             throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
         }
+        if (server.isEnabled()) {
+            server.setConnectable(true);
+        }
         eavObjectDAO.saveObjectAttributesReferences(server);
     }
 

@@ -4,7 +4,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {AuthService} from '../../../services/AuthService';
-import {faCheck, faCogs, faPlus, faSignInAlt, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faCogs, faPlus, faQuestionCircle, faSignInAlt, faSync, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {ServerPage} from '../../../pageable/ServerPage';
 import {EAVObject} from '../../../entity/EAVObject';
 import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
@@ -18,6 +18,8 @@ import {AlertBarService} from '../../../services/AlertBarService';
   templateUrl: './servers.component.html'
 })
 export class ServersComponent implements OnInit, OnDestroy {
+  refreshIcon = faSync;
+  tooltipIcon = faQuestionCircle;
   plusIcon = faPlus;
   proceedIcon = faSignInAlt;
   settingIcon = faCogs;
@@ -43,6 +45,7 @@ export class ServersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log(window.location);
     this.getServersFromPage(1);
   }
 
@@ -68,9 +71,7 @@ export class ServersComponent implements OnInit, OnDestroy {
 
   updateServer(server: Server) {
     server.lastAccessByUser = new Date();
-    this.http.put(this.localApi + '/update', server).subscribe(result => {
-    }, error => {
-    });
+    this.http.put(this.localApi + '/update', server);
   }
 
   getServersFromPage(pageNumber: number): void {
@@ -93,7 +94,7 @@ export class ServersComponent implements OnInit, OnDestroy {
     return this.serverPage.content.indexOf(changedServer);
   }
 
-  openInsert() {
+  openInsertDialog() {
 
     const dialogConfig = new MatDialogConfig();
 
@@ -110,7 +111,7 @@ export class ServersComponent implements OnInit, OnDestroy {
     });
   }
 
-  openUpdate(server: Server) {
+  openUpdateDialog(server: Server) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.autoFocus = true;

@@ -41,7 +41,13 @@
                               [labelText]="'Protocol'" [parentFormGroup]="this.updateForm"
                               [values]="protocols">
       </app-error-check-select>
+      <div [formGroup]="this.updateForm" class="form-check">
+        <input class="form-check-input" formControlName="enabled" id="enabledSelectUpdate" name="enabled"
+               type="checkbox">
+        <label class="form-check-label" for="enabledSelectUpdate">Enabled</label>
+      </div>
     </form>
+    <hr/>
     <div class="d-flex flex-row">
       <button (click)="testConnection()" class="btn btn-info col-4" type="button">Test connection</button>
       <div *ngIf="!(testResult===null)" class="col-8">{{testResult}}</div>

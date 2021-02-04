@@ -2,27 +2,34 @@
   <div class="mb-4"></div>
   <br>
   <div class="row">
-    <div class="container-fluid col-11">
-      <button (click)="openInsert()" class="btn btn-primary">
+    <div class="container-fluid ml-5">
+      <button (click)="openInsertDialog()" class="btn btn-primary">
         <fa-icon [icon]="plusIcon"></fa-icon>
         Add new server
+      </button>
+      <button (click)="getServersFromPage(serverPage.number)" class="btn btn-primary ml-3">
+        <fa-icon [icon]="refreshIcon"></fa-icon>
+        Refresh
       </button>
     </div>
   </div>
   <br>
   <div class="row">
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
       <caption>Servers table</caption>
       <thead class="thead-light">
       <tr>
         <th scope="col" style="width: 15%">Name</th>
         <th scope="col" style="width: 25%">IP</th>
         <th scope="col" style="width: 10%">Protocol</th>
-        <th scope="col" style="width: 15%">Port</th>
-        <th matTooltip="Last time when server provide logs" scope="col" style="width: 15%">Last Logs</th>
-        <th matTooltip="Is Server currently connected and can provide logs" scope="col" style="width: 5%">Connected
+        <th scope="col" style="width: 11%">Port</th>
+        <th scope="col" style="width: 15%">Last Logs
+          <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
         </th>
-        <th scope="col" style="width: 5%">Enabled</th>
+        <th scope="col" style="width: 7%">Connected
+          <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
+        </th>
+        <th scope="col" style="width: 7%">Enabled</th>
         <th scope="col" style="width: 10%">Actions</th>
       </tr>
       </thead>
@@ -34,16 +41,16 @@
         <td>{{server.protocol}}</td>
         <td>{{server.port}}</td>
         <td>{{server.lastAccessByJob | date: 'short'}}</td>
-        <td class="text-center">
+        <td [ngClass]="'text-center '+(server.connectable?'table-success':'table-danger')">
           <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
-        <td class="text-center">
+        <td [ngClass]="'text-center '+(server.enabled?'table-success':'table-danger')">
           <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
         <td class="text-center">
           <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="openUpdate(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
+          <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
                    data-target="#updateModal" data-toggle="modal"></fa-icon>
           <fa-icon (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>
