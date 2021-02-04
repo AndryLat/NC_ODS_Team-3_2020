@@ -23,7 +23,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_LOGS_BY_DIRECTORY_AND_RULE_AND_LEVEL_SORTED_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
@@ -36,7 +36,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_LOGS_BY_DIRECTORY_AND_RULE_AND_DATE_SORTED_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
@@ -49,7 +49,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_TOTAL_LOGS_COUNT_BY_DIRECTORY_AND_RULE_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ COUNT(*)\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
@@ -62,7 +62,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_LOGS_BY_FILE_AND_RULE_AND_LEVEL_SORTED_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
@@ -73,7 +73,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_LOGS_BY_FILE_AND_RULE_AND_DATE_SORTED_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ OBJECTS.OBJECT_ID, logText.VALUE, logLevel.LIST_VALUE_ID, creationDate.DATE_VALUE\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +
@@ -84,7 +84,7 @@ public class LogDAO extends EAVObjectDAO {
     private static final String GET_TOTAL_LOGS_COUNT_BY_FILE_AND_RULE_QUERY = "SELECT /*+ index(A3 Index_FOR_OBJECT_ID_ATTR_ID) index(a2 Index_FOR_OBJECT_ID_ATTR_ID_VALUE) index(A4 Index_FOR_OBJECT_ID_ATTR_ID_DATE_VALUE) index(OBJECTS Index_FOR_PARENT_ID) */ COUNT(*)\n" +
             "FROM OBJECTS\n" +
             "         JOIN ATTRIBUTES logText\n" +
-            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND logText.value like '%' || :text || '%'\n" +
+            "                   on OBJECTS.OBJECT_ID = logText.OBJECT_ID AND logText.attr_id = 23 AND upper(logText.value) like '%' || upper(:text) || '%'\n" +
             "         JOIN ATTRIBUTES logLevel\n" +
             "                   on OBJECTS.object_id = logLevel.OBJECT_ID AND logLevel.attr_id = 24 AND logLevel.list_value_id IN (:levels)\n" +
             "         JOIN ATTRIBUTES creationDate on OBJECTS.object_id = creationDate.OBJECT_ID AND creationDate.attr_id = 25 and\n" +

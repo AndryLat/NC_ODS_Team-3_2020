@@ -73,6 +73,7 @@ public class DirectoryService extends AbstractService {
         if (!isDirectoryValid(directory) || directory.getParentId() == null) {
             throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
         }
+        directory.setLastAccessByUser(new Date());
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
         return serverConnectionService.isDirectoryAvailable(server, directory);
     }

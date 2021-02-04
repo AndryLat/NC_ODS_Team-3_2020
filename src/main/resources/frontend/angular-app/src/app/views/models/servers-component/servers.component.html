@@ -1,41 +1,40 @@
-<div class="container-fluid">
-  <div class="mb-4"></div>
-  <br>
-  <div class="row">
-    <div class="container-fluid ml-5">
-      <button (click)="openInsertDialog()" class="btn btn-primary">
-        <fa-icon [icon]="plusIcon"></fa-icon>
-        Add new server
-      </button>
-      <button (click)="getServersFromPage(serverPage.number)" class="btn btn-primary ml-3">
-        <fa-icon [icon]="refreshIcon"></fa-icon>
-        Refresh
-      </button>
-    </div>
+<div class="mb-4"></div>
+<br>
+<div class="row ml-5">
+  <div class="ml-5">
+    <button (click)="openInsertDialog()" class="btn btn-primary">
+      <fa-icon [icon]="plusIcon"></fa-icon>
+      Add new server
+    </button>
+    <button (click)="getServersFromPage(serverPage.number)" class="btn btn-primary ml-3">
+      <fa-icon [icon]="refreshIcon"></fa-icon>
+      Refresh
+    </button>
   </div>
-  <br>
-  <div class="row">
-    <table class="table table-bordered table-striped">
-      <caption>Servers table</caption>
-      <thead class="thead-light">
-      <tr>
-        <th scope="col" style="width: 15%">Name</th>
-        <th scope="col" style="width: 25%">IP</th>
-        <th scope="col" style="width: 10%">Protocol</th>
-        <th scope="col" style="width: 11%">Port</th>
-        <th scope="col" style="width: 15%">Last Logs
-          <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
-        </th>
-        <th scope="col" style="width: 7%">Connected
-          <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
-        </th>
-        <th scope="col" style="width: 7%">Enabled</th>
-        <th scope="col" style="width: 10%">Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr
-        *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
+</div>
+<br>
+<div class="d-flex justify-content-center row">
+  <table class="table table-bordered table-striped ml-5 mr-5">
+    <caption>Servers table</caption>
+    <thead class="thead-light">
+    <tr>
+      <th scope="col" style="width: 15%">Name</th>
+      <th scope="col" style="width: 25%">IP</th>
+      <th scope="col" style="width: 10%">Protocol</th>
+      <th scope="col" style="width: 11%">Port</th>
+      <th scope="col" style="width: 15%">Last Logs
+        <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
+      </th>
+      <th scope="col" style="width: 7%">Connected
+        <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
+      </th>
+      <th scope="col" style="width: 7%">Enabled</th>
+      <th scope="col" style="width: 10%">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr
+      *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
         <td>{{server.name}}</td>
         <td>{{server.ip}}</td>
         <td>{{server.protocol}}</td>
@@ -47,17 +46,18 @@
         <td [ngClass]="'text-center '+(server.enabled?'table-success':'table-danger')">
           <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
-        <td class="text-center">
-          <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
-                   class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
-                   data-target="#updateModal" data-toggle="modal"></fa-icon>
-          <fa-icon (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
-                   class="btn fas fa-2x pointer-event"></fa-icon>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></pagination-controls>
-  </div>
+      <td class="text-center">
+        <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
+                 class="btn fas fa-2x pointer-event"></fa-icon>
+        <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
+                 data-target="#updateModal" data-toggle="modal"></fa-icon>
+        <fa-icon (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
+                 class="btn fas fa-2x pointer-event"></fa-icon>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<div class="row">
+  <pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></pagination-controls>
 </div>
