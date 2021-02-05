@@ -33,7 +33,8 @@
     "sockjs-client": "^1.3.0",
     "stompjs": "^2.3.3",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "moment": "~2.29.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.5",
