@@ -31,7 +31,11 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {NgxMatDatetimePickerModule, NgxMatNativeDateModule, NgxMatTimepickerModule} from '@angular-material-components/datetime-picker';
+import {
+  NgxMatDatetimePickerModule,
+  NgxMatNativeDateModule,
+  NgxMatTimepickerModule
+} from '@angular-material-components/datetime-picker';
 import {ErrorCheckInputComponent} from './services/inputs/error-check-input/error-check-input.component';
 import {ErrorCheckSelectComponent} from './services/inputs/error-check-select/error-check-select.component';
 import {ServerInputFormModalComponent} from './views/models/servers-component/server-input-form-modal/server-input-form-modal.component';
@@ -41,6 +45,7 @@ import {AlertBarService} from './services/AlertBarService';
 import {DirectoryInputFormModalComponent} from "./views/models/directories-component/directory-input-form-modal/directory-input-form-modal.component";
 import {DirectoryLogFileUpdateFormModalComponent} from "./views/models/directories-component/log-file-update-form-modal/log-file-update-form-modal.component";
 import {MaskedInputComponent} from './views/global-settings-component/date-mask-input-component/date-mask-input.component';
+import {MatIconModule} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -84,7 +89,7 @@ import {MaskedInputComponent} from './views/global-settings-component/date-mask-
     NgxMatTimepickerModule,
     NgxMatDatetimePickerModule,
     NgxMatNativeDateModule,
-    MatDialogModule
+    MatDialogModule, MatIconModule
   ],
   providers: [
     AuthService,
