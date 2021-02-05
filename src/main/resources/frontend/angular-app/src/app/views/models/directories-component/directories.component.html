@@ -1,0 +1,102 @@
+<div *ngIf="msg" class="alert alert-info" role="alert">
+  {{msg}}
+</div>
+<div class="row">
+  <div class="container col-10">
+    <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new Directory</button>
+  </div>
+</div>
+<hr>
+<div class="d-flex justify-content-center row">
+  <table class="col-10 table table-bordered">
+    <caption>Directories table</caption>
+    <thead>
+    <tr>
+      <th scope="col">Path</th>
+      <th scope="col">Enabled</th>
+      <th scope="col">Last Existence Check</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody *ngIf="directoryPage?.content">
+    <tr *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
+      <td>{{directory.path}}</td>
+      <td>{{directory.enabled}}</td>
+      <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
+      <td class="d-flex justify-content-around">
+        <button (click)="routeToLogs(directory.objectId)" class="btn btn-dark">Proceed</button>
+        <button (click)="deleteDirectory(directory.objectId)" class="btn btn-danger">Delete</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <pagination-controls (pageChange)="getDirectoriesFromPage($event)" id="directories"></pagination-controls>
+</div>
+
+<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog"
+     tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Adding new directory</h5>
+        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- PUT FORM -->
+        <form [formGroup]="insertForm">
+          <div class="form-group">
+            <label for="nameInput">Directory path (from home)</label>
+            <input class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
+                   required
+                   type="text">
+            <hr>
+            <div class="d-flex flex-row">
+                <button (click)="testDirectory()" class="btn btn-info col-4" type="button">Test connection</button>
+                <div *ngIf="testResult" class="col-8">{{testResult}}</div>
+            </div>
+            <hr>
+            <button (click)="getFiles()" class="btn btn-info" type="button">Get file list</button>
+            <div *ngIf="getResult" class="col-8">{{getResult}}</div>
+            <hr>
+            <hr>
+            <form [formGroup]="searchForm">
+              <div *ngIf="files" class="form-group">
+                <label for="searchInput">Search by text</label>
+                <input class="form-control" formControlName="searchText" id="searchInput" name="searchText" placeholder="Text"
+                       type="text">
+                <hr>
+                <div class="d-flex flex-row">
+                  <button (click)="search()" class="btn btn-info col-4" type="button">Search</button>
+                </div>
+              </div>
+            </form>
+            <table class="table table-bordered">
+              <caption>Files</caption>
+              <thead>
+              <tr>
+                <th scope="col">File name</th>
+                <th scope="col">Include?</th>
+              </tr>
+              </thead>
+              <tbody *ngIf="files">
+              <tr *ngFor="let file of files;">
+                <td>{{file.name}}</td>
+                <td>
+                  <input class="form-control" [checked]="file.checked" (change)="changeStatusFile(file.name)"  type="checkbox">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <!-- PUT FORM -->
+      </div>
+      <div class="modal-footer">
+        <button (click)="closeDir()" class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+        <button (click)="addDirectory()" data-dismiss="modal" class="btn btn-primary" type="submit">Add Directory</button>
+      </div>
+    </div>
+  </div>
+</div>

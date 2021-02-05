@@ -1,0 +1,24 @@
+<div class="text-center d-flex justify-content-center">
+  <form [formGroup]="form" class="form-signin col-3">
+    <h1>LogViewer</h1>
+    <hr>
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label class="sr-only" for="inputEmail">Email address</label>
+    <input class="form-control" formControlName="email" id="inputEmail" name="email" placeholder="Email">
+    <br>
+    <label class="sr-only" for="inputPassword">Password</label>
+    <input class="form-control" formControlName="password" id="inputPassword" name="password"
+           placeholder="Password" type="password">
+    <br>
+    <button (click)="login()"
+            class="btn btn-lg btn-primary btn-block">Sign in
+    </button>
+    <br>
+    <a [routerLink]="['/resetPassword']">Forgot password?</a>
+  </form>
+</div>
+<footer class="footer">
+  <div class="container text-center">
+    <span class="text-muted">Still in development</span>
+  </div>
+</footer>

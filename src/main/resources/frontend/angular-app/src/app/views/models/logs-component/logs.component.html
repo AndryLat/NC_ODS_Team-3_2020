@@ -1,0 +1,82 @@
+<div class="container-fluid">
+  <div class="row">
+    <div *ngIf="msg" class="alert alert-info col-6" role="alert">
+      {{msg}}
+    </div>
+    <div class="col-9">
+      <table class="table table-bordered">
+        <caption>Logs table</caption>
+        <thead>
+        <tr>
+          <th scope="col" style="width: 5%"><input type="checkbox" [checked]="isAllCheckBoxChecked()"
+                                                   (change)="checkAllCheckBox($event)"></th>
+          <th scope="col" style="width: 90%">Text</th>
+          <th scope="col" style="width: 5%">
+            <fa-icon (click)="deleteSelectedLogs()" [icon]="deleteIcon"
+                     class="btn fas fa-2x pointer-event"></fa-icon>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
+          <td><input type="checkbox" value="{{log.objectId}}" [(ngModel)]="logPage?.content[i].checked"></td>
+          <td>{{log.text}}</td>
+          <td class="text-center">
+            <fa-icon (click)="deleteLog(log.objectId)" [icon]="deleteIcon"
+                     class="btn fas fa-2x pointer-event"></fa-icon>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <pagination-controls (pageChange)="getLogsByRule($event)" id="logs"></pagination-controls>
+    </div>
+    <div class="col-3">Settings
+      <hr>
+      <form [formGroup]="operationForm">
+        <div class="border rounded">
+          <div class="m-2">
+            <label for="searchInput">Search by text</label>
+            <input class="form-control" formControlName="text" id="searchInput" name="text" placeholder="Text"
+                   type="text">
+          </div>
+        </div>
+        <hr>
+        <div class="border rounded">
+          <div class="m-2">
+            <p>Sorting</p>
+            <div class="row input-group-sm">
+              <label class="col-10" for="sortByLevel">Sort By Level</label>
+              <input class="form-control col-2" formControlName="vSort" id="sortByLevel" name="vSort" type="radio"
+                     value="1">
+            </div>
+            <br/>
+            <div class="row input-group-sm">
+              <label class="col-10" for="sortByDate">Sort By Date</label>
+              <input class="form-control  col-2" formControlName="vSort" id="sortByDate" name="vSort" type="radio"
+                     value="0">
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="border rounded">
+          <div class="m-2">
+            <p>Filtration</p>
+            <hr>
+            <label for="dat1">Start date</label>
+            <input class="form-control" type="datetime-local" formControlName="dat1" id="dat1" name="dat1">
+            <label for="dat2">End date</label>
+            <input class="form-control" type="datetime-local" formControlName="dat2" id="dat2" name="dat2">
+            <hr>
+            <div *ngFor="let key of keys()" class="row">
+              <label class="col-10" for="logLevel">{{key}}</label>
+              <input class="form-control  col-2" formControlName="{{key}}" id="logLevel" name="logLevel"
+                     type="checkbox">
+            </div>
+          </div>
+        </div>
+        <button (click)="getLogsByRule(1)" class="btn btn-primary row" type="submit">Apply</button>
+      </form>
+    </div>
+  </div>
+</div>
