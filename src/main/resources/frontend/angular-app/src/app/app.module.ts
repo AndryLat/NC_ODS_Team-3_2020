@@ -38,6 +38,9 @@ import {ServerInputFormModalComponent} from './views/models/servers-component/se
 import {ServerUpdateFormModalComponent} from './views/models/servers-component/server-update-form-modal/server-update-form-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {AlertBarService} from './services/AlertBarService';
+import {DirectoryInputFormModalComponent} from "./views/models/directories-component/directory-input-form-modal/directory-input-form-modal.component";
+import {DirectoryLogFileUpdateFormModalComponent} from "./views/models/directories-component/log-file-update-form-modal/log-file-update-form-modal.component";
+import {MaskedInputComponent} from './views/global-settings-component/date-mask-input-component/date-mask-input.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +61,10 @@ import {AlertBarService} from './services/AlertBarService';
     ErrorCheckSelectComponent,
     ErrorCheckSelectComponent,
     ServerInputFormModalComponent,
-    ServerUpdateFormModalComponent
+    ServerUpdateFormModalComponent,
+    DirectoryInputFormModalComponent,
+    DirectoryLogFileUpdateFormModalComponent,
+    MaskedInputComponent
   ],
   imports: [
     OverlayModule,
@@ -93,7 +99,10 @@ import {AlertBarService} from './services/AlertBarService';
     WebSocketService,
     AlertBarService],
   bootstrap: [AppComponent],
-  entryComponents: [ServerInputFormModalComponent, ServerUpdateFormModalComponent]
+  entryComponents: [ServerInputFormModalComponent,
+    ServerUpdateFormModalComponent,
+    DirectoryInputFormModalComponent,
+    DirectoryLogFileUpdateFormModalComponent]
 })
 export class AppModule {
   constructor() {

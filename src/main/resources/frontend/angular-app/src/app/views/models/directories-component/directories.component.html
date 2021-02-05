@@ -1,160 +1,61 @@
 <div class="mb-5"></div>
-<div *ngIf="msg" class="alert alert-info" role="alert">
-  {{msg}}
-</div>
-<div class="row">
-  <div class="container col-10">
-    <button class="btn btn-primary" data-target="#addingDirModal" data-toggle="modal">Add new Directory</button>
-  </div>
-</div>
-<hr>
-<div class="d-flex justify-content-center row">
-  <table class="col-10 table table-bordered">
-    <caption>Directories table</caption>
-    <thead>
-    <tr>
-      <th scope="col">Path</th>
-      <th scope="col">Enabled</th>
-      <th scope="col">Last Existence Check</th>
-      <th scope="col">Actions</th>
-    </tr>
-    </thead>
-    <tbody *ngIf="directoryPage?.content">
-    <tr
-      *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
-      <td>{{directory.path}}</td>
-      <td>{{directory.enabled}}</td>
-      <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
-      <td class="d-flex justify-content-around">
-        <fa-icon (click)="routeToLogs(directory)" [icon]="logsIcon"
-                 class="btn fas fa-2x pointer-event"></fa-icon>
-        <fa-icon (click)="routeToLogFiles(directory)" [icon]="proceedIcon"
-                 class="btn fas fa-2x pointer-event"></fa-icon>
-        <fa-icon (click)="getFilesForUpdate(directory)" [icon]="updateIcon" class="btn fas fa-2x pointer-event"
-                 data-target="#updateFilesModal"
-                 data-toggle="modal"></fa-icon>
-        <fa-icon (click)="deleteDirectory(directory.objectId)" [icon]="deleteIcon"
-                 class="btn fas fa-2x pointer-event"></fa-icon>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <pagination-controls (pageChange)="getDirectoriesFromPage($event)" id="directories"></pagination-controls>
-</div>
-
-<div aria-hidden="true" aria-labelledby="addingDirModalLabel" class="modal fade" id="addingDirModal" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addingDirModalLabel">Adding new directory</h5>
-        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- PUT FORM -->
-        <form [formGroup]="insertForm">
-          <div class="form-group">
-            <label for="nameInput">Directory path (from home)</label>
-            <input class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
-                   required
-                   type="text">
-            <hr>
-            <div class="d-flex flex-row">
-              <button (click)="testDirectory()" class="btn btn-info col-4" type="button">Test connection</button>
-              <div *ngIf="testResult" class="col-8">{{testResult}}</div>
-            </div>
-            <hr>
-            <button (click)="getFiles()" class="btn btn-info" type="button">Get file list</button>
-            <div *ngIf="getResult" class="col-8">{{getResult}}</div>
-            <hr>
-            <hr>
-            <form [formGroup]="searchForm">
-              <div *ngIf="files" class="form-group">
-                <label for="searchInput">Search by text</label>
-                <input class="form-control" formControlName="searchText" id="searchInput" name="searchText"
-                       placeholder="Text"
-                       type="text">
-                <hr>
-                <div class="d-flex flex-row">
-                  <button (click)="search()" class="btn btn-info col-4" type="button">Search</button>
-                </div>
-              </div>
-            </form>
-            <table class="table table-bordered">
-              <caption>Files</caption>
-              <thead>
-              <tr>
-                <th scope="col">File name</th>
-                <th scope="col">Include?</th>
-              </tr>
-              </thead>
-              <tbody *ngIf="files">
-              <tr *ngFor="let file of files;">
-                <td>{{file.name}}</td>
-                <td>
-                  <input (change)="changeStatusFile(file.name, files)" [checked]="file.checked" class="form-control"
-                         type="checkbox">
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </form>
-        <!-- PUT FORM -->
-      </div>
-      <div class="modal-footer">
-        <button (click)="closeDir()" class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-        <button (click)="addDirectory()" class="btn btn-primary" data-dismiss="modal" type="submit">Add Directory
-        </button>
-      </div>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div *ngIf="msg" class="alert alert-info" role="alert">
+      {{msg}}
     </div>
   </div>
-</div>
 
-<!--for update files-->
-<div aria-hidden="true" aria-labelledby="updateFilesModalLabel" class="modal fade" id="updateFilesModal" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="updateFilesModalLabel">Log Files</h5>
-        <button (click)="closeUpdateFiles()" aria-label="Close" class="close" data-dismiss="modal" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex flex-row">
-          <button (click)="splitFilesServerBD(filesFromDB, filesFromServer)" class="btn btn-info col-4" type="button">
-            Files
-          </button>
-        </div>
-        <hr>
-        <!-- PUT FORM -->
-        <table class="table table-bordered">
-          <caption>Files</caption>
-          <thead>
-          <tr>
-            <th scope="col">File name</th>
-            <th scope="col">Include?</th>
-          </tr>
-          </thead>
-          <tbody *ngIf="filesForUpdate">
-          <tr *ngFor="let file of filesForUpdate;">
-            <td>{{file.name}}</td>
-            <td>
-              <input (change)="changeStatusFile(file.name, filesForUpdate)" [checked]="file.checked"
-                     class="form-control" type="checkbox">
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <!-- PUT FORM -->
-      </div>
-      <div class="modal-footer">
-        <button (click)="updateFiles()" class="btn btn-primary" data-dismiss="modal" type="submit">Update files</button>
-      </div>
+  <div class="row">
+    <div class="container col-10">
+      <button (click)="openInsertModal()" class="btn btn-primary">
+        <fa-icon [icon]="plusIcon"></fa-icon>
+        Add new Directory
+      </button>
     </div>
+  </div>
+  <hr>
+
+  <div class="d-flex justify-content-center row">
+    <table class="col-10 table table-bordered">
+      <caption>Directories table</caption>
+      <thead>
+      <tr>
+        <th scope="col">Path</th>
+        <th scope="col">Enabled</th>
+        <th scope="col">Connectable</th>
+        <th scope="col">Last Existence Check</th>
+        <th scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody *ngIf="directoryPage?.content">
+      <tr
+        *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
+        <td>{{directory.path}}</td>
+        <td [ngClass]="'text-center '+(directory.enabled?'table-success':'table-danger')">
+          <fa-icon [icon]="directory.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        </td>
+        <td [ngClass]="'text-center '+(directory.connectable?'table-success':'table-danger')">
+          <fa-icon [icon]="directory.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        </td>
+        <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
+        <td class="d-flex justify-content-around">
+          <fa-icon (click)="routeToLogs(directory)" [icon]="logsIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="routeToLogFiles(directory)" [icon]="proceedIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="connectEnabled(directory)" [icon]="connectIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="openUpdateModal(directory)" [icon]="updateIcon" class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="deleteDirectory(directory.objectId)" [icon]="deleteIcon"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex row">
+    <pagination-controls (pageChange)="getDirectoriesFromPage($event)" id="directories"></pagination-controls>
   </div>
 </div>

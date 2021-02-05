@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource("classpath:connectionDB.properties")
 @ComponentScan("com.netcracker.odstc.logviewer")
-public class WebConfig {
+public class DataSourceConfig {
 
     @Value("${connectionDB.url}")
     private String urlDb;

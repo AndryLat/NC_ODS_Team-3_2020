@@ -1,0 +1,18 @@
+<div class="group">
+    <label>{{title}}</label>
+    <fa-icon [icon]="icon"
+             class="btn fas fa-2x pointer-event"
+             matTooltip="{{description}}"></fa-icon>
+    <span class="badge badge-info">hh/dd/MM/yyyy</span>
+    <input #mdInputEl class="form-control"
+           [formControl]="mdInput" required type="text">
+  <div class="mat-error" *ngIf="mdInput.invalid && (mdInput.dirty||mdInput.touched)">
+        <span *ngIf="mdInput.errors.required">
+          Field is required
+        </span>
+        <span *ngIf="mdInput.errors.maxlength">
+          Max 13 symbols
+        </span>
+  </div>
+
+</div>

@@ -73,6 +73,9 @@ public class DirectoryController {
     public ResponseEntity<Boolean> testConnectionToDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
         logger.info("GET: Requested test connection to directory");
         Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
-        return ResponseEntity.ok(directoryService.testConnection(directory));
+        Directory dir = new Directory(directory.getPath());
+        dir.setParentId(directory.getParentId());
+        logger.info(directory);
+        return ResponseEntity.ok(directoryService.testConnection(dir));
     }
 }

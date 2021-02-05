@@ -46,14 +46,8 @@ public class LogFileService extends AbstractService {
         }
     }
 
-    public List<LogFile> getLogFileListFromDB(Directory directory) {
-        if (directory == null) {
-            throw buildLogFilesServiceExceptionWithMessage(INVALID_DIRECTORY_MESSAGE);
-        }
-        if (directory.getParentId() == null) {
-            throw buildLogFilesServiceExceptionWithMessage(PARENT_NULL_MESSAGE);
-        }
-        return eavObjectDAO.getObjectsByParentId(directory.getObjectId(), LogFile.class);
+    public List<LogFile> getLogFileListFromDB(BigInteger objectId) {
+        return eavObjectDAO.getObjectsByParentId(objectId, LogFile.class);
     }
 
     public Page<LogFile> getLogFileListByPage(PageRequest pageRequest, Directory directory) {
