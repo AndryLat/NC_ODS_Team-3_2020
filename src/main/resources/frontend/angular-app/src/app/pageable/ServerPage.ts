@@ -1,4 +1,4 @@
-import {Server} from "../entity/Server";
+import {Server} from '../entity/Server';
 
 export class ServerPage {
   content: Server[];

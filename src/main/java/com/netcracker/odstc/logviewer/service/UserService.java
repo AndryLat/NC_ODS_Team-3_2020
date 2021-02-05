@@ -19,14 +19,14 @@ import java.math.BigInteger;
 
 @Service
 public class UserService {
+    private static final String LOGIN_NOT_FOUND_MESSAGE = "User by login not found.";
+    private static final String USER_IS_NULL_MESSAGE = "User shouldn't be null.";
     private final Logger logger = LogManager.getLogger(UserService.class.getName());
-
     private final UserDao userDao;
     private final EAVObjectDAO eavObjectDAO;
-
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private MailService mailService;
-    private JavaMailSender mailSender;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MailService mailService;
+    private final JavaMailSender mailSender;
 
     public UserService(UserDao userDao, EAVObjectDAO eavObjectDAO, BCryptPasswordEncoder bCryptPasswordEncoder, JavaMailSender mailSender, MailService mailService) {
         this.userDao = userDao;
@@ -53,14 +53,14 @@ public class UserService {
         }
         User user = userDao.getByLogin(login);
         if (user == null) {
-            throwUserServiceExceptionWithMessage("User by login not found.");
+            throwUserServiceExceptionWithMessage(LOGIN_NOT_FOUND_MESSAGE);
         }
         return user;
     }
 
     public void create(User user, String login) {
         if (user == null) {
-            throwUserServiceExceptionWithMessage("User shouldn't be null.");
+            throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
         } else {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             User creator = findByLogin(login);
@@ -78,17 +78,36 @@ public class UserService {
 
     public void updatePassword(User user) {
         if (user == null) {
-            throwUserServiceExceptionWithMessage("User shouldn't be null.");
+            throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
         } else {
             if (user.getPassword() == null && user.getLogin() == null) {
                 throwUserServiceExceptionWithMessage("User is not valid to update password.");
             }
             User userFromDb = userDao.getByLogin(user.getLogin());
             if (userFromDb == null) {
-                throwUserServiceExceptionWithMessage("User by login not found.");
+                throwUserServiceExceptionWithMessage(LOGIN_NOT_FOUND_MESSAGE);
             } else {
                 userFromDb.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
                 update(userFromDb);
+            }
+        }
+    }
+
+    public boolean checkPassword(User user) {
+        if (user == null) {
+            throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
+            return false;
+        } else {
+            if (user.getPassword() == null && user.getLogin() == null) {
+                throwUserServiceExceptionWithMessage("User is not valid to check password.");
+                return false;
+            }
+            User userFromDb = userDao.getByLogin(user.getLogin());
+            if (userFromDb == null) {
+                throwUserServiceExceptionWithMessage(LOGIN_NOT_FOUND_MESSAGE);
+                return false;
+            } else {
+                return bCryptPasswordEncoder.matches(user.getPassword(), userFromDb.getPassword());
             }
         }
     }
@@ -136,14 +155,11 @@ public class UserService {
     }
 
     private boolean isUserValid(User user) {
-        if (user != null &&
+        return user != null &&
                 user.getLogin() != null &&
                 user.getEmail() != null &&
                 user.getPassword() != null &&
-                user.getRole() != null) {
-            return true;
-        }
-        return false;
+                user.getRole() != null;
     }
 
     private boolean isUserValidForSave(User user) {

@@ -15,15 +15,23 @@
            id="navbarDropdown" role="button">
           Extras
         </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink="/settings" routerLinkActive="active" href="#">Settings</a>
-          <a class="dropdown-item" *ngIf="isAdmin()" routerLink="/global_settings" routerLinkActive="active" href="#">Global Settings</a>
-          <a class="dropdown-item" *ngIf="isAdmin()" routerLink="/users" routerLinkActive="active" href="#">Users</a>
-          <a class="dropdown-item" (click)="logout()" routerLinkActive="active" href="#">Logout</a>
+        <div aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" href="#" routerLink="/settings" routerLinkActive="active">Settings</a>
+          <a *ngIf="isAdmin()" class="dropdown-item" href="#" routerLink="/global_settings" routerLinkActive="active">Global
+            Settings</a>
+          <a *ngIf="isAdmin()" class="dropdown-item" href="#" routerLink="/users" routerLinkActive="active">Users</a>
+          <a (click)="logout()" class="dropdown-item" href="#" routerLinkActive="active">Logout</a>
         </div>
       </a>
     </div>
   </div>
 </nav>
-<div class="mb-5"></div>
+<div class="row justify-content-center">
+  <div *ngIf="errorMessage" class="alert alert-danger col-12 text-center mb-0" role="alert">
+    {{errorMessage}}
+  </div>
+  <div *ngIf="confirmMessage" class="alert alert-success col-12 text-center mb-0" role="alert">
+    {{confirmMessage}}
+  </div>
+</div>
 <router-outlet></router-outlet>

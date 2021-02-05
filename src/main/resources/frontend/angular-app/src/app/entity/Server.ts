@@ -1,11 +1,11 @@
-import {EAVObject} from "./EAVObject";
+import {EAVObject} from './EAVObject';
 
-export class Server extends EAVObject{
+export class Server extends EAVObject {
   ip: string;
   port: number;
   protocol: string;
   enabled: boolean;
-  canConnect: boolean;
+  connectable: boolean;
   login: string;
   password: string;
   lastAccessByUser: Date;

@@ -1,5 +1,7 @@
 package com.netcracker.odstc.logviewer.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
@@ -54,10 +56,12 @@ public class User extends EAVObject {
         setAttributeValue(Attributes.LOGIN_OT_USER.getAttrId(), login);
     }
 
+    @JsonIgnore
     public String getPassword() {
         return getAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId());
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         setAttributeValue(Attributes.PASSWORD_OT_USER.getAttrId(), password);
     }
@@ -81,5 +85,15 @@ public class User extends EAVObject {
 
     public void setCreated(BigInteger created) {
         setReference(Attributes.CREATED_OT_USER.getAttrId(), created);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

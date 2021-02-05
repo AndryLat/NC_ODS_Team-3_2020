@@ -68,11 +68,10 @@
       true,
       "single"
     ],
-    "semicolon": {
-      "options": [
-        "always"
-      ]
-    },
+    "semicolon": [
+      true,
+      "always"
+    ],
     "space-before-function-paren": {
       "options": {
         "anonymous": "never",
@@ -89,11 +88,11 @@
     "typedef-whitespace": {
       "options": [
         {
-          "call-signature": "nospace",
-          "index-signature": "nospace",
-          "parameter": "nospace",
-          "property-declaration": "nospace",
-          "variable-declaration": "nospace"
+          "call-signature": "onespace",
+          "index-signature": "onespace",
+          "parameter": "onespace",
+          "property-declaration": "onespace",
+          "variable-declaration": "onespace"
         },
         {
           "call-signature": "onespace",

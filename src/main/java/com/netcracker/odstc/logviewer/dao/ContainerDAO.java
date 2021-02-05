@@ -5,7 +5,6 @@ import com.netcracker.odstc.logviewer.containers.HierarchyContainer;
 import com.netcracker.odstc.logviewer.containers.converters.AttributeObjectContainerConverter;
 import com.netcracker.odstc.logviewer.mapper.AttributeObjectMapper;
 import com.netcracker.odstc.logviewer.models.Server;
-import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +17,7 @@ import java.util.Map;
 public class ContainerDAO extends EAVObjectDAO {
     @SuppressWarnings({"squid:S1192"})//Suppress duplications in sql
     private static final String GET_ACTIVE_SERVERS_WITH_DIRECTORIES_WITH_FILES_QUERY = "WITH active_servers AS (\n" +
-            "    SELECT ATTR_ID,\n" +
+            "    SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "           VALUE,\n" +
             "           DATE_VALUE,\n" +
             "           LIST_VALUE_ID,\n" +
@@ -35,7 +34,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "                       AND (nonactive.OBJECT_ID = directory.OBJECT_ID OR PARENT_ID = nonactive.OBJECT_ID))\n" +
             "),\n" +
             "     active_directories AS (\n" +
-            "         SELECT ATTR_ID,\n" +
+            "         SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "                VALUE,\n" +
             "                DATE_VALUE,\n" +
             "                LIST_VALUE_ID,\n" +
@@ -65,7 +64,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "       NAME\n" +
             "FROM active_directories\n" +
             "UNION ALL\n" +
-            "SELECT ATTR_ID,\n" +
+            "SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "       VALUE,\n" +
             "       DATE_VALUE,\n" +
             "       LIST_VALUE_ID,\n" +
@@ -79,7 +78,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "  AND EXISTS(SELECT OBJECT_ID FROM active_directories WHERE OBJECT_ID = logfile.PARENT_ID)";
 
     private static final String GET_NONACTIVE_SERVERS_WITH_DIRECTORIES_QUERY = "WITH nonactive_servers AS (\n" +
-            "    SELECT ATTR_ID,\n" +
+            "    SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "           VALUE,\n" +
             "           DATE_VALUE,\n" +
             "           LIST_VALUE_ID,\n" +
@@ -99,7 +98,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "                 WHERE LIST_VALUE_ID = 6) /* FALSE */\n" +
             "),\n" +
             "     directories AS (\n" +
-            "         SELECT ATTR_ID,\n" +
+            "         SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "                VALUE,\n" +
             "                DATE_VALUE,\n" +
             "                LIST_VALUE_ID,\n" +
@@ -125,7 +124,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "FROM nonactive_servers";
 
     private static final String GET_ACTIVE_SERVERS_NONACTIVE_DIRECTORIES_QUERY = "WITH active_servers AS (\n" +
-            "    SELECT ATTR_ID,\n" +
+            "    SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "           VALUE,\n" +
             "           DATE_VALUE,\n" +
             "           LIST_VALUE_ID,\n" +
@@ -146,7 +145,7 @@ public class ContainerDAO extends EAVObjectDAO {
             "                 WHERE LIST_VALUE_ID = 6) --/* FALSE */\n" +
             "),\n" +
             "     nonactive_directories AS (\n" +
-            "         SELECT ATTR_ID,\n" +
+            "         SELECT /*+ index(A2 INDEX_FOR_OBJECT_ID) */ ATTR_ID,\n" +
             "                VALUE,\n" +
             "                DATE_VALUE,\n" +
             "                LIST_VALUE_ID,\n" +
@@ -185,7 +184,6 @@ public class ContainerDAO extends EAVObjectDAO {
     public ContainerDAO(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
         attributeObjectContainerConverter = new AttributeObjectContainerConverter();
-        DAOPublisher.getInstance().addIgnoredClass(this.getClass());
     }
 
     public List<HierarchyContainer> getActiveServersWithChildren() {

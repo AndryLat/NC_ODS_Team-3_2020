@@ -14,7 +14,7 @@ public class JwtUser implements UserDetails {
     private final BigInteger id;
     private final String login;
     private final String password;
-    private final String role;
+    private String role;
     private List<GrantedAuthority> authorities;
 
     public JwtUser(BigInteger id,
@@ -24,6 +24,29 @@ public class JwtUser implements UserDetails {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.role = role;
+        this.authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role));
+    }
+
+    public JwtUser(BigInteger id,
+                   String login,
+                   String password) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.authorities = new ArrayList<>();
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole() {
         this.role = role;
         this.authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));

@@ -11,9 +11,12 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -29,8 +32,14 @@ public class EAVObjectDAO {
     private static final String GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID" +
             " FROM OBJECTS WHERE PARENT_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-    private static final String GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID " +
-            "FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    private static final String GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID" +
+            " FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+    private static final String GET_COUNT_BY_PARENT_ID_QUERY_WITH_PAGINATION = "SELECT COUNT(object_id)" +
+            " FROM OBJECTS WHERE PARENT_ID  = ?";
+
+    private static final String GET_COUNT_BY_TYPE_QUERY_WITH_PAGINATION = "SELECT COUNT(object_id)" +
+            " FROM OBJECTS WHERE OBJECT_TYPE_ID  = ?";
 
     private static final String GET_OBJECT_BY_PARENT_ID_QUERY = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID FROM OBJECTS WHERE PARENT_ID  = ? ";
 
@@ -78,23 +87,20 @@ public class EAVObjectDAO {
     private static final String GET_ATTRIBUTE_BY_LIST_VALUE_QUERY = "select attr.attr_id, attr.object_id, Lists.value\n" +
             "    from attributes attr join LISTS on attr.LIST_VALUE_ID = LISTS.LIST_VALUE_ID\n" +
             "    where Lists.value like ?";
-
-    protected final JdbcTemplate jdbcTemplate;
-
-    private String errorMessage = "id can`t be null";
-
+    private static final String ERROR_MESSAGE = "id can`t be null";
     private static final EAVObjectFactory eavObjectFactory = EAVObjectFactory.getInstance();
+    protected final JdbcTemplate jdbcTemplate;
 
     public EAVObjectDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public <T extends EAVObject> List<T> getObjectsByParentId(Pageable page, BigInteger bigInteger, Class<T> clazz) {
-        return getObjectsByQuery(page, bigInteger, clazz, GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION);
+    public <T extends EAVObject> Page<T> getObjectsByParentId(Pageable page, BigInteger bigInteger, Class<T> clazz) {
+        return getObjectsByQuery(page, bigInteger, clazz, GET_COUNT_BY_PARENT_ID_QUERY_WITH_PAGINATION, GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION);
     }
 
-    public <T extends EAVObject> List<T> getObjectsByObjectTypeId(Pageable page, BigInteger objectTypeId, Class<T> clazz) {
-        return getObjectsByQuery(page, objectTypeId, clazz, GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION);
+    public <T extends EAVObject> Page<T> getObjectsByObjectTypeId(Pageable page, BigInteger objectTypeId, Class<T> clazz) {
+        return getObjectsByQuery(page, objectTypeId, clazz, GET_COUNT_BY_TYPE_QUERY_WITH_PAGINATION, GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION);
     }
 
     public <T extends EAVObject> List<T> getObjectsByParentId(BigInteger bigInteger, Class<T> clazz) {
@@ -120,7 +126,7 @@ public class EAVObjectDAO {
             eavObject.setReferences(getReference(id));
             return (T) eavObject;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -137,7 +143,7 @@ public class EAVObjectDAO {
             }
             return (T) eavObject;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -153,6 +159,7 @@ public class EAVObjectDAO {
         return getAttribute(listValue, GET_ATTRIBUTE_BY_LIST_VALUE_QUERY);
     }
 
+    @Transactional
     public <T extends EAVObject> void saveObjectAttributesReferences(T eavObject) {
         saveObject(eavObject);
         saveAttributes(eavObject.getObjectId(), eavObject.getAttributes());
@@ -162,6 +169,7 @@ public class EAVObjectDAO {
         DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(eavObject.getObjectTypeId()));
     }
 
+    @Transactional
     public <T extends EAVObject> void saveObjectsAttributesReferences(List<T> eavObjects) {
         for (EAVObject eavObject : eavObjects) {
             saveObjectAttributesReferences(eavObject);
@@ -212,7 +220,7 @@ public class EAVObjectDAO {
             ObjectChangeEvent objectChangeEvent = new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, id, objectTypeId);
             DAOPublisher.getInstance().notifyListeners(objectChangeEvent, ObjectTypes.getObjectTypesByObjectTypeId(objectTypeId));
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -236,7 +244,7 @@ public class EAVObjectDAO {
             }
             return references;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage, e);
+            throw new IllegalArgumentException(ERROR_MESSAGE, e);
         }
     }
 
@@ -252,7 +260,7 @@ public class EAVObjectDAO {
             }
             return attributes;
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or attribute query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + "or attribute query can't be null", e);
         }
     }
 
@@ -261,16 +269,17 @@ public class EAVObjectDAO {
             List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id);
             return getObjectsByIds(objectIds, clazz);
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or object query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + "or object query can't be null", e);
         }
     }
 
-    private <T extends EAVObject> List<T> getObjectsByQuery(Pageable page, BigInteger id, Class<T> clazz, String query) {
+    private <T extends EAVObject> Page<T> getObjectsByQuery(Pageable page, BigInteger id, Class<T> clazz, String countQuery, String query) {
         try {
+            BigInteger totalElements = jdbcTemplate.queryForObject(countQuery, BigInteger.class, id);
             List<EAVObject> objectIds = jdbcTemplate.query(query, new ObjectMapper(), id, page.getOffset(), page.getPageSize());
-            return getObjectsByIds(objectIds, clazz);
+            return new PageImpl<>(getObjectsByIds(objectIds, clazz), page, totalElements.longValue());
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException(errorMessage + "or object query can't be null", e);
+            throw new IllegalArgumentException(ERROR_MESSAGE + " or object query can't be null", e);
         }
     }
 

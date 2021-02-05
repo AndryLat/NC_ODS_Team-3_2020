@@ -1,18 +1,58 @@
-<div *ngIf="user"  class="container">
-  <p>Unique ID: {{user.objectId}}</p>
-  <p>Email: {{user.email}}</p>
-  <p>Login: {{user.login}}</p>
-  <p>Role: {{user.role}}</p>
-  <form>
-    <p>Change password</p>
+<div class="mb-5"></div>
+<div class="container">
+  <div class="card bg-light mb-3">
+    <h5 class="card-header">Account Information</h5>
+    <div class="card-body">
+      <p class="card-text">Email: {{user.email}}</p>
+      <p class="card-text">Login: {{user.login}}</p>
+      <p class="card-text">Role: {{user.role}}</p>
+    </div>
+  </div>
+  <hr>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h3>Change password</h3>
     <div class="form-group">
-      <label for="changePasswordInput">Password</label>
-      <input class="form-control" id="changePasswordInput" placeholder="Password" type="password">
+      <label for="oldPasswordInput">Old password</label>
+      <input class="form-control" formControlName="oldPassword" id="oldPasswordInput" type="password" [ngClass]="{ 'is-invalid': submitted && f.oldPassword.errors }">
+      <div *ngIf="submitted && f.oldPassword.errors" class="invalid-feedback">
+        <div *ngIf="f.oldPassword.errors.required">Old password is required</div>
+      </div>
     </div>
     <div class="form-group">
-      <label for="repeatPasswordInput">Password</label>
-      <input class="form-control" id="repeatPasswordInput" placeholder="Password" type="password">
+      <label for="newPasswordInput">New password</label>
+      <input class="form-control" formControlName="newPassword" id="newPasswordInput" type="password"
+             [ngClass]="{ 'is-invalid': submitted && f.newPassword.errors }">
+      <div *ngIf="submitted && f.newPassword.errors" class="invalid-feedback">
+        <div *ngIf="f.newPassword.errors.required">Password is required</div>
+        <div *ngIf="f.newPassword.errors.minlength">Password must be at least 8 characters</div>
+        <div *ngIf="f.newPassword.errors.maxlength">Password must be no more than 32 characters</div>
+      </div>
     </div>
-    <button class="btn btn-primary" type="submit">Submit</button>
+    <div class="form-group">
+      <label for="confirmPasswordInput">Confirm password</label>
+      <input class="form-control" formControlName="confirmPassword" id="confirmPasswordInput" type="password"
+             [ngClass]="{ 'is-invalid': submitted && f.confirmPassword.errors }">
+      <div *ngIf="submitted && f.confirmPassword.errors" class="invalid-feedback">
+        <div *ngIf="f.confirmPassword.errors.mustMatch">Passwords must match</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Update</button>
+    <a [routerLink]="['/resetPassword']" class="badge badge-dark  ml-2">Forgot password?</a>
+    <div *ngIf="wrongPassword" class="alert alert-danger mt-3" role="alert">Wrong old password!</div>
+    <div *ngIf="samePasswords" class="alert alert-danger mt-3" role="alert">Old password and new password cannot be the same</div>
+    <div *ngIf="passChangeSuccess" class="alert alert-success mt-3" role="alert">Password successfully changed!</div>
+    <div *ngIf="passChangeSuccess == false" class="alert alert-warning mt-3" role="alert">Something went wrong</div>
   </form>
+  <hr>
+  <h3>Account deleting</h3>
+  <br>
+  <button (click)="deletePres()" *ngIf="!deletePressed" class="btn btn-danger" type="button">Delete account</button>
+  <div *ngIf="deletePressed" class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Are you sure?</h4>
+    <p>This process are irreversible!</p>
+    <div class="row">
+      <button (click)="deleteNo()" class="btn btn-secondary ml-3" type="button">No, let me think</button>
+      <button (click)="deleteYes()" class="btn btn-danger ml-5" type="button">Yes</button>
+    </div>
+  </div>
 </div>

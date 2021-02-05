@@ -1,37 +1,73 @@
+<div class="mb-5"></div>
 <div class="container">
-  <!-- PUT FORM -->
   <div *ngIf="msg" class="alert alert-info col-6" role="alert">
     {{msg}}
   </div>
-  <form *ngIf="insertForm" [formGroup]="insertForm">
+  <form *ngIf="insertForm" [formGroup]="insertForm" autocomplete="off">
     <div class="form-group">
       <label for="activityInput">Activity Polling Period</label>
-      <input class="form-control" formControlName="activityPollingPeriod" id="activityInput" name="activityPollingPeriod" placeholder="Activity Polling Period"
+      <fa-icon [icon]="tooltipIcon"
+               class="btn fas fa-2x pointer-event" matTooltip="{{activityPollingPeriod}}"></fa-icon>
+      <input class="form-control" formControlName="activityPollingPeriod" id="activityInput"
+             name="activityPollingPeriod" placeholder="Activity Polling Period"
              required
              type="number">
+      <div class="mat-error" *ngIf="insertForm.get('activityPollingPeriod').invalid && (insertForm.get('activityPollingPeriod').dirty||insertForm.get('activityPollingPeriod').touched)">
+        <span *ngIf="insertForm.get('activityPollingPeriod').errors.required">
+          Field is required
+        </span>
+        <span *ngIf="insertForm.get('activityPollingPeriod').errors.maxlength">
+          Field can not be more than 32 symbols
+        </span>
+        <span *ngIf="insertForm.get('activityPollingPeriod').errors.min">
+          Field can not be negative
+        </span>
+      </div>
       <label for="changesInput">Changes Polling Period</label>
+      <fa-icon [icon]="tooltipIcon"
+               class="btn fas fa-2x pointer-event" matTooltip="{{changesPollingPeriod}}"></fa-icon>
       <input class="form-control" formControlName="changesPollingPeriod" id="changesInput" name="changesPollingPeriod"
              placeholder="Changes Polling Period"
              required type="number">
-      <label for="storageInput">Storage Log Period</label>
-      <input class="form-control" formControlName="storageLogPeriod" id="storageInput" name="storageLogPeriod"
-             placeholder="Storage Log Period"
-             required type="date">
-      <label for="serverInput">Server Activity Period</label>
-      <input class="form-control" formControlName="serverActivityPeriod" id="serverInput" name="serverActivityPeriod"
-             placeholder="Server Activity Period"
-             required type="date">
-      <label for="directoryInput">Directory Activity Period</label>
-      <input class="form-control" formControlName="directoryActivityPeriod" id="directoryInput" name="directoryActivityPeriod"
-             placeholder="Directory Activity Period"
-             required type="date">
+      <div class="mat-error" *ngIf="insertForm.get('changesPollingPeriod').invalid && (insertForm.get('changesPollingPeriod').dirty||insertForm.get('changesPollingPeriod').touched)">
+        <span *ngIf="insertForm.get('changesPollingPeriod').errors.required">
+          Field is required
+        </span>
+        <span *ngIf="insertForm.get('changesPollingPeriod').errors.maxlength">
+          Field can not be more than 32 symbols
+        </span>
+        <span *ngIf="insertForm.get('changesPollingPeriod').errors.min">
+          Field can not be negative
+        </span>
+      </div>
+      <md-input
+        [icon]="tooltipIcon"
+        [title]="'Storage Log Period'"
+        [description]="storageLogPeriod"
+        formControlName="storageLogPeriod"
+        [mask]="mask"></md-input>
+      <md-input
+        [icon]="tooltipIcon"
+        [title]="'Server Activity Period'"
+        [description]="serverActivityPeriod"
+        formControlName="serverActivityPeriod"
+        [mask]="mask"></md-input>
+      <md-input
+        [title]="'Directory Activity Period'"
+        [description]="directoryActivityPeriod"
+        [icon]="tooltipIcon"
+        formControlName="directoryActivityPeriod"
+        [mask]="mask"></md-input>
       <hr>
-      <div class="d-flex flex-row">
-        <button (click)="clickForUpdate()" class="btn btn-info col-4" type="button">Change Settings</button>
+      <div class="row ml-10">
+        <div class="ml-10">
+          <button (click)="clickForUpdate()" class="btn btn-info" type="button">Change Settings</button>
+          <!--<button (click)="setValues()" class="btn btn-info ml-3" type="button">
+            <fa-icon [icon]="refreshIcon"></fa-icon>
+          </button>-->
+        </div>
       </div>
       <hr>
     </div>
   </form>
-  <!-- PUT FORM -->
 </div>
-

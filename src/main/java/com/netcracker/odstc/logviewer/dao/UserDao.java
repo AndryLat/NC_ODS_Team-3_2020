@@ -13,9 +13,7 @@ import java.util.List;
 
 @Repository
 public class UserDao extends EAVObjectDAO {
-
     private final Logger logger = LogManager.getLogger(UserDao.class);
-
     private static final String QUERY_USER_BY_LOGIN = "select ob.object_id\n" +
             "from objects ob, attributes attr\n" +
             "where attr.attr_id = 2 and ob.object_type_id = 1 and attr.object_id = ob.object_id\n" +

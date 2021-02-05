@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.EXPIRATION_TIME_RESET_PASSWORD;
+import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
 import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
 
 @Service
@@ -27,19 +28,25 @@ public class SecurityService {
     }
 
     public String createPasswordResetTokenForUser(User user) {
-        String token = JWT.create()
+        return JWT.create()
                 .withSubject(user.getLogin())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_RESET_PASSWORD))
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
-        return token;
     }
 
-    public String getLogin(String token,BigInteger id){
-        if (!validatePasswordResetToken(token, id)) {
-            logger.error("Password reset is not available.");
-            throw new IllegalArgumentException("Password reset is not available.");
+    public boolean validateToken(String token) {
+        if (token != null) {
+            try {
+                JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                        .build()
+                        .verify(token.replace(PREFIX, ""));
+                return true;
+            } catch (TokenExpiredException exp) {
+                logger.error("Token expired ", exp);
+                return false;
+            }
         }
-        return getLoginUserFromToken(token);
+        return false;
     }
 
     public boolean validatePasswordResetToken(String token, BigInteger id) {
@@ -62,6 +69,14 @@ public class SecurityService {
             }
         }
         return false;
+    }
+
+    public String getLogin(String token, BigInteger id) {
+        if (!validatePasswordResetToken(token, id)) {
+            logger.error("Password reset is not available.");
+            throw new IllegalArgumentException("Password reset is not available.");
+        }
+        return getLoginUserFromToken(token);
     }
 
     public String getLoginUserFromToken(String token) {

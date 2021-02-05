@@ -1,17 +1,19 @@
+<div class="mb-5"></div>
 <div class="container-fluid">
   <div class="row">
-    <div *ngIf="msg" class="alert alert-info col-6" role="alert">
+    <div *ngIf="msg" class="alert alert-info d-flex justify-content-center col-12" role="alert">
       {{msg}}
     </div>
     <div class="col-9">
-      <table class="table table-bordered">
+      <table class="table table-bordered table-sm">
         <caption>Logs table</caption>
         <thead>
         <tr>
-          <th scope="col" style="width: 5%"><input type="checkbox" [checked]="isAllCheckBoxChecked()"
-                                                   (change)="checkAllCheckBox($event)"></th>
+          <th scope="col" style="width: 5%"><input (change)="checkAllCheckBox($event)"
+                                                   [checked]="isAllCheckBoxChecked()"
+                                                   type="checkbox"></th>
           <th scope="col" style="width: 90%">Text</th>
-          <th scope="col" style="width: 5%">
+          <th class="text-center" scope="col" style="width: 5%">
             <fa-icon (click)="deleteSelectedLogs()" [icon]="deleteIcon"
                      class="btn fas fa-2x pointer-event"></fa-icon>
           </th>
@@ -20,8 +22,14 @@
         <tbody>
         <tr
           *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
-          <td><input type="checkbox" value="{{log.objectId}}" [(ngModel)]="logPage?.content[i].checked"></td>
-          <td>{{log.text}}</td>
+          <td><input [(ngModel)]="logPage?.content[i].checked" type="checkbox" value="{{log.objectId}}"></td>
+          <td>
+            <a>{{log.text.substr(0, !log.fullText ? 90 : log.text.length)}}
+              <a *ngIf="log.text.length>90">
+                <a (click)="log.fullText=!log.fullText" class="btn btn-link">{{log.fullText ? "less" : "more"}}</a>
+              </a>
+            </a>
+          </td>
           <td class="text-center">
             <fa-icon (click)="deleteLog(log.objectId)" [icon]="deleteIcon"
                      class="btn fas fa-2x pointer-event"></fa-icon>
@@ -33,12 +41,15 @@
     </div>
     <div class="col-3">Settings
       <hr>
-      <form [formGroup]="operationForm">
+      <form *ngIf="operationForm" [formGroup]="operationForm">
         <div class="border rounded">
           <div class="m-2">
             <label for="searchInput">Search by text</label>
             <input class="form-control" formControlName="text" id="searchInput" name="text" placeholder="Text"
-                   type="text">
+                   [ngClass]="{ 'is-invalid': f.text.errors }" type="text">
+            <div *ngIf="f.text.errors" class="invalid-feedback">
+              <div *ngIf="f.text.errors.maxLength">This field can't be more than 2000</div>
+            </div>
           </div>
         </div>
         <hr>
@@ -64,9 +75,18 @@
             <p>Filtration</p>
             <hr>
             <label for="dat1">Start date</label>
-            <input class="form-control" type="datetime-local" formControlName="dat1" id="dat1" name="dat1">
+            <input class="form-control" formControlName="dat1" id="dat1" name="dat1" type="datetime-local">
             <label for="dat2">End date</label>
-            <input class="form-control" type="datetime-local" formControlName="dat2" id="dat2" name="dat2">
+            <input class="form-control" formControlName="dat2" id="dat2" name="dat2" type="datetime-local">
+            <mat-form-field appearance="legacy">
+              <!-- #docregion toggle -->
+              <input [(ngModel)]="date" [ngxMatDatetimePicker]="picker" class="width-85" formControlName="date"
+                     matInput placeholder="Choose a date">
+              <mat-icon (click)="clearDate($event)" matDatepickerToggleIcon>clear</mat-icon>
+              <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+              <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
+              <!-- #enddocregion toggle -->
+            </mat-form-field>
             <hr>
             <div *ngFor="let key of keys()" class="row">
               <label class="col-10" for="logLevel">{{key}}</label>
@@ -75,7 +95,8 @@
             </div>
           </div>
         </div>
-        <button (click)="getLogsByRule(1)" class="btn btn-primary row" type="submit">Apply</button>
+        <hr>
+        <button (click)="getLogsByRule(1)" class="btn btn-primary" type="submit">Apply</button>
       </form>
     </div>
   </div>

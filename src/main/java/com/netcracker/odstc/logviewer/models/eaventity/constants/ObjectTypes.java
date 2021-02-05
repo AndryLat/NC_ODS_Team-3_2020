@@ -18,9 +18,9 @@ public enum ObjectTypes {
     CONFIG(BigInteger.valueOf(6), Config.class);
 
     private final BigInteger objectTypeID;
-    private final Class objectClass;
+    private final Class<?> objectClass;
 
-    ObjectTypes(BigInteger valueArg,Class objectClass) {
+    ObjectTypes(BigInteger valueArg, Class<?> objectClass) {
         objectTypeID = valueArg;
         this.objectClass = objectClass;
     }

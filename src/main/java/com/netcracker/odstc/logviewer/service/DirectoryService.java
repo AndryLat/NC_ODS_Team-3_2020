@@ -8,7 +8,6 @@ import com.netcracker.odstc.logviewer.service.exceptions.DirectoryServiceExcepti
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +16,8 @@ import java.util.Date;
 
 @Service
 public class DirectoryService extends AbstractService {
+    private static final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
     private static final Class<Directory> directoryClass = Directory.class;
-    private final Logger logger = LogManager.getLogger(DirectoryService.class.getName());
     private final EAVObjectDAO eavObjectDAO;
     private final ServerConnectionService serverConnectionService;
 
@@ -29,21 +28,21 @@ public class DirectoryService extends AbstractService {
 
     public Page<Directory> findByParentId(BigInteger id, Pageable pageable) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
+            throw buildDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directories by parentId");
         }
-        return new PageImpl<>(eavObjectDAO.getObjectsByParentId(pageable,id, directoryClass));
+        return eavObjectDAO.getObjectsByParentId(pageable, id, directoryClass);
     }
 
     public Directory findById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directory");
+            throw buildDirectoryServiceExceptionWithMessage("Id is not valid. Can't get directory");
         }
         return eavObjectDAO.getObjectById(id, directoryClass);
     }
 
     public void add(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
         }
         directory.setLastExistenceCheck(new Date());
         directory.setLastAccessByUser(new Date());
@@ -55,22 +54,26 @@ public class DirectoryService extends AbstractService {
 
     public void update(Directory directory) {
         if (!isDirectoryValid(directory)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't save directory");
+        }
+        if (directory.isEnabled()) {
+            directory.setConnectable(true);
         }
         eavObjectDAO.saveObjectAttributesReferences(directory);
     }
 
     public void deleteById(BigInteger id) {
         if (!isIdValid(id)) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid id. Can't delete directory");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid id. Can't delete directory");
         }
         eavObjectDAO.deleteById(id);
     }
 
     public boolean testConnection(Directory directory) {
         if (!isDirectoryValid(directory) || directory.getParentId() == null) {
-            throwDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
         }
+        directory.setLastAccessByUser(new Date());
         Server server = eavObjectDAO.getObjectById(directory.getParentId(), Server.class);
         return serverConnectionService.isDirectoryAvailable(server, directory);
     }
@@ -82,9 +85,9 @@ public class DirectoryService extends AbstractService {
             return false;
     }
 
-    private void throwDirectoryServiceExceptionWithMessage(String message) {
+    private DirectoryServiceException buildDirectoryServiceExceptionWithMessage(String message) {
         DirectoryServiceException directoryServiceException = new DirectoryServiceException(message);
         logger.error(message, directoryServiceException);
-        throw directoryServiceException;
+        return directoryServiceException;
     }
 }

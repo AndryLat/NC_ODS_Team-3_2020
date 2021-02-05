@@ -1,3 +1,3 @@
 export class GlobalConstants {
-  public static apiUrl = 'http://localhost:8081/';
+  public static readonly apiUrl = 'http://localhost:8081/';
 }

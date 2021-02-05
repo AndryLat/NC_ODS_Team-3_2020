@@ -11,21 +11,39 @@ import {HttpClient} from '@angular/common/http';
 export class PasswordRecoveryComponent {
 
   form: FormGroup;
-  private url:string = 'api/user/resetPassword';
-  public isSent: boolean = false;
+  private url: string = 'api/user/resetPassword';
+  submitted: boolean = false;
+  sendSuccess: boolean = false;
+  badLogin: boolean = false;
 
-  constructor(private fb: FormBuilder, private http:HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
       login: ['', Validators.required]
     });
   }
 
-  send(): void{
-    const login = this.form.value.login;
+  onSubmit() {
+    this.submitted = true;
+    if (this.form.invalid) {
+      return;
+    }
+    this.send();
+  }
+
+  get f() {
+    return this.form.controls;
+  }
+
+  send(): void {
     this.http
-    .post(GlobalConstants.apiUrl + this.url , login, {observe: 'response'})
-    .subscribe(res => console.log(res));
-    this.isSent = true;
-    alert("Check your email :)");
+      .post(GlobalConstants.apiUrl + this.url, this.form.value.login, {observe: 'response'})
+      .subscribe(res => {
+          this.badLogin = false;
+          this.sendSuccess = true;
+        },
+        error => {
+          this.sendSuccess = false;
+          this.badLogin = true;
+        });
   }
 }

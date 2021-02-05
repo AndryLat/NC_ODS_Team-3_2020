@@ -2,7 +2,10 @@ package com.netcracker.odstc.logviewer.models.lists;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogLevelTest {
 
@@ -28,7 +31,7 @@ class LogLevelTest {
     }
 
     @Test
-    void testContains_check_WhenValueMatches(){
+    void testContains_check_WhenValueMatches() {
         assertTrue(LogLevel.contains("DEBUG"));
         assertFalse(LogLevel.contains("DEBAG"));
     }

@@ -3,20 +3,26 @@ package com.netcracker.odstc.logviewer.models;
 import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
-
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Config extends EAVObject {
     private static Config instance = null;
+    private SimpleDateFormat format;
 
     public Config() {
         super();
+        format = new SimpleDateFormat();
+        format.applyPattern("yyyy-MM-dd HH:mm:ss");
         setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 
     public Config(BigInteger objectId) {
         super(objectId);
+        format = new SimpleDateFormat();
+        format.applyPattern("yyyy-MM-dd HH:mm:ss");
         setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 
@@ -48,6 +54,10 @@ public class Config extends EAVObject {
         return getAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId());
     }
 
+    public void setStorageLogPeriod(String storageLogPeriod) throws ParseException {
+        setAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId(), format.parse(storageLogPeriod));
+    }
+
     public void setStorageLogPeriod(Date storageLogPeriod) {
         setAttributeDateValue(Attributes.STORAGE_PERIOD_OT_CONFIG.getAttrId(), storageLogPeriod);
     }
@@ -56,7 +66,11 @@ public class Config extends EAVObject {
         return getAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId());
     }
 
-    public void setDirectoryActivityPeriod(Date directoryActivityPeriod) {
+    public void setDirectoryActivityPeriod(String directoryActivityPeriod) throws ParseException {
+        setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), format.parse(directoryActivityPeriod));
+    }
+
+    public void setDirectoryActivityPeriod(Date directoryActivityPeriod){
         setAttributeDateValue(Attributes.DIRECTORY_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), directoryActivityPeriod);
     }
 
@@ -64,7 +78,11 @@ public class Config extends EAVObject {
         return getAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId());
     }
 
-    public void setServerActivityPeriod(Date serverActivityPeriod) {
+    public void setServerActivityPeriod(String serverActivityPeriod) throws ParseException {
+        setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), format.parse(serverActivityPeriod));
+    }
+
+    public void setServerActivityPeriod(Date serverActivityPeriod){
         setAttributeDateValue(Attributes.SERVER_ACTIVITY_PERIOD_OT_CONFIG.getAttrId(), serverActivityPeriod);
     }
 }

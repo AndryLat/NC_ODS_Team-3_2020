@@ -6,21 +6,21 @@ import com.netcracker.odstc.logviewer.models.User;
 import com.netcracker.odstc.logviewer.service.exceptions.ServerServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class ServerService extends AbstractService {
-
-    private final Logger logger = LogManager.getLogger(ServerService.class.getName());
-    private final EAVObjectDAO eavObjectDAO;
+    private static final Logger logger = LogManager.getLogger(ServerService.class.getName());
     private static final Class<Server> serverClass = Server.class;
     private static final String SERVER_NOT_NULL_MESSAGE = "Server shouldn't be null";
     private static final String ID_NOT_NULL_MESSAGE = "Id shouldn't be 0 or null";
+
+    private final EAVObjectDAO eavObjectDAO;
 
     public ServerService(EAVObjectDAO eavObjectDAO) {
         this.eavObjectDAO = eavObjectDAO;
@@ -34,7 +34,7 @@ public class ServerService extends AbstractService {
         return eavObjectDAO.getObjectById(id, serverClass);
     }
 
-    public List<Server> showAllServersByPagination(PageRequest pageRequest, User user) {
+    public Page<Server> showAllServersByPagination(PageRequest pageRequest, User user) {
         return eavObjectDAO.getObjectsByParentId(pageRequest, user.getObjectId(), Server.class);
     }
 
@@ -55,6 +55,9 @@ public class ServerService extends AbstractService {
         if (!isServerValid(server)) {
             throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
         }
+        if (server.isEnabled()) {
+            server.setConnectable(true);
+        }
         eavObjectDAO.saveObjectAttributesReferences(server);
     }
 
@@ -69,19 +72,23 @@ public class ServerService extends AbstractService {
         if (server == null) {
             return false;
         }
-        if (server.getIp() == null || server.getIp().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getIp())) {
             return false;
         }
-        if (server.getLogin() == null || server.getLogin().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getLogin())) {
             return false;
         }
-        if (server.getPassword() == null || server.getPassword().trim().length() == 0) {
+        if (isStringHaveAnythingExceptSpacesValid(server.getPassword())) {
             return false;
         }
         if (server.getProtocol() == null) {
             return false;
         }
         return server.getPort() != 0;
+    }
+
+    private boolean isStringHaveAnythingExceptSpacesValid(String string) {
+        return string == null || string.trim().length() == 0;
     }
 
     private void throwServerServiceExceptionWithMessage(String message) {

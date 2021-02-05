@@ -10,7 +10,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DAOPublisherTest {
 
@@ -33,30 +34,33 @@ class DAOPublisherTest {
         Server secondServer = new Server(BigInteger.valueOf(1));
         Directory directory = new Directory();
 
-        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE,this,server,null),ObjectTypes.SERVER);
-        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE,this,secondServer,null),ObjectTypes.SERVER);
-        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE,this,directory,null),ObjectTypes.DIRECTORY);
+        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE, this, server, null), ObjectTypes.SERVER);
+        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.DELETE, this, secondServer, null), ObjectTypes.SERVER);
+        daoPublisher.notifyListeners(new ObjectChangeEvent(ObjectChangeEvent.ChangeType.UPDATE, this, directory, null), ObjectTypes.DIRECTORY);
 
         assertNotNull(directoryListener.getObjectChangeEventList());
         assertNotNull(serverListener.getObjectChangeEventList());
 
-        assertEquals(1,directoryListener.getObjectChangeEventList().size());
-        assertEquals(2,serverListener.getObjectChangeEventList().size());
+        assertEquals(1, directoryListener.getObjectChangeEventList().size());
+        assertEquals(2, serverListener.getObjectChangeEventList().size());
 
         assertNotNull(directoryListener.getObjectChangeEventList().get(0));
         assertNotNull(serverListener.getObjectChangeEventList().get(0));
         assertNotNull(serverListener.getObjectChangeEventList().get(1));
 
-        assertEquals(directory,directoryListener.getObjectChangeEventList().get(0).getObject());
-        assertEquals(server,serverListener.getObjectChangeEventList().get(0).getObject());
-        assertEquals(secondServer,serverListener.getObjectChangeEventList().get(1).getObject());
+        assertEquals(directory, directoryListener.getObjectChangeEventList().get(0).getObject());
+        assertEquals(server, serverListener.getObjectChangeEventList().get(0).getObject());
+        assertEquals(secondServer, serverListener.getObjectChangeEventList().get(1).getObject());
     }
-
 
 
     class TestDAOListener implements DAOChangeListener {
 
         private List<ObjectChangeEvent> objectChangeEventList;
+
+        public TestDAOListener() {
+            objectChangeEventList = new ArrayList<>();
+        }
 
         public List<ObjectChangeEvent> getObjectChangeEventList() {
             return objectChangeEventList;
@@ -66,9 +70,6 @@ class DAOPublisherTest {
             this.objectChangeEventList = objectChangeEventList;
         }
 
-        public TestDAOListener(){
-            objectChangeEventList = new ArrayList<>();
-        }
         @Override
         public void objectChanged(ObjectChangeEvent objectChangeEvent) {
             objectChangeEventList.add(objectChangeEvent);

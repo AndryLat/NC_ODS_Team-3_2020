@@ -1,5 +1,5 @@
-export class EAVObject {
-  objectId: bigint;
+export abstract class EAVObject {
+  objectId: string;
   name: string;
-  parentId: bigint;
+  parentId: string;
 }

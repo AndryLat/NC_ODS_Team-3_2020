@@ -1,8 +1,8 @@
 export class Config {
-  objectId: bigint;
-  changesPollingPeriod: bigint;
-  activityPollingPeriod: bigint;
-  storageLogPeriod: Date;
-  directoryActivityPeriod: Date;
-  serverActivityPeriod: Date;
+  objectId: string;
+  changesPollingPeriod: string;
+  activityPollingPeriod: string;
+  storageLogPeriod: string;
+  directoryActivityPeriod: string;
+  serverActivityPeriod: string;
 }

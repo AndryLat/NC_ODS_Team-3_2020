@@ -13,8 +13,8 @@ public class MailService {
 
     public SimpleMailMessage constructResetTokenEmail(
             String contextPath, String token, User user) {
-        String url = contextPath + "/user/changePassword?id=" +
-                user.getObjectId() + "&token=" + token;
+        String url = contextPath + "#/changePassword/" +
+                user.getObjectId() + "/" + token;
         String message = "message.resetPassword";
         return constructEmail("Reset Password", message + " \r\n" + url, user);
     }

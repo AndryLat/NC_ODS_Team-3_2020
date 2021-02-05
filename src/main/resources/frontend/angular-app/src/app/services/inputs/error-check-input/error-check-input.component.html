@@ -1,0 +1,9 @@
+<div [formGroup]="parentFormGroup" class="form-group">
+  <label for="{{inputName}}">{{labelText}}</label>
+  <input [ngClass]="{ 'is-invalid': containErrors() }" class="form-control" formControlName="{{controlName}}"
+         id="{{inputName}}"
+         placeholder="{{placeholder}}" type="{{type}}">{{value}}
+  <div *ngIf="containErrors()" class="invalid-feedback">
+    <div *ngIf="containErrors()">{{getErrorByControlName(this.parentFormGroup.controls[controlName])}}</div>
+  </div>
+</div>

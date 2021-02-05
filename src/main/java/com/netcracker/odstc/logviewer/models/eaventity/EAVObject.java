@@ -1,5 +1,6 @@
 package com.netcracker.odstc.logviewer.models.eaventity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netcracker.odstc.logviewer.models.eaventity.exceptions.EAVAttributeException;
 
 import java.math.BigInteger;
@@ -14,7 +15,9 @@ public class EAVObject {
     private BigInteger parentId;
     private BigInteger objectTypeId;
     private String name;
+    @JsonIgnore
     private Map<BigInteger, Attribute> attributes;
+    @JsonIgnore
     private Map<BigInteger, BigInteger> references;
 
     public EAVObject() {

@@ -1,9 +1,9 @@
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {AuthService} from "./AuthService";
-import {finalize} from "rxjs/operators";
-import {SpinnerService} from "./overlay-spinner/SpinerService";
+import {AuthService} from './AuthService';
+import {finalize} from 'rxjs/operators';
+import {SpinnerService} from './overlay-spinner/SpinerService';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -17,7 +17,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const spinnerSubscription = this.spinnerOverlayService.spinner$.subscribe();
 
-    console.log("Intercepted")
+    console.log('Intercepted');
 
     if (idToken) {
       const cloned = req.clone({

@@ -1,8 +1,8 @@
-import {EAVObject} from "./EAVObject";
+import {EAVObject} from './EAVObject';
 
-export class LogFile  extends EAVObject{
+export class LogFile extends EAVObject {
   fileName: string;
   lastUpdate: Date;
-  lastRow: bigint;
+  lastRow: string;
   checked: boolean;
 }

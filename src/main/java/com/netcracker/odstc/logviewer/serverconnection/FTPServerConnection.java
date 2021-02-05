@@ -118,14 +118,9 @@ public class FTPServerConnection extends AbstractServerConnection {
             throw new ServerConnectionException("Server " + server.getIp() + " have empty list of active directories. Mark as cant be connected.");
         }
         List<Log> result = new ArrayList<>();
-        try {
-            for (int i = 0; i < directories.size(); i++) {
-                HierarchyContainer directory = directories.get(i);
-                result.addAll(extractLogsFromDirectory(directory));
-                ftpClient.changeToParentDirectory();
-            }
-        } catch (IOException e) {
-            throw new ServerConnectionException("Server connection problem in collectNewLogs", e);
+        for (int i = 0; i < directories.size(); i++) {
+            HierarchyContainer directory = directories.get(i);
+            result.addAll(extractLogsFromDirectory(directory));
         }
         return result;
     }
@@ -168,5 +163,15 @@ public class FTPServerConnection extends AbstractServerConnection {
             logger.error("Error with read file {} from {}", logFile.getFileName(), server.getIp(), e);
         }
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -22,6 +22,8 @@ import java.util.regex.Matcher;
 
 abstract class AbstractServerConnection implements ServerConnection {
     protected static final int CONNECT_TIMEOUT = 500;
+    private static final int MAX_LOG_LENGTH = 4000;
+    private static final String TEXT_OVERFLOW_MESSAGE = "[LOG IS TOO LARGE. CONTENT CLIPPED.]";
     private static final Logger logger = LogManager.getLogger(AbstractServerConnection.class.getName());
     protected Server server;
     protected ServerConnectionService serverConnectionService;
@@ -94,7 +96,11 @@ abstract class AbstractServerConnection implements ServerConnection {
     public boolean isDirectoryValid(Directory directory) {
         validateConnection();
         directory.setLastExistenceCheck(new Date());
-        return !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
+        boolean isValid = !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
+        if (logger.isWarnEnabled() && !isValid) {
+            logger.warn("Directory {} from {} marked as invalid due to inactivity", directory.getPath(), server.getIp());
+        }
+        return isValid;
     }
 
     @Override
@@ -129,16 +135,25 @@ abstract class AbstractServerConnection implements ServerConnection {
                 } else {
                     String line = scanner.nextLine();
 
-                    Log log = convertLineToLog(logFile, lastLog, line);
-                    if (log == null) continue;
-
-                    lastLog = log;
-                    result.add(log);
+                    Log log = convertLineToLogOrAppendToLast(logFile, lastLog, line);
+                    if (log != null) {
+                        if (lastLog != null && lastLog.getText().length() > MAX_LOG_LENGTH) {
+                            lastLog.setText(lastLog.getText().substring(0, MAX_LOG_LENGTH - TEXT_OVERFLOW_MESSAGE.length()) + TEXT_OVERFLOW_MESSAGE);
+                        }
+                        lastLog = log;
+                        result.add(log);
+                    }
                     count++;
                 }
                 localCount++;
             }
             logFile.setLastRow(count);
+        }
+
+        //Last log will not trigger changing lastLog, so we need to check this manually.
+        Log lastLog = result.get(result.size() - 1);
+        if (lastLog.getText().length() > MAX_LOG_LENGTH) {
+            lastLog.setText(lastLog.getText().substring(0, MAX_LOG_LENGTH - TEXT_OVERFLOW_MESSAGE.length()) + TEXT_OVERFLOW_MESSAGE);
         }
         return result;
     }
@@ -163,17 +178,7 @@ abstract class AbstractServerConnection implements ServerConnection {
         }
     }
 
-    private Log convertLineToLog(LogFile logFile, Log lastLog, String line) {
-        Matcher matcher = checkMatcher(lastLog, line);
-        if (matcher == null) return null;
-
-        LogLevel logLevel = serverConnectionService.formatLogLevel(matcher.group(2));
-        Date creationDate = serverConnectionService.formatDate(matcher.group(1));
-
-        return new Log(line, logLevel, creationDate, logFile.getObjectId());
-    }
-
-    private Matcher checkMatcher(Log lastLog, String line) {
+    private Log convertLineToLogOrAppendToLast(LogFile logFile, Log lastLog, String line) {
         Matcher matcher = serverConnectionService.getLogMatcher(line);
 
         boolean isLogEntry = matcher != null;
@@ -183,7 +188,11 @@ abstract class AbstractServerConnection implements ServerConnection {
             }
             return null;
         }
-        return matcher;
+
+        LogLevel logLevel = serverConnectionService.formatLogLevel(matcher.group(2));
+        Date creationDate = serverConnectionService.formatDate(matcher.group(1));
+
+        return new Log(line, logLevel, creationDate, logFile.getObjectId());
     }
 
     @Override

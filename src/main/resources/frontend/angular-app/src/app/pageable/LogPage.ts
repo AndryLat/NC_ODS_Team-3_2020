@@ -1,4 +1,4 @@
-import {Log} from "../entity/Log";
+import {Log} from '../entity/Log';
 
 export class LogPage {
   content: Log[];
