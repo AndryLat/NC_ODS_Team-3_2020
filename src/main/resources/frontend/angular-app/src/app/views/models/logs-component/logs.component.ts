@@ -9,7 +9,6 @@ import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
 import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
-import {Log} from '../../../entity/Log';
 
 @Component({
   selector: 'app-logs',
@@ -23,12 +22,9 @@ export class LogsComponent implements OnInit {
   parentType: string;
   parentId: string;
   msg: string;
-
+  date: Date;
   logPage: LogPage;
-  form: any;
   operationForm: FormGroup;
-  logs: Log = new Log();
-
   localApi: string = GlobalConstants.apiUrl + 'api/log';
 
   constructor(private authService: AuthService,
@@ -69,7 +65,7 @@ export class LogsComponent implements OnInit {
 
   clearDate(event) {
     event.stopPropagation();
-    this.form.controls['date'].setValue('');
+    this.date = null;
   }
 
   deleteLog(objectId: string): void {

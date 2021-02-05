@@ -24,8 +24,10 @@
           *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
           <td><input [(ngModel)]="logPage?.content[i].checked" type="checkbox" value="{{log.objectId}}"></td>
           <td>
-            <a>{{log.text.substr(0, !log.fullText ? 10 : log.text.length)}}
-              <a (click)="log.fullText=!log.fullText" class="btn btn-link"> {{log.fullText ? "less" : "more"}} </a>
+            <a>{{log.text.substr(0, !log.fullText ? 90 : log.text.length)}}
+              <a *ngIf="log.text.length>90">
+                <a (click)="log.fullText=!log.fullText" class="btn btn-link">{{log.fullText ? "less" : "more"}}</a>
+              </a>
             </a>
           </td>
           <td class="text-center">
