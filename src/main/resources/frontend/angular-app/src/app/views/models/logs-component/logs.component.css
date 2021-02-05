@@ -1,0 +1,11 @@
+mat-icon {
+  position: relative;
+  float: right;
+  top: -3px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.width-85 {
+  width: 85%;
+}

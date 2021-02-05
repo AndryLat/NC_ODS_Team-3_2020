@@ -3,16 +3,18 @@ import {Router} from '@angular/router';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {LogLevel} from '../../../entity/list/LogLevel';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../services/AuthService';
 import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
 import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
+import {Log} from '../../../entity/Log';
 
 @Component({
   selector: 'app-logs',
-  templateUrl: './logs.component.html'
+  templateUrl: './logs.component.html',
+  styleUrls: ['./logs.component.css']
 })
 export class LogsComponent implements OnInit {
   deleteIcon = faTrashAlt;
@@ -20,12 +22,12 @@ export class LogsComponent implements OnInit {
 
   parentType: string;
   parentId: string;
-
   msg: string;
 
   logPage: LogPage;
-
+  form: any;
   operationForm: FormGroup;
+  logs: Log = new Log();
 
   localApi: string = GlobalConstants.apiUrl + 'api/log';
 
@@ -34,10 +36,11 @@ export class LogsComponent implements OnInit {
               private http: HttpClient,
               private fb: FormBuilder) {
     this.operationForm = this.fb.group({
-      text: [''],
+      text: ['', Validators.maxLength(2000)],
       vSort: [''],
       dat1: [''],
-      dat2: ['']
+      dat2: [''],
+      date: ['']
     });
     for (let level of this.keys()) {
       this.operationForm.addControl(level, this.fb.control(''));
@@ -52,12 +55,21 @@ export class LogsComponent implements OnInit {
       this.parentType = 'directoryId';
     }
 
+  }
 
+  get f() {
+    return this.operationForm.controls;
   }
 
   ngOnInit(): void {
     this.rule = new RuleContainer('', null, null, 0);
     this.getLogsByRule(1);
+  }
+
+
+  clearDate(event) {
+    event.stopPropagation();
+    this.form.controls['date'].setValue('');
   }
 
   deleteLog(objectId: string): void {

@@ -12,14 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -43,6 +36,16 @@ public class LogController {
         PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
         return logService.getAllLogsByAllValues(new BigInteger(directoryId), ruleContainer, pageable);
+    }
+
+    @GetMapping("/file/logs")
+    public Page<LogDTO> getLogByFileId(@RequestParam String fileId,
+                                       @RequestParam(value = "page", defaultValue = "1") int page,
+                                       @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
+                                       @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
+        RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
+        return logService.getLogByFileId(new BigInteger(fileId), ruleContainer, pageable);
     }
 
     @PostMapping("/add")

@@ -6,4 +6,5 @@ export class Log extends EAVObject {
   level: LogLevel;
   creationDate: Date;
   checked?: boolean;
+  fullText: boolean = false;
 }
