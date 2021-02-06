@@ -46,6 +46,7 @@ import {DirectoryInputFormModalComponent} from "./views/models/directories-compo
 import {DirectoryLogFileUpdateFormModalComponent} from "./views/models/directories-component/log-file-update-form-modal/log-file-update-form-modal.component";
 import {MaskedInputComponent} from './views/global-settings-component/date-mask-input-component/date-mask-input.component';
 import {MatIconModule} from "@angular/material/icon";
+import {UserInputFormModalComponent} from './views/models/users-component/user-input-form-modal/user-input-form-modal.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +70,8 @@ import {MatIconModule} from "@angular/material/icon";
     ServerUpdateFormModalComponent,
     DirectoryInputFormModalComponent,
     DirectoryLogFileUpdateFormModalComponent,
-    MaskedInputComponent
+    MaskedInputComponent,
+    UserInputFormModalComponent
   ],
   imports: [
     OverlayModule,
@@ -103,11 +105,7 @@ import {MatIconModule} from "@angular/material/icon";
     AuthGuard,
     WebSocketService,
     AlertBarService],
-  bootstrap: [AppComponent],
-  entryComponents: [ServerInputFormModalComponent,
-    ServerUpdateFormModalComponent,
-    DirectoryInputFormModalComponent,
-    DirectoryLogFileUpdateFormModalComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor() {

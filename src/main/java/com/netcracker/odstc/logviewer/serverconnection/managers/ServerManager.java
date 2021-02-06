@@ -7,7 +7,6 @@ import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
-import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.containers.RemovedObjectsCollector;
 import com.netcracker.odstc.logviewer.serverconnection.exceptions.ServerConnectionException;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +39,10 @@ public class ServerManager implements DAOChangeListener {
 
     private final ServerPollManager serverPollManager;
     private final ServerConnectionService serverConnectionService;
-    private final NewLogsListener newLogsListener;
 
     @SuppressWarnings({"squid:S1144"})
 //Suppress unused private constructor: Spring will use this constructor, even if it private
-    private ServerManager(ContainerDAO containerDAO, NewLogsListener newLogsListener) {
-        this.newLogsListener = newLogsListener;
+    private ServerManager(ContainerDAO containerDAO) {
         this.containerDAO = containerDAO;
         DAOPublisher.getInstance().addListener(this, ObjectTypes.DIRECTORY, ObjectTypes.SERVER, ObjectTypes.LOGFILE);
 

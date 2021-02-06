@@ -1,0 +1,43 @@
+<div class="card">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Adding new user</h5>
+    <button (click)="closeDialog()" aria-label="Close" class="close" type="button">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="inputError" class="alert alert-danger col-12" role="alert">
+      {{inputError}}
+    </div>
+
+    <form [formGroup]="insertForm">
+      <app-error-check-input [controlName]="'login'" [errorCheckFunction]="getErrorByControlName"
+                             [labelText]="'User login'" [parentFormGroup]="this.insertForm" [placeholder]="'login'"
+                             [type]="'text'">
+      </app-error-check-input>
+
+      <app-error-check-input [controlName]="'email'" [errorCheckFunction]="getErrorByControlName"
+                             [labelText]="'E-mail address'" [parentFormGroup]="this.insertForm"
+                             [placeholder]="'user@mail.com'"
+                             [type]="'email'">
+      </app-error-check-input>
+
+      <app-error-check-input [controlName]="'password'" [errorCheckFunction]="getErrorByControlName"
+                             [labelText]="'Password'" [parentFormGroup]="this.insertForm" [placeholder]="'password'"
+                             [type]="'password'">
+      </app-error-check-input>
+
+      <app-error-check-select [controlName]="'role'" [errorCheckFunction]="getErrorByControlName"
+                              [labelText]="'User role'" [parentFormGroup]="this.insertForm"
+                              [values]="roles">
+      </app-error-check-select>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button (click)="closeDialog()" class="btn btn-secondary"
+            type="button">Close
+    </button>
+    <button (click)="saveDialogResult()" class="btn btn-primary" type="submit">Add User
+    </button>
+  </div>
+</div>

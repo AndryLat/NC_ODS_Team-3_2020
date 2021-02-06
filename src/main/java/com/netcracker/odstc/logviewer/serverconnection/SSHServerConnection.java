@@ -43,11 +43,15 @@ public class SSHServerConnection extends AbstractServerConnection {
         ChannelSftp channelSftp = getChannelSftp();
 
         try {
-            List files = channelSftp.ls(directory.getPath());
+            List files = channelSftp.ls("/" + directory.getPath().replace('\\', '/'));
             for (Object file : files) {
-                String fileName = ((ChannelSftp.LsEntry) file).getFilename();
-                LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
-                logFiles.add(logFile);
+                ChannelSftp.LsEntry sftpFile = ((ChannelSftp.LsEntry) file);
+                if (!sftpFile.getAttrs().isDir() && !sftpFile.getAttrs().isLink()) {
+                    String fileName = sftpFile.getFilename();
+
+                    LogFile logFile = new LogFile(fileName, 0, directory.getObjectId());
+                    logFiles.add(logFile);
+                }
             }
         } catch (SftpException e) {
             logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
@@ -62,7 +66,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         try {
             session = jSchClient.getSession(server.getLogin(), server.getIp(), server.getPort());
             session.setPassword(server.getPassword());
-            session.setTimeout(CONNECT_TIMEOUT);
+            session.setTimeout(CONNECT_TIMEOUT + 10000);
             session.connect();
             server.setConnectable(session.isConnected());
         } catch (JSchException e) {
@@ -93,7 +97,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             return false;
         }
         try {
-            channelSftp.cd(directory.getPath());
+            channelSftp.cd("/" + directory.getPath().replace('\\', '/'));
             channelSftp.cd("/");
             return true;
         } catch (SftpException e) {
@@ -137,7 +141,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         Directory directory = (Directory) directoryContainer.getOriginal();
         List<Log> result = new ArrayList<>();
         try {
-            channelSftp.cd("/" + directory.getPath());
+            channelSftp.cd("/" + directory.getPath().replace('\\', '/'));
             for (int i = 0; i < directoryContainer.getChildren().size(); i++) {
                 LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
                 result.addAll(extractLogsFromFile(channelSftp, logFile));

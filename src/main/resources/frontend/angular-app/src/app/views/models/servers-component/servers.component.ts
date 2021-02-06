@@ -3,12 +3,12 @@ import {Router} from '@angular/router';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
-import {AuthService} from '../../../services/AuthService';
 import {
   faCheck,
   faCogs,
   faFolderOpen,
-  faPlus, faPowerOff,
+  faPlus,
+  faPowerOff,
   faQuestionCircle,
   faSync,
   faTimes,
@@ -43,8 +43,7 @@ export class ServersComponent implements OnInit, OnDestroy {
 
   serverPage: ServerPage;
 
-  constructor(private authService: AuthService,
-              private router: Router,
+  constructor(private router: Router,
               private http: HttpClient,
               private dialog: MatDialog,
               private alertBarService: AlertBarService) {
@@ -65,11 +64,11 @@ export class ServersComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/directories');
   }
 
-  deleteServer(objectId: string): void {
-    this.http.delete(this.localApi + '/delete/' + objectId).subscribe(result => {
-      this.alertBarService.setConfirmMessage('Server deleted successfully');
+  deleteServer(server: Server): void {
+    this.http.delete(this.localApi + '/delete/' + server.objectId).subscribe(result => {
+      this.alertBarService.setConfirmMessage('Server ' + server.name + ' deleted successfully');
 
-      let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId === objectId);
+      let changedServer = this.serverPage.content.find(deletedElement => deletedElement.objectId === server.objectId);
       let index = this.serverPage.content.indexOf(changedServer);
 
       this.serverPage.content.splice(index, 1);
@@ -80,7 +79,8 @@ export class ServersComponent implements OnInit, OnDestroy {
 
   updateServer(server: Server) {
     server.lastAccessByUser = new Date();
-    this.http.put(this.localApi + '/update', server);
+    this.http.put(this.localApi + '/update', server).subscribe(result => {
+    });
   }
 
   getServersFromPage(pageNumber: number): void {
@@ -92,7 +92,6 @@ export class ServersComponent implements OnInit, OnDestroy {
       console.log(result);
       this.serverPage = result;
       this.serverPage.number = this.serverPage.number + 1;// In Spring pages start from 0.
-      console.log(this.serverPage);
     }, error => {
       this.alertBarService.setErrorMessage('Cant get list of servers. Try again later.');
     });
@@ -141,6 +140,7 @@ export class ServersComponent implements OnInit, OnDestroy {
   switchServer(server: Server) {
     server.enabled = !server.enabled;
     server.connectable = server.enabled;
-    this.http.put(this.localApi + '/update', server);
+    this.http.put(this.localApi + '/update', server).subscribe(result => {
+    });
   }
 }

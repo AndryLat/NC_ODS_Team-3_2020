@@ -53,7 +53,7 @@
         </fa-icon>
         <fa-icon matTooltip="Edit server" (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
                  data-target="#updateModal" data-toggle="modal"></fa-icon>
-        <fa-icon matTooltip="Delete server" (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
+        <fa-icon (click)="deleteServer(server)" [icon]="deleteIcon" matTooltip="Delete server"
                  class="btn pointer-event"></fa-icon>
       </td>
     </tr>

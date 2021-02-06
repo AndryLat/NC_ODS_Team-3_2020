@@ -1,79 +1,42 @@
-<div class="mb-5"></div>
-<div class="row">
-  <div class="container col-10">
-    <button class="btn btn-primary" data-target="#exampleModal" data-toggle="modal">Add new user</button>
+<div class="mb-4"></div>
+<br>
+<div class="row ml-5">
+  <div class="ml-5">
+    <button (click)="openInsertDialog()" class="btn btn-primary">
+      <fa-icon [icon]="plusIcon"></fa-icon>
+      Add new user
+    </button>
   </div>
 </div>
-<hr>
+<br>
 <div class="d-flex justify-content-center row">
-  <table class="col-10 table table-bordered">
+  <table class="table table-bordered table-striped ml-5 mr-5">
     <caption>Users table</caption>
-    <thead>
+    <thead class="thead-light">
     <tr>
-      <th scope="col">Email</th>
-      <th scope="col">Login</th>
-      <th scope="col">Password</th>
-      <th scope="col">Role</th>
-      <th scope="col">Actions</th>
+      <th scope="col" style="width: 30%">Login</th>
+      <th scope="col" style="width: 30%">Email</th>
+      <th scope="col" style="width: 25%">Role</th>
+      <th scope="col" style="width: 15%">Actions</th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let user of users;">
-      <th scope="row">{{user.email}}</th>
-      <td>{{user.login}}</td>
-      <td>{{user.password}}</td>
-      <td>{{user.role}}</td>
-      <td class="d-flex justify-content-around">
-        <button (click)="deleteUser(user.objectId)" class="btn btn-danger">Delete</button>
+    <tr
+      *ngFor="let user of userPage?.content | paginate: {id: 'users', itemsPerPage: userPage?.size,currentPage: userPage?.number, totalItems: userPage?.totalElements}">
+      <td class="align-middle">{{user.login}}</td>
+      <td class="align-middle">{{user.email}}</td>
+      <td class="align-middle">{{user.role}}</td>
+      <td class="text-center align-middle">
+        <fa-icon (click)="promoteUser(user)" *ngIf="user.role!='ADMIN'" [icon]="promoteIcon"
+                 class="btn pointer-event"
+                 matTooltip="Promote to admin"></fa-icon>
+        <fa-icon (click)="deleteUser(user)" [icon]="deleteIcon" class="btn pointer-event"
+                 matTooltip="Delete user"></fa-icon>
       </td>
     </tr>
     </tbody>
   </table>
 </div>
-
-<div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" role="dialog"
-     tabindex="-1">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
-        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- PUT FORM -->
-        <form *ngIf="form" [formGroup]="form">
-          <div class="form-group">
-            <label for="emailInput">Email address</label>
-            <input class="form-control" formControlName="email" id="emailInput" name="email"
-                   placeholder="name@example.com"
-                   type="email">
-          </div>
-          <div class="form-group">
-            <label for="loginInput">Login</label>
-            <input class="form-control" formControlName="login" id="loginInput" name="login" placeholder="login"
-                   type="text">
-          </div>
-          <div class="form-group">
-            <label for="passwordInput">Password</label>
-            <input class="form-control" formControlName="password" id="passwordInput" name="password"
-                   placeholder="password"
-                   type="text">
-          </div>
-          <div class="form-group">
-            <label for="exampleFormControlSelect1">Role</label>
-            <select class="form-control" formControlName="role" id="exampleFormControlSelect1" name="role">
-              <option *ngFor="let role of roles" [ngValue]="role">{{role}}</option>
-            </select>
-          </div>
-        </form>
-        <!-- PUT FORM -->
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-        <button (click)="addUser()" class="btn btn-primary" type="button">Send message</button>
-      </div>
-    </div>
-  </div>
+<div class="row">
+  <pagination-controls (pageChange)="getUsersFromPage($event)" id="users"></pagination-controls>
 </div>

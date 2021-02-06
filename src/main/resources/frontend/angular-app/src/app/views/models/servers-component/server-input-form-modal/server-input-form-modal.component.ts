@@ -22,7 +22,7 @@ export class ServerInputFormModalComponent implements OnInit {
   testResult: string;
 
   constructor(private http: HttpClient, private fb: FormBuilder,
-              private dialogRef: MatDialogRef<ServerInputFormModalComponent>,) {
+              private dialogRef: MatDialogRef<ServerInputFormModalComponent>) {
     this.insertForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(64)]],
       ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.-]+$/, 'Special characters is not allowed'), Validators.maxLength(128)]],
