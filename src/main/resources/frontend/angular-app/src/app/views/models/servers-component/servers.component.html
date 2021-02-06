@@ -35,26 +35,28 @@
     <tbody>
     <tr
       *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
-        <td class="align-middle">{{server.name}}</td>
-        <td class="align-middle">{{server.ip}}</td>
-        <td class="align-middle">{{server.protocol}}</td>
-        <td class="align-middle">{{server.port}}</td>
-        <td class="align-middle">{{server.lastAccessByJob | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
-        <td [ngClass]="'text-center align-middle h4 '+(server.connectable?'table-success':'table-danger')">
-          <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon"></fa-icon>
-        </td>
-        <td [ngClass]="'text-center align-middle h4 '+(server.enabled?'table-success':'table-danger')">
-          <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon"></fa-icon>
-        </td>
+      <td class="align-middle">{{server.name}}</td>
+      <td class="align-middle">{{server.ip}}</td>
+      <td class="align-middle">{{server.protocol}}</td>
+      <td class="align-middle">{{server.port}}</td>
+      <td class="align-middle">{{server.lastAccessByJob | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
+      <td [ngClass]="'text-center align-middle h4 '+(server.connectable?'table-success':'table-danger')">
+        <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon"></fa-icon>
+      </td>
+      <td [ngClass]="'text-center align-middle h4 '+(server.enabled?'table-success':'table-danger')">
+        <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon"></fa-icon>
+      </td>
       <td class="text-center align-middle">
-        <fa-icon matTooltip="Show directories" (click)="routeToDirectories(server)" [icon]="proceedIcon"
-                 class="btn pointer-event"></fa-icon>
-        <fa-icon matTooltip="Enable/Disable server" (click)="switchServer(server)" [icon]="switchIcon" class="btn pointer-event">
+        <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon" class="btn pointer-event"
+                 matTooltip="Show directories"></fa-icon>
+        <fa-icon (click)="switchServer(server)" [icon]="switchIcon" class="btn pointer-event"
+                 matTooltip="Enable/Disable server">
         </fa-icon>
-        <fa-icon matTooltip="Edit server" (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
-                 data-target="#updateModal" data-toggle="modal"></fa-icon>
-        <fa-icon (click)="deleteServer(server)" [icon]="deleteIcon" matTooltip="Delete server"
-                 class="btn pointer-event"></fa-icon>
+        <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
+                 data-target="#updateModal"
+                 data-toggle="modal" matTooltip="Edit server"></fa-icon>
+        <fa-icon (click)="deleteServer(server)" [icon]="deleteIcon" class="btn pointer-event"
+                 matTooltip="Delete server"></fa-icon>
       </td>
     </tr>
     </tbody>

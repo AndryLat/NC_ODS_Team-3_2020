@@ -29,13 +29,6 @@ export class UsersComponent implements OnInit, OnDestroy {
               private http: HttpClient,
               private dialog: MatDialog,
               private alertBarService: AlertBarService) {
-
-    this.form = this.fb.group({
-      email: ['', Validators.required],
-      login: ['', Validators.required],
-      password: ['', Validators.required],
-      role: ['', Validators.required]
-    });
   }
 
   ngOnInit(): void {
