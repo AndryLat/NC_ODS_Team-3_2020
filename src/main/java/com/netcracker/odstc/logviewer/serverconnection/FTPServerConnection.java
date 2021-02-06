@@ -28,34 +28,15 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     @Override
-    public List<LogFile> getLogFilesFromDirectory(Directory directory, String[] extensions) {
-        validateConnection();
-        List<LogFile> logFiles = new ArrayList<>();
-        try {
-            for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                for (String extension : extensions) {
-                    if (ftpFile.getName().endsWith(extension)) {
-                        LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
-                        logFiles.add(logFile);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
-            throw new ServerConnectionException("Can't list files from FTP due to error", e);
-        }
-        return logFiles;
-    }
-
-
-    @Override
     public List<LogFile> getLogFilesFromDirectory(Directory directory) {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
         try {
             for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
-                logFiles.add(logFile);
+                if(ftpFile.isFile()) {
+                    LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
+                    logFiles.add(logFile);
+                }
             }
         } catch (IOException e) {
             logger.error("Exception when trying get list of files from {} at {}", directory.getPath(), server.getIp(), e);
@@ -138,7 +119,7 @@ public class FTPServerConnection extends AbstractServerConnection {
                 LogFile logFile = (LogFile) directoryContainer.getChildren().get(i).getOriginal();
                 result.addAll(extractLogsFromFile(logFile));
             }
-            ftpClient.changeToParentDirectory();
+            ftpClient.changeWorkingDirectory("/");
         } catch (IOException e) {
             logger.error("Marking directory {} from {} as unavailable", directory.getPath(), server.getIp(), e);
             directory.setConnectable(false);

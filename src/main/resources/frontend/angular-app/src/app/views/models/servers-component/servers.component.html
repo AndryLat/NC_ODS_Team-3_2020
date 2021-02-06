@@ -18,41 +18,43 @@
     <caption>Servers table</caption>
     <thead class="thead-light">
     <tr>
-      <th scope="col" style="width: 15%">Name</th>
+      <th scope="col" style="width: 19%">Name</th>
       <th scope="col" style="width: 25%">IP</th>
-      <th scope="col" style="width: 10%">Protocol</th>
-      <th scope="col" style="width: 11%">Port</th>
+      <th scope="col" style="width: 5%">Protocol</th>
+      <th scope="col" style="width: 5%">Port</th>
       <th scope="col" style="width: 15%">Last Logs
         <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
       </th>
-      <th scope="col" style="width: 7%">Connected
+      <th scope="col" style="width: 8%">Connected
         <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
       </th>
-      <th scope="col" style="width: 7%">Enabled</th>
-      <th scope="col" style="width: 10%">Actions</th>
+      <th scope="col" style="width: 8%">Enabled</th>
+      <th scope="col" style="width: 14%">Actions</th>
     </tr>
     </thead>
     <tbody>
     <tr
       *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
-        <td>{{server.name}}</td>
-        <td>{{server.ip}}</td>
-        <td>{{server.protocol}}</td>
-        <td>{{server.port}}</td>
-        <td>{{server.lastAccessByJob | date: 'short'}}</td>
-        <td [ngClass]="'text-center '+(server.connectable?'table-success':'table-danger')">
-          <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        <td class="align-middle">{{server.name}}</td>
+        <td class="align-middle">{{server.ip}}</td>
+        <td class="align-middle">{{server.protocol}}</td>
+        <td class="align-middle">{{server.port}}</td>
+        <td class="align-middle">{{server.lastAccessByJob | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
+        <td [ngClass]="'text-center align-middle h4 '+(server.connectable?'table-success':'table-danger')">
+          <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon"></fa-icon>
         </td>
-        <td [ngClass]="'text-center '+(server.enabled?'table-success':'table-danger')">
-          <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        <td [ngClass]="'text-center align-middle h4 '+(server.enabled?'table-success':'table-danger')">
+          <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon"></fa-icon>
         </td>
-      <td class="text-center">
-        <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon"
-                 class="btn fas fa-2x pointer-event"></fa-icon>
-        <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn fas fa-2x pointer-event"
+      <td class="text-center align-middle">
+        <fa-icon matTooltip="Show directories" (click)="routeToDirectories(server)" [icon]="proceedIcon"
+                 class="btn pointer-event"></fa-icon>
+        <fa-icon matTooltip="Enable/Disable server" (click)="switchServer(server)" [icon]="switchIcon" class="btn pointer-event">
+        </fa-icon>
+        <fa-icon matTooltip="Edit server" (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
                  data-target="#updateModal" data-toggle="modal"></fa-icon>
-        <fa-icon (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
-                 class="btn fas fa-2x pointer-event"></fa-icon>
+        <fa-icon matTooltip="Delete server" (click)="deleteServer(server.objectId)" [icon]="deleteIcon"
+                 class="btn pointer-event"></fa-icon>
       </td>
     </tr>
     </tbody>

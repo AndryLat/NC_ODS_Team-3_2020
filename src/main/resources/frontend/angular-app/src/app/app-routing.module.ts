@@ -11,6 +11,7 @@ import {PasswordSettingComponent} from './views/password-setting-component/passw
 import {GlobalSettingsComponent} from './views/global-settings-component/global-settings.component';
 import {AuthGuard} from './services/AuthGuard';
 import {LogfileComponentComponent} from './views/models/logfile-component/logfile-component.component';
+import {RealtimeLogsComponentComponent} from './views/realtime-logs-component/realtime-logs-component.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -23,7 +24,8 @@ const routes: Routes = [
   {path: 'settings', component: UserSettingsComponent, canActivate: [AuthGuard]},
   {path: 'resetPassword', component: PasswordRecoveryComponent},
   {path: 'global_settings', component: GlobalSettingsComponent, canActivate: [AuthGuard]},
-  {path: 'changePassword/:id/:token', component: PasswordSettingComponent}
+  {path: 'changePassword/:id/:token', component: PasswordSettingComponent},
+  {path: 'realtime', component: RealtimeLogsComponentComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({

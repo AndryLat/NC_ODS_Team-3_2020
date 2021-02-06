@@ -4,7 +4,16 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Server} from '../../../entity/Server';
 import {GlobalConstants} from '../../../constants/global-constants';
 import {AuthService} from '../../../services/AuthService';
-import {faCheck, faCogs, faPlus, faQuestionCircle, faSignInAlt, faSync, faTimes, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faCogs,
+  faFolderOpen,
+  faPlus, faPowerOff,
+  faQuestionCircle,
+  faSync,
+  faTimes,
+  faTrashAlt
+} from '@fortawesome/free-solid-svg-icons';
 import {ServerPage} from '../../../pageable/ServerPage';
 import {EAVObject} from '../../../entity/EAVObject';
 import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
@@ -21,9 +30,10 @@ export class ServersComponent implements OnInit, OnDestroy {
   refreshIcon = faSync;
   tooltipIcon = faQuestionCircle;
   plusIcon = faPlus;
-  proceedIcon = faSignInAlt;
+  proceedIcon = faFolderOpen;
   settingIcon = faCogs;
   deleteIcon = faTrashAlt;
+  switchIcon = faPowerOff;
 
   enabledIcon = faCheck;
   disabledIcon = faTimes;
@@ -45,7 +55,6 @@ export class ServersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(window.location);
     this.getServersFromPage(1);
   }
 
@@ -127,5 +136,11 @@ export class ServersComponent implements OnInit, OnDestroy {
         this.serverPage.content.splice(index, 1, data);
       }
     });
+  }
+
+  switchServer(server: Server) {
+    server.enabled = !server.enabled;
+    server.connectable = server.enabled;
+    this.http.put(this.localApi + '/update', server);
   }
 }

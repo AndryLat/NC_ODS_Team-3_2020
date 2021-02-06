@@ -111,6 +111,7 @@ abstract class AbstractServerConnection implements ServerConnection {
             server.setLastAccessByJob(new Date());
         } else {
             if (new Date(server.getLastAccessByJob().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date())) {
+                logger.info("Server {} exceeds allowed Server activity period. Disabling.", server.getIp());
                 server.setEnabled(false);
             }
         }
@@ -151,9 +152,11 @@ abstract class AbstractServerConnection implements ServerConnection {
         }
 
         //Last log will not trigger changing lastLog, so we need to check this manually.
-        Log lastLog = result.get(result.size() - 1);
-        if (lastLog.getText().length() > MAX_LOG_LENGTH) {
-            lastLog.setText(lastLog.getText().substring(0, MAX_LOG_LENGTH - TEXT_OVERFLOW_MESSAGE.length()) + TEXT_OVERFLOW_MESSAGE);
+        if (result.size() > 1) {
+            Log lastResultedLog = result.get(result.size() - 1);
+            if (lastResultedLog.getText().length() > MAX_LOG_LENGTH) {
+                lastResultedLog.setText(lastResultedLog.getText().substring(0, MAX_LOG_LENGTH - TEXT_OVERFLOW_MESSAGE.length()) + TEXT_OVERFLOW_MESSAGE);
+            }
         }
         return result;
     }
