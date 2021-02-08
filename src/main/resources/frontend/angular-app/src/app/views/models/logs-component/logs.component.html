@@ -74,15 +74,20 @@
           <div class="m-2">
             <p>Filtration</p>
             <hr>
-            <label for="dat1">Start date</label>
-            <input class="form-control" formControlName="dat1" id="dat1" name="dat1" type="datetime-local">
-            <label for="dat2">End date</label>
-            <input class="form-control" formControlName="dat2" id="dat2" name="dat2" type="datetime-local">
             <mat-form-field appearance="legacy">
               <!-- #docregion toggle -->
-              <input [(ngModel)]="date" [ngxMatDatetimePicker]="picker" class="width-85" formControlName="date"
-                     matInput placeholder="Choose a date">
-              <mat-icon (click)="clearDate($event)" matDatepickerToggleIcon>clear</mat-icon>
+              <input [(ngModel)]="date1" [ngxMatDatetimePicker]="picker1" class="width-85" formControlName="dat1"
+                     id="dat1" matInput name="dat1" placeholder="Start date">
+              <mat-icon (click)="clearDate1($event)" matDatepickerToggleIcon>clear</mat-icon>
+              <mat-datepicker-toggle [for]="picker1" matSuffix></mat-datepicker-toggle>
+              <ngx-mat-datetime-picker #picker1></ngx-mat-datetime-picker>
+              <!-- #enddocregion toggle -->
+            </mat-form-field>
+            <mat-form-field appearance="legacy">
+              <!-- #docregion toggle -->
+              <input [(ngModel)]="date2" [ngxMatDatetimePicker]="picker" class="width-85" formControlName="dat2"
+                     id="dat2" matInput name="dat2" placeholder="End date">
+              <mat-icon (click)="clearDate2($event)" matDatepickerToggleIcon>clear</mat-icon>
               <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
               <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
               <!-- #enddocregion toggle -->

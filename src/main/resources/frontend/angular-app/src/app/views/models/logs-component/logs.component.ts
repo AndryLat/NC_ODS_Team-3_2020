@@ -8,7 +8,7 @@ import {AuthService} from '../../../services/AuthService';
 import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
-import {RouteVariableNameConstants} from '../../../constants/route-variable-names-constants';
+import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
 
 @Component({
   selector: 'app-logs',
@@ -22,7 +22,8 @@ export class LogsComponent implements OnInit {
   parentType: string;
   parentId: string;
   msg: string;
-  date: Date;
+  date1: Date;
+  date2: Date;
   logPage: LogPage;
   operationForm: FormGroup;
   localApi: string = GlobalConstants.apiUrl + 'api/log';
@@ -33,7 +34,7 @@ export class LogsComponent implements OnInit {
               private fb: FormBuilder) {
     this.operationForm = this.fb.group({
       text: ['', Validators.maxLength(2000)],
-      vSort: [''],
+      vSort: ['0'],
       dat1: [''],
       dat2: [''],
       date: ['']
@@ -62,10 +63,14 @@ export class LogsComponent implements OnInit {
     this.getLogsByRule(1);
   }
 
-
-  clearDate(event) {
+  clearDate2(event) {
     event.stopPropagation();
-    this.date = null;
+    this.date2 = null;
+  }
+
+  clearDate1(event) {
+    event.stopPropagation();
+    this.date1 = null;
   }
 
   deleteLog(objectId: string): void {
