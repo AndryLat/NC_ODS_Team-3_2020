@@ -46,10 +46,10 @@ export class LogsComponent implements OnInit {
     let logFileId = localStorage.getItem(RouteVariableNameConstants.logFileToLogsVariableName);
     if (logFileId != null) {
       this.parentId = logFileId;
-      this.parentType = 'logFileId';
+      this.parentType = 'logFile';
     } else {
       this.parentId = localStorage.getItem(RouteVariableNameConstants.directoryToLogsVariableName);
-      this.parentType = 'directoryId';
+      this.parentType = 'directory';
     }
 
   }
@@ -132,10 +132,10 @@ export class LogsComponent implements OnInit {
     console.log(this.rule);
     let params = new HttpParams()
       .set('rule', JSON.stringify(this.rule))
-      .set(this.parentType, this.parentId)
+      .set(this.parentType + "Id", this.parentId)
       .set('page', pageNumber.toString());
 
-    this.http.get<LogPage>(this.localApi + '/', {params}).subscribe(result => {
+    this.http.get<LogPage>(this.localApi + '/' + this.parentType, {params}).subscribe(result => {
       console.log(result);
       this.logPage = result;
       this.logPage.number = this.logPage.number + 1;// In Spring pages start from 0.
@@ -146,9 +146,5 @@ export class LogsComponent implements OnInit {
   keys(): Array<string> {
     let keys = Object.keys(LogLevel);
     return keys.slice(keys.length / 2);
-  }
-
-  handleMessage(message: any) {
-    console.log(message);
   }
 }

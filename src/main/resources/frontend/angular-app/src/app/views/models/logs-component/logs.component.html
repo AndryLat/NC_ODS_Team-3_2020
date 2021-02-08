@@ -7,15 +7,15 @@
     <div class="col-9">
       <table class="table table-bordered table-sm">
         <caption>Logs table</caption>
-        <thead>
+        <thead class="p-0">
         <tr>
-          <th scope="col" style="width: 5%"><input (change)="checkAllCheckBox($event)"
-                                                   [checked]="isAllCheckBoxChecked()"
-                                                   type="checkbox"></th>
-          <th scope="col" style="width: 90%">Text</th>
-          <th class="text-center" scope="col" style="width: 5%">
+          <th class="pt-0 pb-0 align-middle" scope="col" style="width: 2%"><input (change)="checkAllCheckBox($event)"
+                                                                                  [checked]="isAllCheckBoxChecked()"
+                                                                                  type="checkbox"></th>
+          <th class="pt-0 pb-0 align-middle" scope="col" style="width: 95%">Text</th>
+          <th class="text-center p-0 align-middle" scope="col" style="width: 3%">
             <fa-icon (click)="deleteSelectedLogs()" [icon]="deleteIcon"
-                     class="btn fas fa-2x pointer-event"></fa-icon>
+                     class="btn h5 pointer-event text-center mb-0 align-middle"></fa-icon>
           </th>
         </tr>
         </thead>
@@ -41,7 +41,7 @@
     </div>
     <div class="col-3">Settings
       <hr>
-      <form *ngIf="operationForm" [formGroup]="operationForm">
+      <form *ngIf="operationForm" [formGroup]="operationForm" class="classForLateralForm">
         <div class="border rounded">
           <div class="m-2">
             <label for="searchInput">Search by text</label>
@@ -56,6 +56,7 @@
         <div class="border rounded">
           <div class="m-2">
             <p>Sorting</p>
+            <hr>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByLevel">Sort By Level</label>
               <input class="form-control col-2" formControlName="vSort" id="sortByLevel" name="vSort" type="radio"
@@ -75,27 +76,24 @@
             <p>Filtration</p>
             <hr>
             <mat-form-field appearance="legacy">
-              <!-- #docregion toggle -->
               <input [(ngModel)]="date1" [ngxMatDatetimePicker]="picker1" class="width-85" formControlName="dat1"
                      id="dat1" matInput name="dat1" placeholder="Start date">
               <mat-icon (click)="clearDate1($event)" matDatepickerToggleIcon>clear</mat-icon>
               <mat-datepicker-toggle [for]="picker1" matSuffix></mat-datepicker-toggle>
               <ngx-mat-datetime-picker #picker1></ngx-mat-datetime-picker>
-              <!-- #enddocregion toggle -->
             </mat-form-field>
+            <br/>
             <mat-form-field appearance="legacy">
-              <!-- #docregion toggle -->
               <input [(ngModel)]="date2" [ngxMatDatetimePicker]="picker" class="width-85" formControlName="dat2"
                      id="dat2" matInput name="dat2" placeholder="End date">
               <mat-icon (click)="clearDate2($event)" matDatepickerToggleIcon>clear</mat-icon>
               <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
               <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
-              <!-- #enddocregion toggle -->
             </mat-form-field>
             <hr>
             <div *ngFor="let key of keys()" class="row">
-              <label class="col-10" for="logLevel">{{key}}</label>
-              <input class="form-control  col-2" formControlName="{{key}}" id="logLevel" name="logLevel"
+              <label [for]="key" class="col-10">{{key}}</label>
+              <input [id]="key" class="form-control  col-2" formControlName="{{key}}" name="logLevel"
                      type="checkbox">
             </div>
           </div>

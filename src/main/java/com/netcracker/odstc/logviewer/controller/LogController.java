@@ -28,7 +28,7 @@ public class LogController {
         this.logService = logService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/directory")
     public Page<LogDTO> logs(@RequestParam String directoryId,
                              @RequestParam(value = "page", defaultValue = "1") int page,
                              @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
@@ -38,14 +38,14 @@ public class LogController {
         return logService.getAllLogsByAllValues(new BigInteger(directoryId), ruleContainer, pageable);
     }
 
-    @GetMapping("/file/logs")
-    public Page<LogDTO> getLogByFileId(@RequestParam String fileId,
+    @GetMapping("/logFile")
+    public Page<LogDTO> getLogByFileId(@RequestParam String logFileId,
                                        @RequestParam(value = "page", defaultValue = "1") int page,
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize,
                                        @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
-        return logService.getLogByFileId(new BigInteger(fileId), ruleContainer, pageable);
+        return logService.getLogByFileId(new BigInteger(logFileId), ruleContainer, pageable);
     }
 
     @PostMapping("/add")
