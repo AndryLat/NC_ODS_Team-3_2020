@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.netcracker.odstc.logviewer.models.User;
+import com.netcracker.odstc.logviewer.security.jwt.SecuritySettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -12,34 +13,32 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.util.Date;
 
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.EXPIRATION_TIME_RESET_PASSWORD;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
-
 @Service
 public class SecurityService {
 
     private final Logger logger = LogManager.getLogger(SecurityService.class.getName());
 
     private final UserService userService;
+    private final SecuritySettings securitySettings;
 
-    public SecurityService(UserService userService) {
+    public SecurityService(UserService userService, SecuritySettings securitySettings) {
         this.userService = userService;
+        this.securitySettings = securitySettings;
     }
 
     public String createPasswordResetTokenForUser(User user) {
         return JWT.create()
                 .withSubject(user.getLogin())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_RESET_PASSWORD))
-                .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
+                .withExpiresAt(new Date(System.currentTimeMillis() + securitySettings.getExpiration_time_reset_password()))
+                .sign(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()));
     }
 
     public boolean validateToken(String token) {
         if (token != null) {
             try {
-                JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
                         .build()
-                        .verify(token.replace(PREFIX, ""));
+                        .verify(token.replace(securitySettings.getPrefix(), ""));
                 return true;
             } catch (TokenExpiredException exp) {
                 logger.error("Token expired ", exp);
@@ -52,7 +51,7 @@ public class SecurityService {
     public boolean validatePasswordResetToken(String token, BigInteger id) {
         if (token != null) {
             try {
-                String userLogin = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                String userLogin = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
                         .build()
                         .verify(token)
                         .getSubject();
@@ -83,7 +82,7 @@ public class SecurityService {
         String login;
         if (token != null) {
             try {
-                login = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+                login = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
                         .build()
                         .verify(token)
                         .getSubject();

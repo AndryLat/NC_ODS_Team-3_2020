@@ -70,6 +70,9 @@ export class DirectoriesComponent implements OnInit {
     this.getDirectoriesFromPage(1);
   }
 
+  ngOnDestroy(): void {
+    this.alertBarService.resetMessage();
+  }
 
   routeToLogs(dir: Directory): void {
     localStorage.setItem(RouteVariableNameConstants.directoryToLogsVariableName, dir.objectId);
@@ -98,6 +101,7 @@ export class DirectoriesComponent implements OnInit {
 
   connectEnabled(dir:Directory):void{
     dir.enabled = !dir.enabled;
+    dir.connectable = dir.enabled;
     this.http.put(GlobalConstants.apiUrl + 'api/directory/update', dir).subscribe();
   }
 

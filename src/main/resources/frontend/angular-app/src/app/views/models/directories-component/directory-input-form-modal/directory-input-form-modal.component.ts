@@ -126,8 +126,8 @@ export class DirectoryInputFormModalComponent{
         console.log('Complete', this.addingFiles);
         this.addingFiles = undefined;
         this.files = undefined;
-        //this.ngOnInit();
-        this.dialogRef.close(this.insertForm.value);
+        this.dialogRef.close(this.currentDir);
+        //this.closeDir();
       }, error => {
         this.msg = 'Something went wrong with files';
       });
@@ -156,6 +156,7 @@ export class DirectoryInputFormModalComponent{
 
   closeDir(): void {
     this.dir = undefined;
+    this.currentDir = undefined;
     this.addingFiles = undefined;
     this.files = undefined;
     this.flag = false;

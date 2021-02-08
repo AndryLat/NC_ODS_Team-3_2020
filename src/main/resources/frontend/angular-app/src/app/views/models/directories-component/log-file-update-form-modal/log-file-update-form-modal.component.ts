@@ -67,6 +67,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
   }
 
   splitFilesServerBD(logFilesFromDB: LogFile[], logFilesFromServer: LogFile[]) {
+    this.filesForUpdate = [];
     if (logFilesFromDB && logFilesFromServer) {
       logFilesFromServer.forEach(result => {
         logFilesFromDB.forEach(res => {

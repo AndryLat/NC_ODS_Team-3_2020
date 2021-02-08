@@ -16,18 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.EXPIRATION_TIME;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.HEADER;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
-
-
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final SecuritySettings securitySettings;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, SecuritySettings securitySettings) {
         this.authenticationManager = authenticationManager;
+        this.securitySettings = securitySettings;
     }
 
     @Override
@@ -60,8 +56,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = JWT.create()
                 .withSubject(((JwtUser) authResult.getPrincipal()).getUsername())
                 .withClaim("Role", roleUser)
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
-        response.addHeader(HEADER, PREFIX + token);
+                .withExpiresAt(new Date(System.currentTimeMillis() + securitySettings.getExpiration_time()))
+                .sign(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()));
+        response.addHeader(securitySettings.getHeader(), securitySettings.getPrefix() + token);
     }
 }

@@ -3,6 +3,7 @@ package com.netcracker.odstc.logviewer.config;
 import com.netcracker.odstc.logviewer.security.UserDetailsServiceImpl;
 import com.netcracker.odstc.logviewer.security.jwt.JwtAuthenticationFilter;
 import com.netcracker.odstc.logviewer.security.jwt.JwtAuthorizationFilter;
+import com.netcracker.odstc.logviewer.security.jwt.SecuritySettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +26,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ENDPOINT = "/api/user/*";
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final SecuritySettings securitySettings;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, SecuritySettings securitySettings) {
         this.userDetailsService = userDetailsService;
+        this.securitySettings = securitySettings;
     }
 
     @Bean
@@ -50,8 +53,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), securitySettings))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), securitySettings))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }

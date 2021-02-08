@@ -22,9 +22,9 @@
       <thead>
       <tr>
         <th scope="col">Path</th>
+        <th scope="col">Last Existence Check</th>
         <th scope="col">Enabled</th>
         <th scope="col">Connectable</th>
-        <th scope="col">Last Existence Check</th>
         <th scope="col">Actions</th>
       </tr>
       </thead>
@@ -32,13 +32,13 @@
       <tr
         *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
         <td>{{directory.path}}</td>
+        <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
         <td [ngClass]="'text-center '+(directory.enabled?'table-success':'table-danger')">
           <fa-icon [icon]="directory.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
         <td [ngClass]="'text-center '+(directory.connectable?'table-success':'table-danger')">
           <fa-icon [icon]="directory.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>
-        <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
         <td class="d-flex justify-content-around">
           <fa-icon (click)="routeToLogs(directory)" [icon]="logsIcon"
                    class="btn fas fa-2x pointer-event"></fa-icon>

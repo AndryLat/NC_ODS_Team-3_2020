@@ -17,22 +17,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.HEADER;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.PREFIX;
-import static com.netcracker.odstc.logviewer.security.jwt.SecurityConstants.SECRET_KEY;
-
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+    private final SecuritySettings securitySettings;
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, SecuritySettings securitySettings) {
         super(authenticationManager);
+        this.securitySettings = securitySettings;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        String header = request.getHeader(HEADER);
+        String header = request.getHeader(securitySettings.getHeader());
 
-        if (header == null || !header.startsWith(PREFIX)) {
+        if (header == null || !header.startsWith(securitySettings.getPrefix())) {
             chain.doFilter(request, response);
             return;
         }
@@ -44,17 +43,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(HEADER);
+        String token = request.getHeader(securitySettings.getHeader());
 
         if (token != null) {
-            String user = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+            String user = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
                     .build()
-                    .verify(token.replace(PREFIX, ""))
+                    .verify(token.replace(securitySettings.getPrefix(), ""))
                     .getSubject();
 
-            String role = JWT.require(Algorithm.HMAC256(SECRET_KEY.getBytes()))
+            String role = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
                     .build()
-                    .verify(token.replace(PREFIX, ""))
+                    .verify(token.replace(securitySettings.getPrefix(), ""))
                     .getClaim("Role").asString();
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
