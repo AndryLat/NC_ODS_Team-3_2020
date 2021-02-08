@@ -37,7 +37,7 @@
       </div>
     </div>
     <button class="btn btn-primary" type="submit">Update</button>
-    <a [routerLink]="['/resetPassword']" class="badge badge-dark  ml-2">Forgot password?</a>
+    <a [routerLink]="['/resetPassword']" class="ml-3">Forgot password?</a>
     <div *ngIf="wrongPassword" class="alert alert-danger mt-3" role="alert">Wrong old password!</div>
     <div *ngIf="samePasswords" class="alert alert-danger mt-3" role="alert">Old password and new password cannot be the same</div>
     <div *ngIf="passChangeSuccess" class="alert alert-success mt-3" role="alert">Password successfully changed!</div>
