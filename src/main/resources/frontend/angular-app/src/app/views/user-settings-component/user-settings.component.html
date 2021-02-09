@@ -1,3 +1,28 @@
+<div *ngIf="wrongPassword" class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+  Wrong old password!
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div *ngIf="samePasswords" class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+  Old password and new password cannot be the same
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div *ngIf="passChangeSuccess" class="alert alert-success text-center alert-dismissible fade show" role="alert">
+  Password successfully changed!
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div *ngIf="passChangeSuccess == false" class="alert alert-warning text-center alert-dismissible fade show"
+     role="alert">
+  Something went wrong
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 <div class="mb-5"></div>
 <div class="container">
   <div class="card bg-light mb-3">
@@ -13,7 +38,8 @@
     <h3>Change password</h3>
     <div class="form-group">
       <label for="oldPasswordInput">Old password</label>
-      <input class="form-control" formControlName="oldPassword" id="oldPasswordInput" type="password" [ngClass]="{ 'is-invalid': submitted && f.oldPassword.errors }">
+      <input class="form-control" formControlName="oldPassword" id="oldPasswordInput" type="password"
+             [ngClass]="{ 'is-invalid': submitted && f.oldPassword.errors }">
       <div *ngIf="submitted && f.oldPassword.errors" class="invalid-feedback">
         <div *ngIf="f.oldPassword.errors.required">Old password is required</div>
       </div>
@@ -38,10 +64,6 @@
     </div>
     <button class="btn btn-primary" type="submit">Update</button>
     <a [routerLink]="['/resetPassword']" class="ml-3">Forgot password?</a>
-    <div *ngIf="wrongPassword" class="alert alert-danger mt-3" role="alert">Wrong old password!</div>
-    <div *ngIf="samePasswords" class="alert alert-danger mt-3" role="alert">Old password and new password cannot be the same</div>
-    <div *ngIf="passChangeSuccess" class="alert alert-success mt-3" role="alert">Password successfully changed!</div>
-    <div *ngIf="passChangeSuccess == false" class="alert alert-warning mt-3" role="alert">Something went wrong</div>
   </form>
   <hr>
   <h3>Account deleting</h3>

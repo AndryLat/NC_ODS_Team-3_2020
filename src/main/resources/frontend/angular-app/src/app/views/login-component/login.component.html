@@ -1,3 +1,16 @@
+<div *ngIf="badLogin" class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+  Incorrect login or password
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div *ngIf="smthWrong" class="alert alert-warning text-center alert-dismissible fade show"
+     role="alert">
+  Something went wrong
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 <div class="mb-5"></div>
 <div class="text-center d-flex justify-content-center">
   <form [formGroup]="form" class="form-signin col-3" (ngSubmit)="onSubmit()">
@@ -21,8 +34,7 @@
         <div *ngIf="f.password.errors.required">Password is required</div>
       </div>
     </div>
-    <br *ngIf="!(badLogin || (submitted && f.password.errors))">
-    <div *ngIf="badLogin" class="alert alert-danger mt-3" role="alert">Incorrect login or password.</div>
+    <br *ngIf="!(submitted && f.password.errors)">
     <button class="btn btn-lg btn-primary btn-block">Sign in</button>
     <br>
     <a [routerLink]="['/resetPassword']">Forgot password?</a>

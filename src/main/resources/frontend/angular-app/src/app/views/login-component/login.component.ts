@@ -13,6 +13,7 @@ export class LoginComponent {
 
   form: FormGroup;
   badLogin: boolean = false;
+  smthWrong: boolean = false;
   private url: string = 'login';
   submitted: boolean = false;
 
@@ -50,11 +51,12 @@ export class LoginComponent {
       .post(GlobalConstants.apiUrl + this.url, {login, password}, {observe: 'response'})
       .subscribe(res => {
           this.badLogin = false;
+          this.smthWrong = false;
           this.authService.setToken(res.headers.get('Authorization'));
           this.router.navigateByUrl('/');
         },
         error => {
-          this.badLogin = (error.status == 401);
+          error.status == 401 ? this.badLogin = true : this.smthWrong = true;
         });
 
 

@@ -23,6 +23,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER_RESET_ENDPOINT = "/api/user/resetPassword**";
     private static final String USER_CHANGE_PASSWORD_ENDPOINT = "/api/user/changePassword**";
     private static final String USER_UPDATE_PASSWORD_ENDPOINT = "/api/user/updatePassword**";
+    public static final String USER_GET_INFO_ENDPOINT = "/api/user/getInfo/**";
+    public static final String USER_CHECK_PASSWORD_ENDPOINT = "/api/user/checkPassword/**";
     private static final String ADMIN_ENDPOINT = "/api/user/*";
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -49,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/ws/**").permitAll()// Will be secured through WebSocketSecurity
-                .antMatchers(LOGIN_ENDPOINT, GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT, USER_UPDATE_PASSWORD_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT, GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT, USER_UPDATE_PASSWORD_ENDPOINT, USER_GET_INFO_ENDPOINT, USER_CHECK_PASSWORD_ENDPOINT).permitAll()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
