@@ -5,14 +5,10 @@ import {RouteVariableNameConstants} from '../../../constants/route-variable-name
 import {Router} from '@angular/router';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {
-  faBolt,
-  faCheck,
   faEye,
   faPlus,
-  faRedoAlt,
   faSignInAlt,
   faStream,
-  faTimes,
   faTrashAlt
 } from '@fortawesome/free-solid-svg-icons';
 import {GlobalConstants} from '../../../constants/global-constants';
