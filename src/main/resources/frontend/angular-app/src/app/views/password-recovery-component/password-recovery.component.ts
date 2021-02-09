@@ -15,6 +15,8 @@ export class PasswordRecoveryComponent {
   submitted: boolean = false;
   sendSuccess: boolean = false;
   badLogin: boolean = false;
+  smthWrong: boolean = false;
+
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
@@ -42,8 +44,15 @@ export class PasswordRecoveryComponent {
           this.sendSuccess = true;
         },
         error => {
-          this.sendSuccess = false;
+          if (error.status == 400){
           this.badLogin = true;
+          this.sendSuccess = false;
+          this.smthWrong = false;
+          } else {
+          this.smthWrong = true;
+          this.sendSuccess = false;
+          this.badLogin = false;
+          }
         });
   }
 }
