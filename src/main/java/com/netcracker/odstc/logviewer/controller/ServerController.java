@@ -10,15 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.security.Principal;
@@ -42,6 +34,7 @@ public class ServerController {
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         User user = userService.findByLogin(principal.getName());
+        logger.info("GET: Requested all servers");
         return serverService.showAllServersByPagination(pageRequest, user);
     }
 
@@ -49,14 +42,21 @@ public class ServerController {
     public ResponseEntity<BigInteger> add(@RequestBody Server server, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         serverService.add(server, user.getObjectId());
-        logger.info("Server added");
+        logger.info("Post: Requested server added");
         return ResponseEntity.ok(server.getObjectId());
     }
 
     @PutMapping("/update")
     public ResponseEntity<Server> update(@RequestBody Server server) {
         serverService.update(server);
-        logger.info("Server update");
+        logger.info("PUT: Requested server update");
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/updateLastAccessByJob")
+    public ResponseEntity<Server> updateLastAccessByJob(@RequestBody Server server) {
+        serverService.updateLastAccessByJob(server);
+        logger.info("PUT: Requested server update with last access by job");
         return ResponseEntity.accepted().build();
     }
 
@@ -69,7 +69,7 @@ public class ServerController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
         serverService.deleteById(id);
-        logger.info("Server delete");
+        logger.info("DELETE: Requested server delete");
         return ResponseEntity.noContent().build();
     }
 

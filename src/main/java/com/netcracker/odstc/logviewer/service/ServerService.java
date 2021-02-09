@@ -61,6 +61,16 @@ public class ServerService extends AbstractService {
         eavObjectDAO.saveObjectAttributesReferences(server);
     }
 
+    public void updateLastAccessByJob(Server server){
+        if(!isIdValid(server.getObjectId())){
+            throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
+        }
+        if (server.getLastAccessByJob()==null){
+            throwServerServiceExceptionWithMessage("Server don't have last access by job");
+        }
+        eavObjectDAO.saveObjectAttributesReferences(server);
+    }
+
     public void deleteById(BigInteger id) {
         if (!isIdValid(id)) {
             throwServerServiceExceptionWithMessage(ID_NOT_NULL_MESSAGE);
