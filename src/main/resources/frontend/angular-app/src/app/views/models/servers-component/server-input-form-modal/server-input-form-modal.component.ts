@@ -19,7 +19,8 @@ export class ServerInputFormModalComponent implements OnInit {
     'SSH', 'FTP'
   ];
 
-  testResult: string;
+  testResultMessage: string = undefined;
+  testResult: boolean;
 
   constructor(private http: HttpClient, private fb: FormBuilder,
               private dialogRef: MatDialogRef<ServerInputFormModalComponent>) {
@@ -37,10 +38,16 @@ export class ServerInputFormModalComponent implements OnInit {
   }
 
   testConnection(): void {
+    this.insertForm.markAllAsTouched();
+    if (!this.insertForm.valid) {
+      return;
+    }
     this.http.post<boolean>(this.localApi + '/testConnection', this.insertForm.value).subscribe(result => {
-      this.testResult = result ? 'Connection established' : 'Can\'t connect to server';
+      this.testResult = result;
+      this.testResultMessage = result ? 'Connection established' : 'Can\'t connect to server';
     }, error => {
-      this.testResult = 'Some errors occurs when checking';
+      this.testResult = false;
+      this.testResultMessage = 'Some errors occurs when checking';
     });
   }
 
@@ -65,7 +72,7 @@ export class ServerInputFormModalComponent implements OnInit {
 
   closeDialog() {
     this.insertForm.reset();
-    this.testResult = null;
+    this.testResultMessage = null;
     this.dialogRef.close();
   }
 

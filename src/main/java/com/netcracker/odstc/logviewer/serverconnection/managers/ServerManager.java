@@ -53,7 +53,6 @@ public class ServerManager implements DAOChangeListener {
     @Override
     public void objectChanged(ObjectChangeEvent objectChangeEvent) {
         if (ContainerDAO.class.isAssignableFrom(objectChangeEvent.getSource().getClass())) {
-            logger.info("Ignoring event from {} with event {}", ContainerDAO.class, objectChangeEvent);
             return;
         }
         if (objectChangeEvent.getChangeType() == ObjectChangeEvent.ChangeType.DELETE) {
@@ -71,6 +70,9 @@ public class ServerManager implements DAOChangeListener {
 
     public void getLogsFromAllServers() {
         List<Log> result = new ArrayList<>(serverPollManager.getLogsFromThreads());
+        if (logger.isInfoEnabled() && !result.isEmpty()) {
+            logger.info("Gathered {} new logs from poll.", result.size());
+        }
         containerDAO.saveObjectsAttributesReferences(result);
         if (!serverPollManager.getActiveServerConnections().isEmpty()) {
             logger.warn("Skipping job due to previous is not finished");
@@ -164,7 +166,6 @@ public class ServerManager implements DAOChangeListener {
 
     private void updateActiveServersFromDB() {
         List<HierarchyContainer> serverContainers = containerDAO.getActiveServersWithChildren();
-        logger.info("Active Servers in DB: {}", serverContainers.size());
         for (HierarchyContainer serverContainer : serverContainers) {
             Server server = (Server) serverContainer.getOriginal();
             if (serverConnections.containsKey(server.getObjectId())) {
@@ -176,9 +177,9 @@ public class ServerManager implements DAOChangeListener {
                 if (serverConnection == null) continue;
                 serverConnection.setDirectories(serverContainer.getChildren());
                 serverConnections.put(server.getObjectId(), serverConnection);
+                logger.info("Server added. Now have {} in a poll", serverConnections.size());
             }
         }
-        logger.info("Active Servers in Poll: {}", serverConnections.size());
     }
 
     private void startPoll() {
@@ -188,7 +189,9 @@ public class ServerManager implements DAOChangeListener {
             if (serverConnection.getServer().isConnectable() && serverConnection.getServer().isEnabled()) {
                 serverPollManager.addServerToPoll(serverConnection);
             } else {
+                logger.info("Removing server: {} from the poll", serverConnection.getServer().getIp());
                 serverConnectionIterator.remove();
+                logger.info("Server removed. Now have {} in a poll", serverConnections.size());
             }
         }
     }

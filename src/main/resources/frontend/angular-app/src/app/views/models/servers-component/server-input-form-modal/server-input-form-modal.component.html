@@ -41,9 +41,11 @@
                               [values]="protocols">
       </app-error-check-select>
     </form>
-    <div class="d-flex flex-row">
+    <div class="d-flex justify-content-around">
       <button (click)="testConnection()" class="btn btn-info col-4" type="button">Test connection</button>
-      <div *ngIf="!(testResult===null)" class="col-8">{{testResult}}</div>
+      <div *ngIf="(testResultMessage===undefined)" class="col-7"></div>
+      <div *ngIf="(testResultMessage!==undefined)" [ngClass]="testResult?'alert-success':'alert-danger'"
+           class="alert col-7 text-center mb-0 pt-1 pb-1 pr-2 pl-2">{{testResultMessage}}</div>
     </div>
   </div>
   <div class="modal-footer">

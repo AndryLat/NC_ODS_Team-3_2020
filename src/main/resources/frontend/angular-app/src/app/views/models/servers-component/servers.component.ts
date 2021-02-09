@@ -59,7 +59,16 @@ export class ServersComponent implements OnInit, OnDestroy {
 
   routeToDirectories(server: Server): void {
     const objectId = server.objectId;
-    this.updateServer(server);
+    let accessedServer = new Server();
+    accessedServer.objectId = server.objectId;
+    accessedServer.parentId = server.parentId;
+    accessedServer.name = server.name;
+    accessedServer.lastAccessByUser = new Date();
+    accessedServer.objectTypeId = server.objectTypeId;
+    console.log(accessedServer);
+
+    this.http.put(this.localApi + '/updateLastAccessByUser', accessedServer).subscribe(result => {
+    });
     localStorage.setItem(RouteVariableNameConstants.serverToDirectoryVariableName, objectId);
     this.router.navigateByUrl('/directories');
   }
@@ -74,12 +83,6 @@ export class ServersComponent implements OnInit, OnDestroy {
       this.serverPage.content.splice(index, 1);
     }, error => {
       this.alertBarService.setErrorMessage('Something gone wrong. Try again later.');
-    });
-  }
-
-  updateServer(server: Server) {
-    server.lastAccessByUser = new Date();
-    this.http.put(this.localApi + '/update', server).subscribe(result => {
     });
   }
 
@@ -138,9 +141,15 @@ export class ServersComponent implements OnInit, OnDestroy {
   }
 
   switchServer(server: Server) {
-    server.enabled = !server.enabled;
-    server.connectable = server.enabled;
-    this.http.put(this.localApi + '/update', server).subscribe(result => {
+    let switchedServer = Object.assign({}, server);
+    switchedServer.enabled = !server.enabled;
+    switchedServer.connectable = switchedServer.enabled;
+    this.http.put(this.localApi + '/update', switchedServer).subscribe(result => {
+      this.alertBarService.setConfirmMessage('Server ' + server.name + (switchedServer.enabled ? ' enabled' : ' disabled'));
+      server.enabled = switchedServer.enabled;
+      server.connectable = switchedServer.connectable;
+    }, error => {
+      this.alertBarService.setErrorMessage('Cant' + (switchedServer.enabled ? ' enable ' : ' disable ') + server.name + '. Try again later');
     });
   }
 }

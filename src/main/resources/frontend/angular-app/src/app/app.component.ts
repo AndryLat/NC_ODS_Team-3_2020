@@ -11,9 +11,11 @@ export class AppComponent {
   title: 'LogViewer';
   errorMessage: string;
   confirmMessage: string;
+  alertBarService: AlertBarService;
 
-  constructor(private authService: AuthService, private alertBarService: AlertBarService) {
+  constructor(private authService: AuthService, alertBarService: AlertBarService) {
     alertBarService.topBar = this;
+    this.alertBarService = alertBarService;
   }
 
   public setErrorMessage(message: string) {

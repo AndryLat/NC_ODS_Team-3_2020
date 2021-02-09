@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String GENERAL_ENDPOINT = "/*";
+    private static final String ASSETS_ENDPOINT = "/assets/*";
     private static final String LOGIN_ENDPOINT = "/login";
     private static final String USER_RESET_ENDPOINT = "/api/user/resetPassword**";
     private static final String USER_CHANGE_PASSWORD_ENDPOINT = "/api/user/changePassword**";
@@ -51,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/ws/**").permitAll()// Will be secured through WebSocketSecurity
-                .antMatchers(LOGIN_ENDPOINT, GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT, USER_UPDATE_PASSWORD_ENDPOINT, USER_GET_INFO_ENDPOINT, USER_CHECK_PASSWORD_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT, GENERAL_ENDPOINT, USER_RESET_ENDPOINT, USER_CHANGE_PASSWORD_ENDPOINT, USER_UPDATE_PASSWORD_ENDPOINT, USER_GET_INFO_ENDPOINT, USER_CHECK_PASSWORD_ENDPOINT, ASSETS_ENDPOINT).permitAll()
                 .antMatchers(ADMIN_ENDPOINT).access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()

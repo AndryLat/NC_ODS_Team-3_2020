@@ -61,11 +61,11 @@ public class ServerService extends AbstractService {
         eavObjectDAO.saveObjectAttributesReferences(server);
     }
 
-    public void updateLastAccessByJob(Server server){
-        if(!isIdValid(server.getObjectId())){
+    public void updateLastAccessByUser(Server server) {
+        if (!isIdValid(server.getObjectId())) {
             throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
         }
-        if (server.getLastAccessByJob()==null){
+        if (server.getLastAccessByUser() == null) {
             throwServerServiceExceptionWithMessage("Server don't have last access by job");
         }
         eavObjectDAO.saveObjectAttributesReferences(server);

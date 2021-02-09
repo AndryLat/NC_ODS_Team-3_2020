@@ -10,7 +10,15 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
 import java.security.Principal;
@@ -53,9 +61,9 @@ public class ServerController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/updateLastAccessByJob")
+    @PutMapping("/updateLastAccessByUser")
     public ResponseEntity<Server> updateLastAccessByJob(@RequestBody Server server) {
-        serverService.updateLastAccessByJob(server);
+        serverService.updateLastAccessByUser(server);
         logger.info("PUT: Requested server update with last access by job");
         return ResponseEntity.accepted().build();
     }

@@ -34,7 +34,6 @@ export class UserInputFormModalComponent implements OnInit {
 
   getErrorByControlName(control: AbstractControl): string {
     let errors = control.errors;
-    console.log(errors);
     if (errors.max) {
       return 'Specified number is greater than max allowed: ' + errors.max.max;
     }
@@ -45,7 +44,7 @@ export class UserInputFormModalComponent implements OnInit {
       return 'Maximum allowed length: ' + errors.maxlength.requiredLength;
     }
     if (errors.minlength) {
-      return 'Minimum allowed length: ' + errors.maxlength.requiredLength;
+      return 'Minimum allowed length: ' + errors.minlength.requiredLength;
     }
     if (errors.required) {
       return 'This field is required';

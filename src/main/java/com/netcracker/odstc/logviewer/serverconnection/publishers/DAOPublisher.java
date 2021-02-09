@@ -48,7 +48,6 @@ public class DAOPublisher {
     }
 
     public void notifyListeners(ObjectChangeEvent objectChangeEvent, ObjectTypes objectType) {
-        logger.info("Got new event {}, Value: {}", objectChangeEvent.getChangeType(), objectChangeEvent);
         if (listeners.containsKey(objectType)) {
             for (DAOChangeListener changeListener : listeners.get(objectType)) {
                 changeListener.objectChanged(objectChangeEvent);
