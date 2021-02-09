@@ -1,42 +1,44 @@
-<div class="mb-4"></div>
-<br>
-<div class="row ml-5">
-  <div class="ml-5">
-    <button (click)="openInsertDialog()" class="btn btn-primary">
-      <fa-icon [icon]="plusIcon"></fa-icon>
-      Add new user
-    </button>
+<div class="container col-12 pl-0 pr-0">
+  <div class="mb-4"></div>
+  <br>
+  <div class="col-12">
+    <div class="ml-5">
+      <button (click)="openInsertDialog()" class="btn btn-primary">
+        <fa-icon [icon]="plusIcon"></fa-icon>
+        Add new user
+      </button>
+    </div>
   </div>
-</div>
-<br>
-<div class="d-flex justify-content-center row">
-  <table class="table table-bordered table-striped ml-5 mr-5">
-    <caption>Users table</caption>
-    <thead class="thead-light">
-    <tr>
-      <th scope="col" style="width: 30%">Login</th>
-      <th scope="col" style="width: 30%">Email</th>
-      <th scope="col" style="width: 25%">Role</th>
-      <th scope="col" style="width: 15%">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr
-      *ngFor="let user of userPage?.content | paginate: {id: 'users', itemsPerPage: userPage?.size,currentPage: userPage?.number, totalItems: userPage?.totalElements}">
-      <td class="align-middle">{{user.login}}</td>
-      <td class="align-middle">{{user.email}}</td>
-      <td class="align-middle">{{user.role}}</td>
-      <td class="text-center align-middle">
-        <fa-icon (click)="promoteUser(user)" *ngIf="user.role!='ADMIN'" [icon]="promoteIcon"
-                 class="btn pointer-event"
-                 matTooltip="Promote to admin"></fa-icon>
-        <fa-icon (click)="deleteUser(user)" [icon]="deleteIcon" class="btn pointer-event"
-                 matTooltip="Delete user"></fa-icon>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-<div class="row">
-  <pagination-controls (pageChange)="getUsersFromPage($event)" id="users"></pagination-controls>
+  <br>
+  <div class="col-12">
+    <table class="table table-bordered table-striped">
+      <caption>Users table</caption>
+      <thead class="thead-light">
+      <tr>
+        <th scope="col" style="width: 30%">Login</th>
+        <th scope="col" style="width: 30%">Email</th>
+        <th scope="col" style="width: 25%">Role</th>
+        <th scope="col" style="width: 15%">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let user of userPage?.content | paginate: {id: 'users', itemsPerPage: userPage?.size,currentPage: userPage?.number, totalItems: userPage?.totalElements}">
+        <td class="align-middle">{{user.login}}</td>
+        <td class="align-middle">{{user.email}}</td>
+        <td class="align-middle">{{user.role}}</td>
+        <td class="text-center align-middle">
+          <fa-icon (click)="promoteUser(user)" *ngIf="user.role!='ADMIN'" [icon]="promoteIcon"
+                   class="btn pointer-event"
+                   matTooltip="Promote to admin"></fa-icon>
+          <fa-icon (click)="deleteUser(user)" [icon]="deleteIcon" class="btn pointer-event"
+                   matTooltip="Delete user"></fa-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-12">
+    <app-pagination-controls (pageChange)="getUsersFromPage($event)" id="users"></app-pagination-controls>
+  </div>
 </div>

@@ -7,4 +7,5 @@ export class LogPage {
   'totalElements': number;
   'number': number;
   'size': number;
+  'approximate': boolean;
 }

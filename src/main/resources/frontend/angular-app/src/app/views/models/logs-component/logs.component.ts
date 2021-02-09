@@ -52,6 +52,7 @@ export class LogsComponent implements OnInit {
       this.parentType = 'directory';
     }
 
+    this.rule = new RuleContainer();
   }
 
   get f() {
@@ -59,8 +60,7 @@ export class LogsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rule = new RuleContainer('', null, null, 0);
-    this.getLogsByRule(1);
+    this.setNewRule();
   }
 
   clearDate2(event) {
@@ -112,11 +112,37 @@ export class LogsComponent implements OnInit {
     }
   }
 
-  getLogsByRule(pageNumber: number): void {
-    console.log(this.parentId);
+  getLogsByRule(pageNumber: number, ruleChange: boolean): void {
 
-    console.log(this.rule);
+    let params = new HttpParams()
+      .set('rule', JSON.stringify(this.rule))
+      .set(this.parentType + "Id", this.parentId)
+      .set('page', pageNumber.toString());
 
+    this.http.get<LogPage>(this.localApi + '/' + this.parentType, {params}).subscribe(result => {
+      if ((this.logPage === undefined && result.approximate) || (pageNumber == this.logPage?.totalPages)) {
+        this.http.get<number>(this.localApi + '/' + this.parentType + '/' + 'count', {params}).subscribe(result => {
+          console.log("Get accurate count: " + result);
+          this.logPage.approximate = false;
+          this.logPage.totalElements = result;
+        })
+      }
+      if ((result.approximate && this.logPage !== undefined && !this.logPage.approximate) && (!ruleChange)) {
+        result.totalElements = this.logPage.totalElements;
+        result.approximate = this.logPage.approximate;
+      }
+      this.logPage = result;
+      this.logPage.number = this.logPage.number + 1;// In Spring pages start from 0.
+      console.log(this.logPage);
+    });
+  }
+
+  keys(): Array<string> {
+    let keys = Object.keys(LogLevel);
+    return keys.slice(keys.length / 2);
+  }
+
+  setNewRule() {
     this.rule.text = this.operationForm.controls['text'].value;
     this.rule.dat1 = this.operationForm.controls['dat1'].value;
     this.rule.dat2 = this.operationForm.controls['dat2'].value;
@@ -128,23 +154,6 @@ export class LogsComponent implements OnInit {
         this.rule.levels.push(LogLevel[level] - 13);
       }
     }
-
-    console.log(this.rule);
-    let params = new HttpParams()
-      .set('rule', JSON.stringify(this.rule))
-      .set(this.parentType + "Id", this.parentId)
-      .set('page', pageNumber.toString());
-
-    this.http.get<LogPage>(this.localApi + '/' + this.parentType, {params}).subscribe(result => {
-      console.log(result);
-      this.logPage = result;
-      this.logPage.number = this.logPage.number + 1;// In Spring pages start from 0.
-      console.log(this.logPage);
-    });
-  }
-
-  keys(): Array<string> {
-    let keys = Object.keys(LogLevel);
-    return keys.slice(keys.length / 2);
+    this.getLogsByRule(1, true);
   }
 }

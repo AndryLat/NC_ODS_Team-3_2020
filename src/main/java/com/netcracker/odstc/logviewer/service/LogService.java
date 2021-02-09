@@ -38,7 +38,7 @@ public class LogService extends AbstractService {
         } else {
             ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
         }
-        return logDAO.getLogByDirectoryId(directoryId, ruleContainer, pageable);
+        return logDAO.getLogsByDirectoryId(directoryId, ruleContainer, pageable);
     }
 
     public Page<LogDTO> getLogByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
@@ -52,7 +52,7 @@ public class LogService extends AbstractService {
         } else {
             ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
         }
-        return logDAO.getLogByFileId(fileId, ruleContainer, pageable);
+        return logDAO.getLogsByFileId(fileId, ruleContainer, pageable);
     }
 
     public void deleteById(BigInteger id) {
@@ -83,6 +83,28 @@ public class LogService extends AbstractService {
                 throw buildLogServiceExceptionWithMessage(LOG_ID_NULL_MESSAGE);
             }
         }
+    }
+
+    public BigInteger getCountByDirectory(BigInteger directoryId, RuleContainer ruleContainer) {
+        if (ruleContainer.getLevels() != null) {
+            if (ruleContainer.getLevels().isEmpty()) {
+                ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+            }
+        } else {
+            ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+        }
+        return logDAO.getLogsCountByDirectory(directoryId, ruleContainer);
+    }
+
+    public BigInteger getCountByLogFile(BigInteger fileId, RuleContainer ruleContainer) {
+        if (ruleContainer.getLevels() != null) {
+            if (ruleContainer.getLevels().isEmpty()) {
+                ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+            }
+        } else {
+            ruleContainer.setLevels(Arrays.asList(LogLevel.values()));
+        }
+        return logDAO.getLogsCountByFile(fileId, ruleContainer);
     }
 
     private LogServiceException buildLogServiceExceptionWithMessage(String message) {

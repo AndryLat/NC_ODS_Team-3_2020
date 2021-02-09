@@ -1,67 +1,69 @@
-<div class="mb-4"></div>
-<br>
-<div class="row ml-5">
-  <div class="ml-5">
-    <button (click)="openInsertDialog()" class="btn btn-primary">
-      <fa-icon [icon]="plusIcon"></fa-icon>
-      Add new server
-    </button>
-    <button (click)="getServersFromPage(serverPage.number)" class="btn btn-primary ml-3">
-      <fa-icon [icon]="refreshIcon"></fa-icon>
-      Refresh
-    </button>
+<div class="container col-12 pl-0 pr-0">
+  <div class="mb-4"></div>
+  <br>
+  <div class="col-12">
+    <div class="ml-5">
+      <button (click)="openInsertDialog()" class="btn btn-primary">
+        <fa-icon [icon]="plusIcon"></fa-icon>
+        Add new server
+      </button>
+      <button (click)="getServersFromPage(serverPage.number)" class="btn btn-primary ml-3">
+        <fa-icon [icon]="refreshIcon"></fa-icon>
+        Refresh
+      </button>
+    </div>
   </div>
-</div>
-<br>
-<div class="d-flex justify-content-center row">
-  <table class="table table-bordered table-striped ml-5 mr-5">
-    <caption>Servers table</caption>
-    <thead class="thead-light">
-    <tr>
-      <th scope="col" style="width: 19%">Name</th>
-      <th scope="col" style="width: 25%">IP</th>
-      <th scope="col" style="width: 5%">Protocol</th>
-      <th scope="col" style="width: 5%">Port</th>
-      <th scope="col" style="width: 15%">Last Logs
-        <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
-      </th>
-      <th scope="col" style="width: 8%">Connected
-        <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
-      </th>
-      <th scope="col" style="width: 8%">Enabled</th>
-      <th scope="col" style="width: 14%">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr
-      *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
-      <td class="align-middle">{{server.name}}</td>
-      <td class="align-middle">{{server.ip}}</td>
-      <td class="align-middle">{{server.protocol}}</td>
-      <td class="align-middle">{{server.port}}</td>
-      <td class="align-middle">{{server.lastAccessByJob | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
-      <td [ngClass]="'text-center align-middle h4 '+(server.connectable?'table-success':'table-danger')">
-        <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon"></fa-icon>
-      </td>
-      <td [ngClass]="'text-center align-middle h4 '+(server.enabled?'table-success':'table-danger')">
-        <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon"></fa-icon>
-      </td>
-      <td class="text-center align-middle">
-        <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon" class="btn pointer-event"
-                 matTooltip="Show directories"></fa-icon>
-        <fa-icon (click)="switchServer(server)" [icon]="switchIcon" class="btn pointer-event"
-                 matTooltip="Enable/Disable server">
-        </fa-icon>
-        <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
-                 data-target="#updateModal"
-                 data-toggle="modal" matTooltip="Edit server"></fa-icon>
-        <fa-icon (click)="deleteServer(server)" [icon]="deleteIcon" class="btn pointer-event"
-                 matTooltip="Delete server"></fa-icon>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-<div class="row">
-  <pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></pagination-controls>
+  <br>
+  <div class="col-12">
+    <table class="table table-bordered table-striped">
+      <caption>Servers table</caption>
+      <thead class="thead-light">
+      <tr>
+        <th scope="col" style="width: 19%">Name</th>
+        <th scope="col" style="width: 25%">IP</th>
+        <th scope="col" style="width: 5%">Protocol</th>
+        <th scope="col" style="width: 5%">Port</th>
+        <th scope="col" style="width: 15%">Last Logs
+          <fa-icon [icon]="tooltipIcon" matTooltip="Last time when server provide logs"></fa-icon>
+        </th>
+        <th scope="col" style="width: 8%">Connected
+          <fa-icon [icon]="tooltipIcon" matTooltip="Is Server currently connected and can provide logs"></fa-icon>
+        </th>
+        <th scope="col" style="width: 8%">Enabled</th>
+        <th scope="col" style="width: 14%">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let server of serverPage?.content | paginate: {id: 'servers', itemsPerPage: serverPage?.size,currentPage: serverPage?.number, totalItems: serverPage?.totalElements}">
+        <td class="align-middle">{{server.name}}</td>
+        <td class="align-middle">{{server.ip}}</td>
+        <td class="align-middle">{{server.protocol}}</td>
+        <td class="align-middle">{{server.port}}</td>
+        <td class="align-middle">{{server.lastAccessByJob | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
+        <td [ngClass]="'text-center align-middle h4 '+(server.connectable?'table-success':'table-danger')">
+          <fa-icon [icon]="server.connectable?enabledIcon:disabledIcon"></fa-icon>
+        </td>
+        <td [ngClass]="'text-center align-middle h4 '+(server.enabled?'table-success':'table-danger')">
+          <fa-icon [icon]="server.enabled?enabledIcon:disabledIcon"></fa-icon>
+        </td>
+        <td class="text-center align-middle">
+          <fa-icon (click)="routeToDirectories(server)" [icon]="proceedIcon" class="btn pointer-event"
+                   matTooltip="Show directories"></fa-icon>
+          <fa-icon (click)="switchServer(server)" [icon]="switchIcon" class="btn pointer-event"
+                   matTooltip="Enable/Disable server">
+          </fa-icon>
+          <fa-icon (click)="openUpdateDialog(server)" [icon]="settingIcon" class="btn pointer-event"
+                   data-target="#updateModal"
+                   data-toggle="modal" matTooltip="Edit server"></fa-icon>
+          <fa-icon (click)="deleteServer(server)" [icon]="deleteIcon" class="btn pointer-event"
+                   matTooltip="Delete server"></fa-icon>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-12">
+    <app-pagination-controls (pageChange)="getServersFromPage($event)" id="servers"></app-pagination-controls>
+  </div>
 </div>

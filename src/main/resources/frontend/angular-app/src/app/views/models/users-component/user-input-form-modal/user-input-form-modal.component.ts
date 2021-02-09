@@ -24,7 +24,7 @@ export class UserInputFormModalComponent implements OnInit {
     this.insertForm = this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(64)]],
       login: ['', [Validators.required, Validators.maxLength(64), matchPattern(/^[a-zA-Z0-9.-]+$/, 'Special characters is not allowed')]],
-      password: ['', [Validators.required, Validators.maxLength(32)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
       role: ['', Validators.required]
     });
   }
@@ -42,7 +42,10 @@ export class UserInputFormModalComponent implements OnInit {
       return 'Specified number is lower than min allowed: ' + errors.min.min;
     }
     if (errors.maxlength) {
-      return 'Max allowed length: ' + errors.maxlength.requiredLength;
+      return 'Maximum allowed length: ' + errors.maxlength.requiredLength;
+    }
+    if (errors.minlength) {
+      return 'Minimum allowed length: ' + errors.maxlength.requiredLength;
     }
     if (errors.required) {
       return 'This field is required';

@@ -2,7 +2,7 @@ import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
 import {WebSocketMessageHandler} from './WebSocketMessageHandler';
 import {Injectable} from '@angular/core';
-import {AuthService} from '../services/AuthService';
+import {AuthService} from '../AuthService';
 
 @Injectable()
 export class WebSocketService {

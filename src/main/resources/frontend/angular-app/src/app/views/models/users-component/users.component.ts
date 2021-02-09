@@ -41,7 +41,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   deleteUser(user: User): void {
     this.http.delete(GlobalConstants.apiUrl + 'api/user/delete/' + user.objectId).subscribe(() => {
-      this.alertBarService.setConfirmMessage('Server ' + user.login + ' deleted successfully');
+      this.alertBarService.setConfirmMessage('User ' + user.login + ' deleted successfully');
 
       let changedServer = this.userPage.content.find(deletedElement => deletedElement.objectId === user.objectId);
       let index = this.userPage.content.indexOf(changedServer);
@@ -62,7 +62,7 @@ export class UsersComponent implements OnInit, OnDestroy {
       this.userPage = result;
       this.userPage.number = this.userPage.number + 1;// In Spring pages start from 0.
     }, error => {
-      this.alertBarService.setErrorMessage('Cant get list of users. Try again later.');
+      this.alertBarService.setErrorMessage('Can\'t get list of users. Try again later.');
     });
   }
 

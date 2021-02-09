@@ -14,10 +14,8 @@ import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOChangeListe
 import com.netcracker.odstc.logviewer.serverconnection.publishers.DAOPublisher;
 import com.netcracker.odstc.logviewer.serverconnection.publishers.ObjectChangeEvent;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
-import com.netcracker.odstc.logviewer.socket.NewLogsListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@EnableScheduling
 public class ServerManager implements DAOChangeListener {
     private final Logger logger = LogManager.getLogger(ServerManager.class.getName());
 

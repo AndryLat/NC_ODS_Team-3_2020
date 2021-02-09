@@ -21,7 +21,7 @@
         </thead>
         <tbody>
         <tr
-          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.totalElements}; let i=index;">
+          *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.approximate?logPage.size*10:logPage?.totalElements}; let i=index;">
           <td><input [(ngModel)]="logPage?.content[i].checked" type="checkbox" value="{{log.objectId}}"></td>
           <td>
             <a>{{log.text.substr(0, !log.fullText ? 90 : log.text.length)}}
@@ -37,7 +37,8 @@
         </tr>
         </tbody>
       </table>
-      <pagination-controls (pageChange)="getLogsByRule($event)" id="logs"></pagination-controls>
+      <app-pagination-controls (pageChange)="getLogsByRule($event,false)" *ngIf="logPage" [approximate]="logPage?.approximate"
+                               id="logs"></app-pagination-controls>
     </div>
     <div class="col-3">Settings
       <hr>
@@ -99,7 +100,7 @@
           </div>
         </div>
         <hr>
-        <button (click)="getLogsByRule(1)" class="btn btn-primary" type="submit">Apply</button>
+        <button (click)="setNewRule()" class="btn btn-primary" type="submit">Apply</button>
       </form>
     </div>
   </div>

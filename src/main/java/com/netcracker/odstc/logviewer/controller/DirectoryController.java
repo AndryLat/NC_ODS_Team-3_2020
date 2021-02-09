@@ -56,6 +56,13 @@ public class DirectoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/updateAttributes")
+    public ResponseEntity<Directory> updateDirectoryAttributes(@RequestBody Directory directory) {
+        logger.info("PUT: Requested attributes update for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
+        directoryService.update(directory);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Directory> deleteDirectoryById(@PathVariable BigInteger id) {
         logger.info("DELETE: Requested deleting for directory id {}", (id != null ? id : "null"));

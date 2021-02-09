@@ -8,3 +8,21 @@
 .mat-tooltip {
   font-size: 12px !important;
 }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.wrapper {
+  min-height: 100%;
+  margin-bottom: -40px;
+}
+
+.footer,
+.push {
+  height: 40px;
+  bottom: 0;
+  width: 100%;
+  line-height: 40px;
+}

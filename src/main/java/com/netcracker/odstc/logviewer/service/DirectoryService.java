@@ -3,6 +3,8 @@ package com.netcracker.odstc.logviewer.service;
 import com.netcracker.odstc.logviewer.dao.EAVObjectDAO;
 import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.eaventity.EAVObject;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.serverconnection.services.ServerConnectionService;
 import com.netcracker.odstc.logviewer.service.exceptions.DirectoryServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -89,5 +91,15 @@ public class DirectoryService extends AbstractService {
         DirectoryServiceException directoryServiceException = new DirectoryServiceException(message);
         logger.error(message, directoryServiceException);
         return directoryServiceException;
+    }
+
+    protected void updateObjectAttributes(EAVObject eavObject) {
+        if (eavObject == null || !isIdValid(eavObject.getObjectId()) || eavObject.getAttributes() == null) {
+            throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
+        }
+        if (eavObject.getAttributes().containsKey(Attributes.IS_ENABLED_OT_DIRECTORY.getAttrId())) {
+            ((Directory) eavObject).setConnectable(true);
+        }
+        eavObjectDAO.saveObjectAttributesReferences(eavObject);
     }
 }

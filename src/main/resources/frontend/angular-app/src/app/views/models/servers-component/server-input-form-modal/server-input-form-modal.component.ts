@@ -53,7 +53,7 @@ export class ServerInputFormModalComponent implements OnInit {
       return 'Specified number is lower than min allowed: ' + errors.min.min;
     }
     if (errors.maxlength) {
-      return 'Max allowed length: ' + errors.maxlength.requiredLength;
+      return 'Maximum allowed length: ' + errors.maxlength.requiredLength;
     }
     if (errors.required) {
       return 'This field is required';

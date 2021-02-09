@@ -1,0 +1,31 @@
+<div class="col-12">
+  <pagination-template #p="paginationApi"
+                       (pageChange)="pageChange.emit($event)"
+                       [id]="id">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+
+        <li [class.disabled]="p.isFirstPage()" class="page-item">
+          <a (click)="p.previous()" class="page-link"> Prev </a>
+        </li>
+        <li *ngFor="let page of p.pages" [class.active]="p.getCurrent() === page.value" class="page-item">
+          <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value && (!approximate||page.value<p.getCurrent()+6)"
+             class="page-link">
+            <span>{{ page.label }}</span>
+          </a>
+          <a *ngIf="p.getCurrent() === page.value" class="page-link">
+            <span>{{ page.label }}</span>
+          </a>
+        </li>
+
+        <li *ngIf="approximate" class="page-item">
+          <span class="page-link disabled">Loading...</span>
+        </li>
+
+        <li [class.disabled]="p.isLastPage()" class="page-item">
+          <a (click)="p.next()" class="page-link"> Next </a>
+        </li>
+      </ul>
+    </nav>
+  </pagination-template>
+</div>

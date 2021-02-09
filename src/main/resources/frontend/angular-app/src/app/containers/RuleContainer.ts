@@ -8,11 +8,7 @@ export class RuleContainer {
   levels: LogLevel[];
   sort: number;
 
-  constructor(text: string, dat1: Date, dat2: Date, vSort: number) {
-    this.text = text;
-    this.dat1 = dat1;
-    this.dat2 = dat2;
+  constructor() {
     this.levels = [];
-    this.sort = vSort;
   }
 }

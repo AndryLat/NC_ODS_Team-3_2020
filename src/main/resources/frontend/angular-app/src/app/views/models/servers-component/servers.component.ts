@@ -93,7 +93,7 @@ export class ServersComponent implements OnInit, OnDestroy {
       this.serverPage = result;
       this.serverPage.number = this.serverPage.number + 1;// In Spring pages start from 0.
     }, error => {
-      this.alertBarService.setErrorMessage('Cant get list of servers. Try again later.');
+      this.alertBarService.setErrorMessage('Can\'t get list of servers. Try again later.');
     });
   }
 

@@ -21,7 +21,7 @@ import {OverlaySpinnerComponent} from './services/overlay-spinner/overlay-spinne
 import {OverlayModule} from '@angular/cdk/overlay';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
-import {WebSocketService} from './socket-service/WebSocketService';
+import {WebSocketService} from './services/socket-service/WebSocketService';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RealtimeLogsComponentComponent} from './views/realtime-logs-component/realtime-logs-component.component';
 import {LogfileComponentComponent} from './views/models/logfile-component/logfile-component.component';
@@ -47,6 +47,7 @@ import {DirectoryLogFileUpdateFormModalComponent} from "./views/models/directori
 import {MaskedInputComponent} from './views/global-settings-component/date-mask-input-component/date-mask-input.component';
 import {MatIconModule} from "@angular/material/icon";
 import {UserInputFormModalComponent} from './views/models/users-component/user-input-form-modal/user-input-form-modal.component';
+import {ApproximatePaginationControls} from "./services/inputs/approximate-pagination-controls/approximate-pagination-controls";
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import {UserInputFormModalComponent} from './views/models/users-component/user-i
     DirectoryInputFormModalComponent,
     DirectoryLogFileUpdateFormModalComponent,
     MaskedInputComponent,
-    UserInputFormModalComponent
+    UserInputFormModalComponent,
+    ApproximatePaginationControls
   ],
   imports: [
     OverlayModule,
@@ -91,7 +93,8 @@ import {UserInputFormModalComponent} from './views/models/users-component/user-i
     NgxMatTimepickerModule,
     NgxMatDatetimePickerModule,
     NgxMatNativeDateModule,
-    MatDialogModule, MatIconModule
+    MatDialogModule,
+    MatIconModule
   ],
   providers: [
     AuthService,
