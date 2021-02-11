@@ -96,11 +96,16 @@ abstract class AbstractServerConnection implements ServerConnection {
     public boolean isDirectoryValid(Directory directory) {
         validateConnection();
         directory.setLastExistenceCheck(new Date());
-        boolean isValid = !new Date(directory.getLastAccessByUser().getTime() + appConfiguration.getDirectoryActivityPeriod().getTime()).before(new Date());
+        boolean isValid = isLastAccessByUserValid(directory);
         if (logger.isWarnEnabled() && !isValid) {
             logger.warn("Directory {} from {} marked as invalid due to inactivity", directory.getPath(), server.getIp());
         }
         return isValid;
+    }
+
+    private boolean isLastAccessByUserValid(Directory directory) {
+        Date minimalDate = new Date(new Date().getTime()-appConfiguration.getDirectoryActivityPeriod().getTime());
+        return directory.getLastAccessByUser().after(minimalDate);
     }
 
     @Override
