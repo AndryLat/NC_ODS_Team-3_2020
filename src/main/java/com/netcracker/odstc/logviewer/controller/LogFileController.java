@@ -11,14 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -55,7 +48,7 @@ public class LogFileController {
 
     @GetMapping("/files/database")
     public ResponseEntity<List<LogFile>> getLogFilesFromDirectoryFromDB(@RequestParam BigInteger objectId) {
-        logger.info("GET: Requested file listing from database");
+        logger.info("GET: Requested file listing from database with directory id {}", (objectId != null ? objectId : "null"));
         return ResponseEntity.ok(logFileService.getLogFileListFromDB(objectId));
     }
 
@@ -88,7 +81,7 @@ public class LogFileController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<LogFile> deleteById(@PathVariable BigInteger id) {
         logFileService.deleteById(id);
-        logger.info("File of logs deleted");
+        logger.info("File of logs with id: {} deleted", id);
         return ResponseEntity.noContent().build();
     }
 
