@@ -79,18 +79,18 @@ public class DirectoryController {
     @GetMapping("/test")
     public ResponseEntity<Boolean> testConnectionToDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
         Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
-        if(logger.isDebugEnabled()) {
-            if(directory!=null){
+        if (logger.isDebugEnabled()) {
+            if (directory != null) {
                 String path = "[null path]";
                 String parentId = "[null parentId]";
-                if(directory.getPath()!=null){
+                if (directory.getPath() != null) {
                     path = directory.getPath();
                 }
-                if(directory.getParentId()!=null){
+                if (directory.getParentId() != null) {
                     parentId = directory.getParentId().toString();
                 }
-                logger.debug("GET: Requested test connection to directory {}. From server with Id: {}",path,parentId);
-            }else{
+                logger.debug("GET: Requested test connection to directory {}. From server with Id: {}", path, parentId);
+            } else {
                 logger.debug("GET: Requested test connection to directory [null]");
             }
 

@@ -33,7 +33,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         List<LogFile> logFiles = new ArrayList<>();
         try {
             for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
-                if(ftpFile.isFile()) {
+                if (ftpFile.isFile()) {
                     LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
                     logFiles.add(logFile);
                 }
