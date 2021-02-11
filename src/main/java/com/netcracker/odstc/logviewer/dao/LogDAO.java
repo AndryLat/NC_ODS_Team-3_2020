@@ -121,7 +121,7 @@ public class LogDAO extends EAVObjectDAO {
     }
 
     @Transactional
-    public Page<LogDTO> getLogsByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
+    public Page<LogDTO> getLogsByDirectoryId(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
 
         MapSqlParameterSource parameterSourceCount = new MapSqlParameterSource()
                 .addValue("directoryId", directoryId)
@@ -140,12 +140,12 @@ public class LogDAO extends EAVObjectDAO {
 
         List<LogDTO> content = namedParameterJdbcTemplate.query(query, parameterSourceForObject, new LogDTOMapper());
 
-        BigInteger approximateCount = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_APPROXIMATE_COUNT_BY_FILE_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
+        BigInteger approximateCount = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_APPROXIMATE_COUNT_BY_DIRECTORY_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
         BigInteger totalRows;
         boolean approximate;
         if (BigInteger.valueOf(100000).compareTo(approximateCount) > 0) {
             approximate = false;
-            totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_COUNT_BY_FILE_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
+            totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_COUNT_BY_DIRECTORY_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
         } else {
             approximate = true;
             totalRows = approximateCount;
@@ -159,7 +159,7 @@ public class LogDAO extends EAVObjectDAO {
     }
 
     @Transactional
-    public Page<LogDTO> getLogsByDirectoryId(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
+    public Page<LogDTO> getLogsByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         MapSqlParameterSource parameterSourceCount = new MapSqlParameterSource()
                 .addValue("fileId", fileId)
@@ -176,12 +176,12 @@ public class LogDAO extends EAVObjectDAO {
 
         List<LogDTO> content = namedParameterJdbcTemplate.query(query, parameterSourceForObject, new LogDTOMapper());
 
-        BigInteger approximateCount = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_APPROXIMATE_COUNT_BY_DIRECTORY_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
+        BigInteger approximateCount = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_APPROXIMATE_COUNT_BY_FILE_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
         BigInteger totalRows;
         boolean approximate;
         if (BigInteger.valueOf(100000).compareTo(approximateCount) > 0) {
             approximate = false;
-            totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_COUNT_BY_DIRECTORY_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
+            totalRows = namedParameterJdbcTemplate.queryForObject(GET_TOTAL_LOGS_COUNT_BY_FILE_AND_RULE_QUERY, parameterSourceCount, BigInteger.class);
         } else {
             approximate = true;
             totalRows = approximateCount;

@@ -27,7 +27,7 @@ public class LogService extends AbstractService {
         this.logDAO = logDAO;
     }
 
-    public Page<LogDTO> getAllLogsByAllValues(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
+    public Page<LogDTO> getLogsByDirectoryId(BigInteger directoryId, RuleContainer ruleContainer, Pageable pageable) {
         if (!isIdValid(directoryId) || ruleContainer == null || pageable == null) {
             throw buildLogServiceExceptionWithMessage("Values сan't be null");
         }
@@ -41,7 +41,7 @@ public class LogService extends AbstractService {
         return logDAO.getLogsByDirectoryId(directoryId, ruleContainer, pageable);
     }
 
-    public Page<LogDTO> getLogByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
+    public Page<LogDTO> getLogsByFileId(BigInteger fileId, RuleContainer ruleContainer, Pageable pageable) {
         if (!isIdValid(fileId) || ruleContainer == null || pageable == null) {
             throw buildLogServiceExceptionWithMessage("Values сan't be null");
         }

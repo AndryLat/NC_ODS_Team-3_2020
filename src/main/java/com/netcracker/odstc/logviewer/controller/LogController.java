@@ -42,7 +42,7 @@ public class LogController {
                              @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
-        return logService.getAllLogsByAllValues(new BigInteger(directoryId), ruleContainer, pageable);
+        return logService.getLogsByDirectoryId(new BigInteger(directoryId), ruleContainer, pageable);
     }
 
     @GetMapping("/logFile")
@@ -52,7 +52,7 @@ public class LogController {
                                        @RequestParam(value = "rule") String ruleString) throws JsonProcessingException {
         PageRequest pageable = PageRequest.of(page - 1, pageSize);// On UI pages starts from 1. Spring start count from 0.
         RuleContainer ruleContainer = new ObjectMapper().readValue(ruleString, RuleContainer.class);
-        return logService.getLogByFileId(new BigInteger(logFileId), ruleContainer, pageable);
+        return logService.getLogsByFileId(new BigInteger(logFileId), ruleContainer, pageable);
     }
 
     @PostMapping("/add")

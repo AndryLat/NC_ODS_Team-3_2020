@@ -6,6 +6,7 @@ import com.netcracker.odstc.logviewer.models.Directory;
 import com.netcracker.odstc.logviewer.models.Log;
 import com.netcracker.odstc.logviewer.models.LogFile;
 import com.netcracker.odstc.logviewer.models.Server;
+import com.netcracker.odstc.logviewer.models.eaventity.constants.Attributes;
 import com.netcracker.odstc.logviewer.models.eaventity.constants.ObjectTypes;
 import com.netcracker.odstc.logviewer.serverconnection.ServerConnection;
 import com.netcracker.odstc.logviewer.serverconnection.containers.RemovedObjectsCollector;
@@ -125,6 +126,9 @@ public class ServerManager implements DAOChangeListener {
 
     private void directoryChanged(ObjectChangeEvent objectChangeEvent) {
         Directory directory = (Directory) objectChangeEvent.getObject();
+        if(!directory.getAttributes().containsKey(Attributes.PATH_OT_DIRECTORY.getAttrId())){
+            return;
+        }
         if (!serverConnections.containsKey(directory.getParentId()))
             return;
         ServerConnection serverConnection = serverConnections.get(directory.getParentId());
@@ -135,6 +139,9 @@ public class ServerManager implements DAOChangeListener {
 
     private void serverChanged(ObjectChangeEvent objectChangeEvent) {
         Server server = (Server) objectChangeEvent.getObject();
+        if(!server.getAttributes().containsKey(Attributes.IP_ADDRESS_OT_SERVER.getAttrId())){
+            return;
+        }
         if (!server.isEnabled() && serverConnections.containsKey(server.getObjectId())) {
             serverConnections.remove(server.getObjectId());
             removedObjectsCollector.addRemovedObjectId(ObjectTypes.SERVER, server.getObjectId());
