@@ -26,7 +26,7 @@ import java.security.Principal;
 @RequestMapping("/api/server")
 @RestController
 public class ServerController {
-    private final Logger logger = LogManager.getLogger(ServerController.class.getName());
+    private static final Logger logger = LogManager.getLogger(ServerController.class.getName());
     private static final String DEFAULT_PAGE_SIZE = "10";
     private final ServerService serverService;
     private final UserService userService;
@@ -42,7 +42,7 @@ public class ServerController {
                                        @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         User user = userService.findByLogin(principal.getName());
-        logger.info("GET: Requested all servers");
+        logger.info("GET: Request to get all servers by user");
         return serverService.showAllServersByPagination(pageRequest, user);
     }
 
@@ -50,34 +50,35 @@ public class ServerController {
     public ResponseEntity<BigInteger> add(@RequestBody Server server, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         serverService.add(server, user.getObjectId());
-        logger.info("Post: Requested server added");
+        logger.info("POST: Request adding a new server with id {}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.ok(server.getObjectId());
     }
 
     @PutMapping("/update")
     public ResponseEntity<Server> update(@RequestBody Server server) {
         serverService.update(server);
-        logger.info("PUT: Requested server update");
+        logger.debug("PUT: Request updating for server id {}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.accepted().build();
     }
 
     @PutMapping("/updateLastAccessByUser")
     public ResponseEntity<Server> updateLastAccessByJob(@RequestBody Server server) {
         serverService.updateLastAccessByUser(server);
-        logger.info("PUT: Requested server update with last access by job");
+        logger.info("PUT: Request to update the server with last access by job for id {}", (server.getObjectId() != null ? server.getObjectId(): "null"));
         return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
         Server server = serverService.findById(id);
+        logger.info("GET:Request to get server by id");
         return ResponseEntity.ok(server);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
         serverService.deleteById(id);
-        logger.info("DELETE: Requested server delete");
+        logger.info("DELETE: Request to delete server by id");
         return ResponseEntity.noContent().build();
     }
 
