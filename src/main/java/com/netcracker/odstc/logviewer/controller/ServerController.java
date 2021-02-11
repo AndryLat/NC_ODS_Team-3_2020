@@ -71,14 +71,14 @@ public class ServerController {
     @GetMapping("/{id}")
     public ResponseEntity<Server> findById(@PathVariable BigInteger id) {
         Server server = serverService.findById(id);
-        logger.info("GET:Request to get server by id");
+        logger.info("GET:Request to get server by id {}", (id != null ? id: "null"));
         return ResponseEntity.ok(server);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Server> deleteById(@PathVariable BigInteger id) {
         serverService.deleteById(id);
-        logger.info("DELETE: Request to delete server by id");
+        logger.info("DELETE: Request to delete server by id {}", (id != null ? id: "null"));
         return ResponseEntity.noContent().build();
     }
 
