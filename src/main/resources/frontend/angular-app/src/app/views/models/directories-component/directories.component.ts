@@ -12,8 +12,8 @@ import {DirectoryLogFileUpdateFormModalComponent} from "./log-file-update-form-m
 import {AlertBarService} from "../../../services/AlertBarService";
 import {
   faBolt,
-  faCheck,
-  faPlus,
+  faCheck, faFolderOpen,
+  faPlus, faPowerOff,
   faRedoAlt,
   faSignInAlt,
   faStream,
@@ -30,12 +30,12 @@ export class DirectoriesComponent implements OnInit {
 
   plusIcon = faPlus;
   logsIcon = faStream;
-  proceedIcon = faSignInAlt;
+  proceedIcon = faFolderOpen;
   deleteIcon = faTrashAlt;
   updateIcon = faRedoAlt;
   enabledIcon = faCheck;
   disabledIcon = faTimes;
-  connectIcon = faBolt;
+  connectIcon = faPowerOff;
 
   directories: Directory[] = [];
 
@@ -63,6 +63,8 @@ export class DirectoriesComponent implements OnInit {
       this.directoryPage = result;
       this.directoryPage.number = this.directoryPage.number + 1;// In Spring pages start from 0.
       console.log(this.directoryPage);
+    }, error=>{
+      this.alertBarService.setErrorMessage('Can\'t get list of directories. Try again later.');
     });
   }
 
@@ -96,6 +98,9 @@ export class DirectoriesComponent implements OnInit {
       let deletedDirectory = this.directoryPage.content.find(deletedElement => deletedElement.objectId == objectId);
       let index = this.directoryPage.content.indexOf(deletedDirectory);
       this.directoryPage.content.splice(index, 1);
+      this.alertBarService.setConfirmMessage('Directory with id:' + objectId + ' deleted successfully');
+    }, error => {
+      this.alertBarService.setErrorMessage('Something gone wrong. Try again later.');
     });
   }
 

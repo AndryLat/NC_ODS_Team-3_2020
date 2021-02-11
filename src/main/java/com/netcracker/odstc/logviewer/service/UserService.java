@@ -18,9 +18,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 
 @Service
-public class UserService {
+public class UserService extends AbstractService {
     private static final String LOGIN_NOT_FOUND_MESSAGE = "User by login not found.";
     private static final String USER_IS_NULL_MESSAGE = "User shouldn't be null.";
+    private static final String USER_INVALID_LOGIN_MESSAGE = "User don't have unique login.";
     private final Logger logger = LogManager.getLogger(UserService.class.getName());
     private final UserDao userDao;
     private final EAVObjectDAO eavObjectDAO;
@@ -37,7 +38,7 @@ public class UserService {
     }
 
     public Page<User> getUsers(Pageable page) {
-        return new PageImpl<>(userDao.getUsers(page));
+        return eavObjectDAO.getObjectsByObjectTypeId(page, BigInteger.ONE, User.class);
     }
 
     public User findById(BigInteger id) {
@@ -62,10 +63,23 @@ public class UserService {
         if (user == null) {
             throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
         } else {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            User creator = findByLogin(login);
-            user.setCreated(creator.getObjectId());
-            save(user);
+            if (checkUniqueLogin(user)) {
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                User creator = findByLogin(login);
+                user.setCreated(creator.getObjectId());
+                save(user);
+            } else {
+                throwUserServiceExceptionWithMessage(USER_INVALID_LOGIN_MESSAGE);
+            }
+        }
+    }
+
+    private boolean checkUniqueLogin(User user) {
+        try {
+            this.findByLogin(user.getLogin());
+            return false;
+        } catch (UserServiceException exp) {
+            return true;
         }
     }
 
@@ -76,11 +90,28 @@ public class UserService {
         userDao.saveObjectAttributesReferences(user);
     }
 
+    public void updateRole(User user) {
+        if (user == null) {
+            throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
+        } else {
+            if (!isIdValid(user.getObjectId()) || user.getRole() == null) {
+                throwUserServiceExceptionWithMessage("User is not valid.");
+            }
+            User userFromDb = userDao.getByLogin(user.getLogin());
+            if (userFromDb == null) {
+                throwUserServiceExceptionWithMessage(LOGIN_NOT_FOUND_MESSAGE);
+            } else {
+                userFromDb.setRole(user.getRole());
+                update(userFromDb);
+            }
+        }
+    }
+
     public void updatePassword(User user) {
         if (user == null) {
             throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
         } else {
-            if (user.getPassword() == null && user.getLogin() == null) {
+            if (user.getPassword() == null || user.getLogin() == null) {
                 throwUserServiceExceptionWithMessage("User is not valid to update password.");
             }
             User userFromDb = userDao.getByLogin(user.getLogin());
@@ -98,7 +129,7 @@ public class UserService {
             throwUserServiceExceptionWithMessage(USER_IS_NULL_MESSAGE);
             return false;
         } else {
-            if (user.getPassword() == null && user.getLogin() == null) {
+            if (user.getPassword() == null || user.getLogin() == null) {
                 throwUserServiceExceptionWithMessage("User is not valid to check password.");
                 return false;
             }
@@ -148,10 +179,6 @@ public class UserService {
             throwUserServiceExceptionWithMessage("User is not valid for save.");
         }
         userDao.saveObjectAttributesReferences(user);
-    }
-
-    private boolean isIdValid(BigInteger id) {
-        return id != null && !id.equals(BigInteger.valueOf(0));
     }
 
     private boolean isUserValid(User user) {

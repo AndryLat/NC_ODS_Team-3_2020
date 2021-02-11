@@ -8,6 +8,7 @@
       <label for="activityInput">Activity Polling Period</label>
       <fa-icon [icon]="tooltipIcon"
                class="btn fas fa-2x pointer-event" matTooltip="{{activityPollingPeriod}}"></fa-icon>
+      <span class="badge badge-info">ms</span>
       <input class="form-control" formControlName="activityPollingPeriod" id="activityInput"
              name="activityPollingPeriod" placeholder="Activity Polling Period"
              required
@@ -26,6 +27,7 @@
       <label for="changesInput">Changes Polling Period</label>
       <fa-icon [icon]="tooltipIcon"
                class="btn fas fa-2x pointer-event" matTooltip="{{changesPollingPeriod}}"></fa-icon>
+      <span class="badge badge-info">ms</span>
       <input class="form-control" formControlName="changesPollingPeriod" id="changesInput" name="changesPollingPeriod"
              placeholder="Changes Polling Period"
              required type="number">
@@ -46,18 +48,37 @@
         [description]="storageLogPeriod"
         formControlName="storageLogPeriod"
         [mask]="mask"></md-input>
+      <div class="mat-error" *ngIf="this.insertForm.controls.storageLogPeriod.invalid
+        && (this.insertForm.controls.storageLogPeriod.dirty||this.insertForm.controls.storageLogPeriod.touched)">
+        <span *ngIf="this.insertForm.controls.storageLogPeriod.errors.validatorForNullDate">
+          Field cant be 00/00/00/0000.
+        </span>
+      </div>
       <md-input
         [icon]="tooltipIcon"
         [title]="'Server Activity Period'"
         [description]="serverActivityPeriod"
         formControlName="serverActivityPeriod"
         [mask]="mask"></md-input>
+      <div class="mat-error" *ngIf="this.insertForm.controls.serverActivityPeriod.invalid
+        && (this.insertForm.controls.serverActivityPeriod.dirty||this.insertForm.controls.serverActivityPeriod.touched)">
+        <span *ngIf="this.insertForm.controls.serverActivityPeriod.errors.validatorForNullDate">
+          Field cant be 00/00/00/0000.
+        </span>
+      </div>
       <md-input
         [title]="'Directory Activity Period'"
         [description]="directoryActivityPeriod"
         [icon]="tooltipIcon"
         formControlName="directoryActivityPeriod"
-        [mask]="mask"></md-input>
+        [mask]="mask">
+      </md-input>
+      <div class="mat-error" *ngIf="this.insertForm.controls.directoryActivityPeriod.invalid
+        && (this.insertForm.controls.directoryActivityPeriod.dirty||this.insertForm.controls.directoryActivityPeriod.touched)">
+        <span *ngIf="this.insertForm.controls.directoryActivityPeriod.errors.validatorForNullDate">
+          Field cant be 00/00/00/0000.
+        </span>
+      </div>
       <hr>
       <div class="row ml-10">
         <div class="ml-10">

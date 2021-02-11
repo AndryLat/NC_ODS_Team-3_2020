@@ -1,25 +1,22 @@
-<div class="mb-5"></div>
-<div class="container-fluid">
+<div class="container col-12 pl-0 pr-0">
+  <div class="mb-5"></div>
+  <br>
   <div class="row justify-content-center">
     <div *ngIf="msg" class="alert alert-info" role="alert">
       {{msg}}
     </div>
   </div>
-
-  <div class="row">
-    <div class="container col-10">
+  <div class="col-12">
       <button (click)="openInsertModal()" class="btn btn-primary">
         <fa-icon [icon]="plusIcon"></fa-icon>
         Add new Directory
       </button>
-    </div>
   </div>
   <hr>
-
-  <div class="d-flex justify-content-center row">
-    <table class="col-10 table table-bordered">
+  <div class="col-12">
+    <table class="table table-bordered table-striped">
       <caption>Directories table</caption>
-      <thead>
+      <thead class="thead-light">
       <tr>
         <th scope="col">Path</th>
         <th scope="col">Last Existence Check</th>
@@ -55,7 +52,7 @@
     </table>
   </div>
 
-  <div class="d-flex row">
+  <div class="col-12">
     <app-pagination-controls (pageChange)="getDirectoriesFromPage($event)" id="directories"></app-pagination-controls>
   </div>
 </div>

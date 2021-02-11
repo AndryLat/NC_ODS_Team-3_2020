@@ -36,7 +36,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   private _currentCursorPosition: number;
 
-  private readonly _placeholderChar: string = '_';
+  private readonly _placeholderChar: string = '0';
 
   public ngOnInit(): void {
     this._maxInputValue = this.mask.length;
@@ -50,8 +50,9 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
           const placeholder = this._convertMaskToPlaceholder();
 
           const values = this._conformValue(value, placeholder);
+          //const values = this._conformValue(value, '00/00/00/0000');
 
-          const adjustedCursorPosition = this._getCursorPosition(value, placeholder, values.conformed);
+          const adjustedCursorPosition = this._getCursorPosition(value, '00/00/00/0000', values.conformed);
 
           this.mdInputEl.nativeElement.value = values.conformed;
           this.mdInputEl.nativeElement.setSelectionRange(
@@ -93,25 +94,32 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   private _convertMaskToPlaceholder(): string {
-    return this.mask.map((char) => {
+    const r =  this.mask.map((char) => {
       return (char instanceof RegExp) ? this._placeholderChar : char;
     }).join('');
+    console.log(r);
+    return r;
   }
 
 
   private _conformValue(value: string, placeholder: string): { conformed: string, cleaned: string } {
     const editDistance = value.length - this._previousValue.length;
+    console.log('editDistance : '+editDistance)
     const isAddition = editDistance > 0;
     const indexOfFirstChange = this._currentCursorPosition + (isAddition ? -editDistance : 0);
+    console.log('indexOfFirstChange : '+ indexOfFirstChange)
     const indexOfLastChange = indexOfFirstChange + Math.abs(editDistance);
+    console.log('indexOfLastChange : '+ indexOfLastChange)
 
+    const placeholderWithoutMask = '00/00/00/0000';
     if (!isAddition) {
       let compensatingPlaceholderChars = '';
 
       for (let i = indexOfFirstChange; i < indexOfLastChange; i++) {
-        if (placeholder[i] === this._placeholderChar) {
+        /*if (placehol[i] === this._placeholderChar) {
           compensatingPlaceholderChars += this._placeholderChar;
-        }
+        }*/
+        compensatingPlaceholderChars += placeholderWithoutMask[i];
       }
 
       value =
@@ -121,17 +129,55 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         );
     }
 
-    const valueArr = value.split('');
+    const prevValue = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
+    let flag : boolean = false;
+    if (isAddition && value.length > 13 ) {
+      const prevVal = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
+      const addVal = value.slice(indexOfFirstChange, indexOfLastChange);
+      const delVal = prevVal.slice(indexOfFirstChange, indexOfLastChange);
+      const result = prevVal.slice(0, indexOfFirstChange)+addVal+prevVal.slice(indexOfLastChange, value.length);
+      flag = true;
+      value = result;
+    }
+    //const prevValue = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
+
+    //console.log('value : '+ value)
+    const valueArray = value.split('');
+    const valueArr = (valueArray.length== 10) ? [ valueArray[0] + valueArray[1],
+      valueArray[2] + valueArray[3],
+      valueArray[4] + valueArray[5],
+      valueArray[6] + valueArray[7] + valueArray[8] + valueArray[9]]
+      :
+      [ valueArray[0] + valueArray[1], valueArray[2],
+        valueArray[3] + valueArray[4], valueArray[5],
+        valueArray[6] + valueArray[7], valueArray[8],
+        valueArray[9] + valueArray[10] + valueArray[11] + valueArray[12]];
+
+    //console.log('valueArr : '+ valueArr)
+    //console.log('valueArray : '+ valueArray)
+
+    //console.log('prevValue: '+ prevValue)
+    const valueArrayPrev = prevValue.split('');
+    const valueArrPrev = (valueArrayPrev.length==10) ? [valueArrayPrev[0] + valueArrayPrev[1],
+    valueArrayPrev[2] + valueArrayPrev[3],
+    valueArrayPrev[4] + valueArrayPrev[5],
+    valueArrayPrev[6] + valueArrayPrev[7] + valueArrayPrev[8] + valueArrayPrev[9]]
+      :
+      [ valueArrayPrev[0] + valueArrayPrev[1], valueArrayPrev[2],
+        valueArrayPrev[3] + valueArrayPrev[4], valueArrayPrev[5],
+        valueArrayPrev[6] + valueArrayPrev[7], valueArrayPrev[8],
+        valueArrayPrev[9] + valueArrayPrev[10] + valueArrayPrev[11] + valueArrayPrev[12]];
+    //console.log('valueArrPrev : '+ valueArrPrev)
+    //console.log('valueArrayPrev : '+ valueArrPrev)
 
     for (let i = value.length - 1; i >= 0; i--) {
       let char = value[i];
-
       if (char !== this._placeholderChar) {
         const shouldOffset = i >= indexOfFirstChange &&
           this._previousValue.length === this._maxInputValue;
-
         if (char === placeholder[(shouldOffset) ? i - editDistance : i]) {
           valueArr.splice(i, 1);
+          valueArrPrev.splice(i, 1);
         }
       }
     }
@@ -141,21 +187,28 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
     placeholderLoop: for (let i = 0; i < placeholder.length; i++) {
       const charInPlaceholder = placeholder[i];
-
       if (charInPlaceholder === this._placeholderChar) {
         if (valueArr.length > 0) {
           while (valueArr.length > 0) {
             let valueChar = valueArr.shift();
+            let prevChar = valueArrPrev.shift();
 
             if (valueChar === this._placeholderChar) {
               conformedValue += this._placeholderChar;
-
               continue placeholderLoop;
             } else if (this.mask[i].test(valueChar)) {
               conformedValue += valueChar;
               cleanedValue += valueChar;
 
               continue placeholderLoop;
+            }
+            else {
+              if (flag && this.mask[i].test(prevChar)) {
+                conformedValue += prevChar;
+                cleanedValue += prevChar;
+
+                continue placeholderLoop;
+              }
             }
           }
         }

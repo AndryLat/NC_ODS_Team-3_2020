@@ -5,4 +5,5 @@ export class LogFile extends EAVObject {
   lastUpdate: Date;
   lastRow: string;
   checked: boolean;
+  fullText: boolean = false;
 }

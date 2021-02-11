@@ -21,6 +21,7 @@ export class DirectoryInputFormModalComponent{
 
   dir: Directory;
   testResult: string;
+  testBool: boolean = false;
 
   files: LogFile[] = [];
   filesFromDir: LogFile[] = [];
@@ -54,7 +55,11 @@ export class DirectoryInputFormModalComponent{
 
     this.http.get<boolean>(GlobalConstants.apiUrl + 'api/directory/test', {params}).subscribe(result => {
       this.testResult = result ? 'Connection established' : 'Can\'t connect';
+      this.testBool = result;
+      this.dir = result ? this.dir : undefined;
     }, error => {
+      this.dir = undefined;
+      this.testBool = false;
       this.testResult = 'Error with checking connection';
     });
   }
@@ -63,19 +68,24 @@ export class DirectoryInputFormModalComponent{
     if (this.dir === undefined) {
       this.testDirectory();
     }
+    if (this.dir !== undefined) {
+      let params = new HttpParams().set('directoryInString', JSON.stringify(this.dir));
 
-    let params = new HttpParams().set('directoryInString', JSON.stringify(this.dir));
-
-    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files', {params}).subscribe(result => {
-      result.forEach(result => result.checked = true);
-      this.filesFromDir = this.files = result;
-      this.flag = true;
-    }, error => {
-      this.getResult = 'Error with receiving files';
-    });
+      this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files', {params}).subscribe(result => {
+        result.forEach(result => result.checked = true);
+        this.filesFromDir = this.files = result;
+        this.flag = true;
+      }, error => {
+        this.files = undefined;
+        this.getResult = 'Error with receiving files';
+      });
+    }
   }
   search(): void {
     const val = this.searchForm.value;
+    if(val.searchText == '' || val.searchText == null){
+      this.files = this.filesFromDir;
+    }
     if (val.searchText) {
       this.files = [];
       this.filesFromDir.forEach(result => {
@@ -90,25 +100,30 @@ export class DirectoryInputFormModalComponent{
     if (this.dir === undefined) {
       this.testDirectory();
     }
-    console.log(this.insertForm.value);
-    this.http.post<Directory>(GlobalConstants.apiUrl + 'api/directory/add', this.dir).subscribe(result => {
-      this.currentDir = result;
-      this.dir = undefined;
-      this.insertForm.reset({});
-      this.flag = false;
-      this.msg = 'Directory added';
-      console.log('Add Directory ', result);
-      this.addFilesToDb();
-    }, error => {
-      this.msg = 'Something went wrong with directory';
-    });
+    if (this.testBool) {
+      console.log(this.dir);
+      console.log(this.insertForm.value);
+      this.http.post<Directory>(GlobalConstants.apiUrl + 'api/directory/add', this.dir).subscribe(result => {
+        this.currentDir = result;
+        this.dir = undefined;
+        this.insertForm.reset({});
+        this.flag = false;
+        this.msg = 'Directory added';
+        console.log('Add Directory ', result);
+        this.addFilesToDb();
+      }, error => {
+        this.msg = 'Something went wrong with directory';
+      });
+    }
   }
 
   addFilesToDb(): void {
     if (this.files === undefined) {
       this.getFiles();
     }
-    this.addFiles(this.currentDir, this.files);
+    if (this.files !== undefined) {
+      this.addFiles(this.currentDir, this.files);
+    }
   }
 
   addFiles(dir: Directory, files: LogFile[]): void {
@@ -121,6 +136,7 @@ export class DirectoryInputFormModalComponent{
     });
     if (this.addingFiles == []) {
       console.log('AddingFiles is empty');
+      this.msg = 'AddingFiles is empty';
     } else {
       this.http.post<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files/add', this.addingFiles).subscribe(result => {
         console.log('Complete', this.addingFiles);

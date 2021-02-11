@@ -26,3 +26,8 @@ html, body {
   width: 100%;
   line-height: 40px;
 }
+
+.mat-tooltip1{
+  word-break: break-all !important;
+  white-space: normal !important;
+}

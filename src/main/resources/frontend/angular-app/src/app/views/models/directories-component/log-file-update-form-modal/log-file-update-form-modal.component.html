@@ -6,12 +6,9 @@
       </button>
     </div>
     <div class="modal-body">
-      <div class="d-flex flex-row">
-        <button (click)="splitFilesServerBD(filesFromDB, filesFromServer)" class="btn btn-info col-4" type="button">
-          Files
-        </button>
+      <div *ngIf="errMes" class="alert alert-info col-6" role="alert">
+        {{errMes}}
       </div>
-      <hr>
       <!-- PUT FORM -->
       <table class="table table-bordered">
         <caption>Files</caption>
@@ -23,7 +20,12 @@
         </thead>
         <tbody *ngIf="filesForUpdate">
         <tr *ngFor="let file of filesForUpdate;">
-          <td>{{file.name}}</td>
+          <td>
+            {{file.fileName.substr(0, !file.fullText ? 20 : file.fileName.length)}}
+            <a *ngIf="file.fileName.length>20" class="btn btn-link" matTooltip="{{file.fileName}}" matTooltipClass="mat-tooltip1" (mouseenter)="$event.stopImmediatePropagation()"
+               (mouseleave)="$event.stopImmediatePropagation()"
+               #tooltip="matTooltip" (click)="tooltip.toggle()">...</a>
+          </td>
           <td>
             <input (change)="changeStatusFile(file.name, filesForUpdate)" [checked]="file.checked"
                    class="form-control" type="checkbox">

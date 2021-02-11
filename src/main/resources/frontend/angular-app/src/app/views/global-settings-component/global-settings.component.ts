@@ -3,7 +3,7 @@ import {GlobalConstants} from '../../constants/global-constants';
 import {HttpClient} from '@angular/common/http';
 import {AuthService} from '../../services/AuthService';
 import {Config} from '../../entity/Config';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import * as moment from 'moment';
 import {faQuestionCircle, faSync} from "@fortawesome/free-solid-svg-icons";
 
@@ -21,16 +21,21 @@ export class GlobalSettingsComponent{
   tooltipIcon = faQuestionCircle;
   refreshIcon = faSync;
 
-  activityPollingPeriod: string = 'The time stamp in the connection check job. For example, every 300000 will check all IsEnabled = false servers.';
+  activityPollingPeriod: string = 'The time stamp in the connection check job. For example, every 300000(ms) will check all IsEnabled = false servers.';
   changesPollingPeriod: string  = 'The time interval through which the log check job runs.';
   directoryActivityPeriod: string  = 'The maximum time a directory can not provide new logs.';
   serverActivityPeriod: string  = 'The maximum time a server can not provide new logs.';
   storageLogPeriod: string  = 'Time from the date of creation of logs after which they will be deleted.';
 
-  public mask = [/[0-2]/,/[0-9]/,'/',/[0-3]/,/[0-9]/,'/',/[0-1]/,/[0-9]/,'/',/[0-2]/,/[0-9]/,/[0-9]/,/[0-9]/]
+  //public mask = [/[0-2]/,/[0-9]/,'/',/[0-3]/,/[0-9]/,'/',/[0-1]/,/[0-9]/,'/',/[0-2]/,/[0-9]/,/[0-9]/,/[0-9]/]
+  public mask = [/([0-1][0-9])|([2][0-4])/,'/',/([0-2][0-9])|([3][0-1])/,'/',/([0][0-9])|([1][0-2])/,'/',/[0-2][0-9][0-9][0-9]/]
+  //public mask = [/[0-2]/,/[0-9]/,'/',/(0[1-9]|1[0-9]|2[0-9]|3[01])/,'/',/(0[1-9]|1[012])/,'/',/[0-9]{4}/]
 
   constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder) {
-    http.get<Config>(GlobalConstants.apiUrl + 'api/user/config').subscribe(result => {
+  }
+
+  ngOnInit():void{
+    this.http.get<Config>(GlobalConstants.apiUrl + 'api/user/config').subscribe(result => {
       this.config = result;
       this.createForm(result);
     }, error => {
@@ -40,12 +45,7 @@ export class GlobalSettingsComponent{
 
   setValues():void{
     this.insertForm.reset();
-    this.insertForm.controls.activityPollingPeriod.setValue(this.config.activityPollingPeriod);
-    this.insertForm.controls.changesPollingPeriod.setValue(this.config.changesPollingPeriod);
-    this.insertForm.controls.directoryActivityPeriod.setValue(this.config.directoryActivityPeriod);
-    this.insertForm.controls.serverActivityPeriod.setValue(this.getValidDate(this.config.serverActivityPeriod));
-    this.insertForm.controls.directoryActivityPeriod.setValue(this.getValidDate(this.config.directoryActivityPeriod));
-    this.insertForm.controls.storageLogPeriod.setValue(this.getValidDate(this.config.storageLogPeriod));
+    this.ngOnInit();
   }
 
   clickForUpdate(): void {
@@ -72,29 +72,38 @@ export class GlobalSettingsComponent{
       });
   }
 
+  validatorForNullDate = (control: FormControl) => {
+    const condition = control.value;
+    console.log(condition)
+    if (condition == '0000000000') {
+      return {validatorForNullDate: 'Field cant be null'}
+    }
+    return null;
+  }
+
   private createForm(config: Config) {
     this.insertForm = this.fb.group({
       activityPollingPeriod: [config.activityPollingPeriod,[
         Validators.required,
-        Validators.maxLength(32),
+        Validators.maxLength(16),
         Validators.min(0)
       ]],
       changesPollingPeriod: [config.changesPollingPeriod,[
         Validators.required,
-        Validators.maxLength(32),
+        Validators.maxLength(16),
         Validators.min(0)
       ]],
       serverActivityPeriod: [this.getValidDate(config.serverActivityPeriod),[
         Validators.required,
-        Validators.maxLength(13)]
+        this.validatorForNullDate]
       ],
       directoryActivityPeriod: [this.getValidDate(config.directoryActivityPeriod), [
         Validators.required,
-        Validators.maxLength(13)]
+        this.validatorForNullDate]
       ],
       storageLogPeriod: [this.getValidDate(config.storageLogPeriod),[
         Validators.required,
-        Validators.maxLength(13)]]
+        this.validatorForNullDate]]
     });
   }
 

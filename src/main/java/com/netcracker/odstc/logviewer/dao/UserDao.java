@@ -4,12 +4,9 @@ import com.netcracker.odstc.logviewer.mapper.UserMapper;
 import com.netcracker.odstc.logviewer.models.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class UserDao extends EAVObjectDAO {
@@ -28,7 +25,7 @@ public class UserDao extends EAVObjectDAO {
         User userId;
         try {
             userId = jdbcTemplate.queryForObject(QUERY_USER_BY_LOGIN, new UserMapper(), login);
-        } catch (Exception exp) {
+        } catch (EmptyResultDataAccessException exp) {
             logger.error("User by login not found:", exp);
             return null;
         }
@@ -36,15 +33,5 @@ public class UserDao extends EAVObjectDAO {
             return getObjectById(userId.getObjectId(), User.class);
         }
         return null;
-    }
-
-    public List<User> getUsers(Pageable page) {
-        List<User> usersIds = jdbcTemplate.query(QUERY_PAGEABLE_USER_ID, new UserMapper(), page.getOffset(), page.getPageSize());
-        List<User> users = new ArrayList<>();
-        for (User id : usersIds) {
-            User user = getObjectById(id.getObjectId(), User.class);
-            users.add(user);
-        }
-        return users;
     }
 }

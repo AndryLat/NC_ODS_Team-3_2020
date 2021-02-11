@@ -13,16 +13,21 @@
                    required
                    type="text">
             <hr>
-            <div class="d-flex flex-row">
-              <button (click)="testDirectory()" class="btn btn-info col-4" type="button">Test connection</button>
-              <div *ngIf="testResult" class="col-8">{{testResult}}</div>
+            <div class="d-flex row-cols-2">
+              <button (click)="testDirectory()" class="btn btn-info col-4 h-25" type="button">Test connection</button>
+              <div class="col-8 h-25">
+                <div *ngIf="testResult"
+                     [ngClass]="'alert alert-'+(testBool?'info':'danger')"
+                     role="alert">{{testResult}}</div>
+              </div>
             </div>
             <hr>
             <button (click)="getFiles()" class="btn btn-info" type="button">Get file list</button>
+
             <div *ngIf="getResult" class="col-8">{{getResult}}</div>
+
             <hr>
-            <hr>
-            <form [formGroup]="searchForm">
+            <form *ngIf="flag && testBool" [formGroup]="searchForm">
               <div *ngIf="files" class="form-group">
                 <label for="searchInput">Search by text</label>
                 <input class="form-control" formControlName="searchText" id="searchInput" name="searchText"
@@ -34,22 +39,30 @@
                 </div>
               </div>
             </form>
-            <table class="table table-bordered">
+            <table *ngIf="flag && testBool" class="table table-bordered">
               <caption>Files</caption>
               <thead>
               <tr>
                 <th scope="col">File name</th>
                 <th scope="col">
-                  <div class="d-flex justify-content-center row">Include?
-                    <fa-icon *ngIf="flag" (click)="checkAll(files)" [icon]="icon"
+                  <!--<div class="d-flex justify-content-center row">-->
+                  <div class="row justify-content-center">Include?</div>
+                  <div class="row justify-content-center">
+                    <fa-icon *ngIf="flag && testBool" (click)="checkAll(files)" [icon]="icon"
                              class="btn fas fa-2x pointer-event"></fa-icon>
                   </div>
+                  <!--</div>-->
                 </th>
               </tr>
               </thead>
               <tbody *ngIf="flag">
               <tr *ngFor="let file of files;">
-                <td>{{file.name}}</td>
+                <td>
+                  {{file.fileName.substr(0, !file.fullText ? 20 : file.fileName.length)}}
+                  <a *ngIf="file.fileName.length>20" class="btn btn-link" matTooltip="{{file.fileName}}" matTooltipClass="mat-tooltip1" (mouseenter)="$event.stopImmediatePropagation()"
+                     (mouseleave)="$event.stopImmediatePropagation()"
+                     #tooltip="matTooltip" (click)="tooltip.toggle()">...</a>
+                </td>
                 <td>
                   <input (change)="changeStatusFile(file.name, files)" [checked]="file.checked" class="form-control"
                          type="checkbox">

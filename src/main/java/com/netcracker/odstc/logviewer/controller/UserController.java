@@ -59,6 +59,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/promoteToAdmin")
+    public ResponseEntity<User> promoteToAdmin(@RequestBody User user) {
+        logger.info("PUT: Requested promote user with id {} to admin.", (user.getObjectId() != null ? user.getObjectId() : "null"));
+        userService.updateRole(user);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/updatePassword")
     public ResponseEntity<User> updatePassword(@RequestBody User user) {
         logger.info("PUT: Requested update password for user with id {}", (user.getObjectId() != null ? user.getObjectId() : "null"));

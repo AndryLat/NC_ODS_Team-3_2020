@@ -15,7 +15,7 @@ public class MailService {
             String contextPath, String token, User user) {
         String url = contextPath + "#/changePassword/" +
                 user.getObjectId() + "/" + token;
-        String message = "message.resetPassword";
+        String message = "If you want to reset your account password on LogViewer, follow the link below: ";
         return constructEmail("Reset Password", message + " \r\n" + url, user);
     }
 

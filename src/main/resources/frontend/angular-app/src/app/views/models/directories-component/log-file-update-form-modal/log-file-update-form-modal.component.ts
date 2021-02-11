@@ -18,12 +18,17 @@ export class DirectoryLogFileUpdateFormModalComponent{
   filesFromDB: LogFile[];
   filesFromServer: LogFile[];
   filesForUpdate: LogFile[] = [];
+  errMes:string;
 
   constructor(private http: HttpClient, private fb: FormBuilder,
               private dialogRef: MatDialogRef<DirectoryLogFileUpdateFormModalComponent>,
               @Inject(MAT_DIALOG_DATA) dir) {
     this.currentDirectory = dir;
     this.getFilesForUpdate(this.currentDirectory);
+  }
+
+  ngAfterContentChecked(): void{
+    this.splitFilesServerBD(this.filesFromDB, this.filesFromServer);
   }
 
   getFilesFromDB(objectId: String): void {
@@ -34,6 +39,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
       this.filesFromDB = result;
       console.log(this.filesFromDB);
     }, error => {
+      this.errMes = 'Error with receiving files from db';
     });
   }
 
@@ -48,7 +54,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
       this.filesFromServer = result;
       console.log(this.filesFromServer);
     }, error => {
-      //this.Result = 'Error with receiving files';
+      this.errMes = 'Error with receiving files from server';
     });
   }
 
@@ -111,6 +117,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
         this.http.post<LogFile>(GlobalConstants.apiUrl + 'api/logFile/file/add', result).subscribe(result => {
           console.log('Adding ', result);
         }, error => {
+          this.errMes = 'Something went wrong with files';
           //msg = 'Something went wrong with files';
         });
         //
