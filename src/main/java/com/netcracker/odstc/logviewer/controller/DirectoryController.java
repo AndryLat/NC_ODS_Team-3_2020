@@ -38,20 +38,20 @@ public class DirectoryController {
                                                                     @RequestParam(value = "page", defaultValue = "1") int page,
                                                                     @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        logger.info("GET: Requested all directories by parentId {}", (parentId != null ? parentId : "null"));
+        logger.debug("GET: Requested all directories by parentId {}", (parentId != null ? parentId : "null"));
         return ResponseEntity.ok(directoryService.findByParentId(parentId, pageable));
     }
 
     @PostMapping("/add")
     public ResponseEntity<Directory> addDirectory(@RequestBody Directory directory) {
-        logger.info("POST: Requested save for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
+        logger.debug("POST: Requested save for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
         directoryService.add(directory);
         return ResponseEntity.ok(directory);
     }
 
     @PutMapping("/update")
     public ResponseEntity<Directory> updateDirectory(@RequestBody Directory directory) {
-        logger.info("PUT: Requested update for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
+        logger.debug("PUT: Requested update for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
         directoryService.update(directory);
         return ResponseEntity.noContent().build();
     }
@@ -65,21 +65,36 @@ public class DirectoryController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Directory> deleteDirectoryById(@PathVariable BigInteger id) {
-        logger.info("DELETE: Requested deleting for directory id {}", (id != null ? id : "null"));
+        logger.debug("DELETE: Requested deleting for directory id {}", (id != null ? id : "null"));
         directoryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Directory> getDirectoryById(@PathVariable BigInteger id) {
-        logger.info("GET: Requested directory with id {}", (id != null ? id : "null"));
+        logger.debug("GET: Requested directory with id {}", (id != null ? id : "null"));
         return ResponseEntity.ok(directoryService.findById(id));
     }
 
     @GetMapping("/test")
     public ResponseEntity<Boolean> testConnectionToDirectory(@RequestParam String directoryInString) throws JsonProcessingException {
-        logger.info("GET: Requested test connection to directory");
         Directory directory = new ObjectMapper().readValue(directoryInString, Directory.class);
+        if(logger.isDebugEnabled()) {
+            if(directory!=null){
+                String path = "[null path]";
+                String parentId = "[null parentId]";
+                if(directory.getPath()!=null){
+                    path = directory.getPath();
+                }
+                if(directory.getParentId()!=null){
+                    parentId = directory.getParentId().toString();
+                }
+                logger.debug("GET: Requested test connection to directory {}. From server with Id: {}",path,parentId);
+            }else{
+                logger.debug("GET: Requested test connection to directory [null]");
+            }
+
+        }
         return ResponseEntity.ok(directoryService.testConnection(directory));
     }
 }

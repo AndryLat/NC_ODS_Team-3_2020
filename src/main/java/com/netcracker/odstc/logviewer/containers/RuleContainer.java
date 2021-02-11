@@ -1,26 +1,31 @@
 package com.netcracker.odstc.logviewer.containers;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.netcracker.odstc.logviewer.models.lists.LogLevel;
 
 import java.util.Date;
 import java.util.List;
 
 public class RuleContainer {
-    private String text;
-    private Date dat1;
-    private Date dat2;
+    @JsonAlias("text")
+    private String searchText;
+    @JsonAlias("dat1")
+    private Date startDate;
+    @JsonAlias("dat2")
+    private Date endDate;
     private List<LogLevel> levels;
-    private int sort;
+    @JsonAlias("sort")
+    private SortType sortType;
 
     public RuleContainer() {
     }
 
-    public RuleContainer(String text, Date dat1, Date dat2, List<LogLevel> levels, int vSort) {
-        this.text = text;
-        this.dat1 = dat1;
-        this.dat2 = dat2;
+    public RuleContainer(String searchText, Date startDate, Date endDate, List<LogLevel> levels, SortType sortType) {
+        this.searchText = searchText;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.levels = levels;
-        this.sort = vSort;
+        this.sortType = sortType;
     }
 
     public List<LogLevel> getLevels() {
@@ -31,35 +36,35 @@ public class RuleContainer {
         this.levels = levels;
     }
 
-    public String getText() {
-        return text;
+    public String getSearchText() {
+        return searchText;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setSearchText(String searchText) {
+        this.searchText = searchText;
     }
 
-    public Date getDat1() {
-        return dat1;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setDat1(Date dat1) {
-        this.dat1 = dat1;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Date getDat2() {
-        return dat2;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setDat2(Date dat2) {
-        this.dat2 = dat2;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
-    public int getSort() {
-        return sort;
+    public SortType getSortType() {
+        return sortType;
     }
 
-    public void setSort(int sort) {
-        this.sort = sort;
+    public void setSortType(SortType sortType) {
+        this.sortType = sortType;
     }
 }
