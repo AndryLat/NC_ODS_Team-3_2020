@@ -9,6 +9,7 @@ import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
 import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
+import {Log} from "../../../entity/Log";
 
 @Component({
   selector: 'app-logs',
@@ -155,5 +156,12 @@ export class LogsComponent implements OnInit {
       }
     }
     this.getLogsByRule(1, true);
+  }
+
+  getTextWithDelimiter(log: Log): string {
+
+    let logWithEnter = log.text.split('\n').join('<br/>');
+    logWithEnter = logWithEnter.substr(0, !log.fullText ? 90 : logWithEnter.length);
+    return logWithEnter;
   }
 }

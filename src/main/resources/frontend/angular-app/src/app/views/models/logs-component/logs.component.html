@@ -5,7 +5,7 @@
       {{msg}}
     </div>
     <div class="col-9">
-      <table class="table table-bordered table-sm">
+      <table class="table table-striped table-bordered table-sm">
         <caption>Logs table</caption>
         <thead class="p-0">
         <tr>
@@ -23,11 +23,11 @@
         <tr
           *ngFor="let log of logPage?.content | paginate: {id: 'logs', itemsPerPage: logPage?.size,currentPage: logPage?.number, totalItems: logPage?.approximate?logPage.size*10:logPage?.totalElements}; let i=index;">
           <td><input [(ngModel)]="logPage?.content[i].checked" type="checkbox" value="{{log.objectId}}"></td>
-          <td>
-            <a>{{log.text.substr(0, !log.fullText ? 90 : log.text.length)}}
-              <a *ngIf="log.text.length>90">
-                <a (click)="log.fullText=!log.fullText" class="btn btn-link">{{log.fullText ? "less" : "more"}}</a>
-              </a>
+          <td class="text-monospace">
+            <a [innerHTML]="getTextWithDelimiter(log)">
+            </a>
+            <a *ngIf="log.text.length>90">
+              <a (click)="log.fullText=!log.fullText" class="btn btn-link">{{log.fullText ? "less" : "more"}}</a>
             </a>
           </td>
           <td class="text-center">
