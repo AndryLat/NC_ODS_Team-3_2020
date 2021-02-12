@@ -97,7 +97,7 @@ public class UserService extends AbstractService {
             if (!isIdValid(user.getObjectId()) || user.getRole() == null) {
                 throwUserServiceExceptionWithMessage("User is not valid.");
             }
-            User userFromDb = userDao.getByLogin(user.getLogin());
+            User userFromDb = findById(user.getObjectId());
             if (userFromDb == null) {
                 throwUserServiceExceptionWithMessage(LOGIN_NOT_FOUND_MESSAGE);
             } else {

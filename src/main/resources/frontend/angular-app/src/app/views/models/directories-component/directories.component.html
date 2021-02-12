@@ -18,18 +18,18 @@
       <caption>Directories table</caption>
       <thead class="thead-light">
       <tr>
-        <th scope="col">Path</th>
-        <th scope="col">Last Existence Check</th>
-        <th scope="col">Enabled</th>
-        <th scope="col">Connectable</th>
-        <th scope="col">Actions</th>
+        <th scope="col" style="width: 35%">Path</th>
+        <th scope="col" style="width: 15%">Last Existence Check</th>
+        <th scope="col" style="width: 12%">Enabled</th>
+        <th scope="col" style="width: 12%">Connectable</th>
+        <th scope="col" style="width: 25%">Actions</th>
       </tr>
       </thead>
       <tbody *ngIf="directoryPage?.content">
       <tr
         *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
-        <td>{{directory.path}}</td>
-        <td class="col-1">{{directory.lastExistenceCheck | date: 'short'}}</td>
+        <td class="align-middle">{{directory.path}}</td>
+        <td class="align-middle">{{directory.lastExistenceCheck | date: 'short'}}</td>
         <td [ngClass]="'text-center '+(directory.enabled?'table-success':'table-danger')">
           <fa-icon [icon]="directory.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
         </td>

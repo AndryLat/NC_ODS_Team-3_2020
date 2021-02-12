@@ -15,7 +15,6 @@ public class UserDao extends EAVObjectDAO {
             "from objects ob, attributes attr\n" +
             "where attr.attr_id = 2 and ob.object_type_id = 1 and attr.object_id = ob.object_id\n" +
             "and attr.value = ? ";
-    private static final String QUERY_PAGEABLE_USER_ID = "SELECT object_id FROM OBJECTS WHERE OBJECT_TYPE_ID = 1 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     public UserDao(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);

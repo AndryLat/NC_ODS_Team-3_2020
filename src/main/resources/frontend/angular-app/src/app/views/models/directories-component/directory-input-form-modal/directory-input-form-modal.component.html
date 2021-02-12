@@ -12,19 +12,27 @@
             <input (change)="changePath()"  class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
                    required
                    type="text">
+            <div class="mat-error" *ngIf="insertForm.get('path').invalid && (insertForm.get('path').dirty||insertForm.get('path').touched)">
+               <span *ngIf="insertForm.get('path').errors.required">
+                Field is required
+               </span>
+            </div>
             <hr>
             <div class="d-flex row-cols-2">
               <button (click)="testDirectory()" class="btn btn-info col-4 h-25" type="button">Test connection</button>
-              <div class="col-8 h-25">
+              <div class="col-8 h-24">
                 <div *ngIf="testResult"
-                     [ngClass]="'alert alert-'+(testBool?'info':'danger')"
+                     [ngClass]="'alert alert-'+(testBool?'success':'danger')"
                      role="alert">{{testResult}}</div>
               </div>
             </div>
             <hr>
             <button (click)="getFiles()" class="btn btn-info" type="button">Get file list</button>
-
-            <div *ngIf="getResult" class="col-8">{{getResult}}</div>
+            <div *ngIf="getResult" class="col h-15">
+              <br>
+              <div class="alert alert-danger"
+                   role="alert">{{getResult}}</div>
+            </div>
 
             <hr>
             <form *ngIf="flag && testBool" [formGroup]="searchForm">

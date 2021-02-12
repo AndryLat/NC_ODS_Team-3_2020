@@ -11,11 +11,9 @@ import {DirectoryInputFormModalComponent} from "./directory-input-form-modal/dir
 import {DirectoryLogFileUpdateFormModalComponent} from "./log-file-update-form-modal/log-file-update-form-modal.component";
 import {AlertBarService} from "../../../services/AlertBarService";
 import {
-  faBolt,
   faCheck, faFolderOpen,
   faPlus, faPowerOff,
   faRedoAlt,
-  faSignInAlt,
   faStream,
   faTimes,
   faTrashAlt
@@ -105,9 +103,16 @@ export class DirectoriesComponent implements OnInit {
   }
 
   connectEnabled(dir:Directory):void{
-    dir.enabled = !dir.enabled;
-    dir.connectable = dir.enabled;
-    this.http.put(GlobalConstants.apiUrl + 'api/directory/update', dir).subscribe();
+    let switchedDir = Object.assign({}, dir);
+    switchedDir.enabled = !dir.enabled;
+    switchedDir.connectable = switchedDir.enabled;
+    this.http.put(GlobalConstants.apiUrl + 'api/directory/update', switchedDir).subscribe(() =>{
+      this.alertBarService.setConfirmMessage('Directory ' + dir.path + (switchedDir.enabled ? ' enabled' : ' disabled'));
+      dir.enabled = switchedDir.enabled;
+      dir.connectable = switchedDir.connectable;
+    }, error=>{
+      this.alertBarService.setErrorMessage('Cant' + (switchedDir.enabled ? ' enable ' : ' disable ') + dir.path + '. Try again later');
+    });
   }
 
   openInsertModal() {

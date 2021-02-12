@@ -6,11 +6,12 @@
       </button>
     </div>
     <div class="modal-body">
-      <div *ngIf="errMes" class="alert alert-info col-6" role="alert">
-        {{errMes}}
+      <div *ngIf="errMes" class="col h-15">
+        <div class="alert alert-danger"
+             role="alert">{{errMes}}</div>
       </div>
       <!-- PUT FORM -->
-      <table class="table table-bordered">
+      <table *ngIf="flag" class="table table-bordered">
         <caption>Files</caption>
         <thead>
         <tr>
@@ -35,6 +36,6 @@
       </table>
     </div>
     <div class="modal-footer">
-      <button (click)="updateFiles()" class="btn btn-primary" data-dismiss="modal" type="submit">Update files</button>
+      <button *ngIf="flag" (click)="updateFiles()" class="btn btn-primary" data-dismiss="modal" type="submit">Update files</button>
     </div>
   </div>

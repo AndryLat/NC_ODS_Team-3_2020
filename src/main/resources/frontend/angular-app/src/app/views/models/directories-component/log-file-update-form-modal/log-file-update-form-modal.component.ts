@@ -19,6 +19,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
   filesFromServer: LogFile[];
   filesForUpdate: LogFile[] = [];
   errMes:string;
+  flag:boolean = false;
 
   constructor(private http: HttpClient, private fb: FormBuilder,
               private dialogRef: MatDialogRef<DirectoryLogFileUpdateFormModalComponent>,
@@ -86,6 +87,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
           }
         });
         this.filesForUpdate.push(result);
+        this.flag = true;
       });
       console.log(this.filesForUpdate);
     }
@@ -96,6 +98,7 @@ export class DirectoryLogFileUpdateFormModalComponent{
     this.filesFromServer = undefined;
     this.filesForUpdate = [];
     this.dialogRef.close();
+    this.flag = false;
   }
 
   updateFiles() {

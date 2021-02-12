@@ -21,7 +21,7 @@ export class GlobalSettingsComponent{
   tooltipIcon = faQuestionCircle;
   refreshIcon = faSync;
 
-  activityPollingPeriod: string = 'The time stamp in the connection check job. For example, every 300000(ms) will check all IsEnabled = false servers.';
+  activityPollingPeriod: string = 'The time stamp in the connection check job. For example, every 300000(ms) will check disabled servers.';
   changesPollingPeriod: string  = 'The time interval through which the log check job runs.';
   directoryActivityPeriod: string  = 'The maximum time a directory can not provide new logs.';
   serverActivityPeriod: string  = 'The maximum time a server can not provide new logs.';
