@@ -134,6 +134,8 @@ public class ServerManager implements DAOChangeListener {
         ServerConnection serverConnection = serverConnections.get(directory.getParentId());
         if (directory.isEnabled()) {
             serverConnection.updateDirectory(directory);
+        } else {
+            serverConnection.removeDirectory(directory);
         }
     }
 
@@ -193,7 +195,7 @@ public class ServerManager implements DAOChangeListener {
         Iterator<ServerConnection> serverConnectionIterator = serverConnections.values().iterator();
         while (serverConnectionIterator.hasNext()) {
             ServerConnection serverConnection = serverConnectionIterator.next();
-            if (serverConnection.getServer().isConnectable() && serverConnection.getServer().isEnabled()) {
+            if (serverConnection.getServer().isConnectable() && serverConnection.getServer().isEnabled() && !serverConnection.getDirectories().isEmpty()) {
                 serverPollManager.addServerToPoll(serverConnection);
             } else {
                 logger.info("Removing server: {} from the poll", serverConnection.getServer().getIp());

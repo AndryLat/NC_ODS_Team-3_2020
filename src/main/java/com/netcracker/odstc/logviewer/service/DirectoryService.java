@@ -23,6 +23,8 @@ public class DirectoryService extends AbstractService {
     private final EAVObjectDAO eavObjectDAO;
     private final ServerConnectionService serverConnectionService;
 
+    private static final int MAX_PATH_LENGTH = 2000;
+
     public DirectoryService(EAVObjectDAO eavObjectDAO) {
         this.serverConnectionService = ServerConnectionService.getInstance();
         this.eavObjectDAO = eavObjectDAO;
@@ -82,9 +84,10 @@ public class DirectoryService extends AbstractService {
 
     private boolean isDirectoryValid(Directory directory) {
         if (directory != null) {
-            return directory.getPath() != null && directory.getPath().trim().length() != 0;
-        } else
+            return directory.getPath() != null && directory.getPath().trim().length() != 0 && directory.getPath().length() < MAX_PATH_LENGTH;
+        } else {
             return false;
+        }
     }
 
     private DirectoryServiceException buildDirectoryServiceExceptionWithMessage(String message) {
@@ -93,7 +96,7 @@ public class DirectoryService extends AbstractService {
         return directoryServiceException;
     }
 
-    protected void updateObjectAttributes(EAVObject eavObject) {
+    public void updateObjectAttributes(EAVObject eavObject) {
         if (eavObject == null || !isIdValid(eavObject.getObjectId()) || eavObject.getAttributes() == null) {
             throw buildDirectoryServiceExceptionWithMessage("Got invalid directory. Can't check invalid directory or without parentId");
         }

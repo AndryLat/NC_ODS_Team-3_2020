@@ -107,10 +107,10 @@ public class SSHServerConnection extends AbstractServerConnection {
     }
 
     protected List<Log> collectNewLogs() {
-        if (directories.isEmpty()) {
-            throw new ServerConnectionException("Server " + server.getIp() + " have empty list of active directories. Mark as cant be connected.");
-        }
         List<Log> result = new ArrayList<>();
+        if (directories.isEmpty()) {
+            return result;
+        }
         try {
             ChannelSftp channelSftp = getChannelSftp();
             for (int i = 0; i < directories.size(); i++) {

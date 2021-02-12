@@ -189,7 +189,8 @@ public class ContainerDAO extends EAVObjectDAO {
     public List<HierarchyContainer> getActiveServersWithChildren() {
         Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(GET_ACTIVE_SERVERS_WITH_DIRECTORIES_WITH_FILES_QUERY);
 
-        validateServerContainer(hierarchyContainerMap);
+        excludeNotServerContainers(hierarchyContainerMap);
+        excludeEmptyContainers(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
@@ -197,7 +198,7 @@ public class ContainerDAO extends EAVObjectDAO {
     public List<HierarchyContainer> getNonactiveServers() {
         Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(GET_NONACTIVE_SERVERS_WITH_DIRECTORIES_QUERY);
 
-        validateServerContainer(hierarchyContainerMap);
+        excludeNotServerContainers(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
@@ -205,8 +206,8 @@ public class ContainerDAO extends EAVObjectDAO {
     public List<HierarchyContainer> getActiveServersWithNonactiveDirectories() {
         Map<BigInteger, HierarchyContainer> hierarchyContainerMap = getHierarchyContainerFromQuery(GET_ACTIVE_SERVERS_NONACTIVE_DIRECTORIES_QUERY);
 
-        validateServerContainer(hierarchyContainerMap);
-        validateChildrenNotEmpty(hierarchyContainerMap);
+        excludeNotServerContainers(hierarchyContainerMap);
+        excludeEmptyContainers(hierarchyContainerMap);
 
         return new ArrayList<>(hierarchyContainerMap.values());
     }
@@ -217,12 +218,12 @@ public class ContainerDAO extends EAVObjectDAO {
         return attributeObjectContainerConverter.convertAttributeObjectContainerToHierarchyContainer(eavObjectsContainers);
     }
 
-    private void validateServerContainer(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
+    private void excludeNotServerContainers(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
         hierarchyContainerMap.entrySet().removeIf(serverContainer ->
                 !Server.class.isAssignableFrom(serverContainer.getValue().getOriginal().getClass()));
     }
 
-    private void validateChildrenNotEmpty(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
+    private void excludeEmptyContainers(Map<BigInteger, HierarchyContainer> hierarchyContainerMap) {
         hierarchyContainerMap.entrySet().removeIf(serverContainer ->
                 serverContainer.getValue().getChildren().isEmpty());
     }

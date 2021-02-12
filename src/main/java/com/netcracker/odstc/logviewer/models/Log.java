@@ -41,6 +41,9 @@ public class Log extends EAVObject {
     }
 
     public LogLevel getLevel() {
+        if (getAttributeListValueId(Attributes.LEVEL_OT_LOG.getAttrId()) == null) {
+            return null;
+        }
         return LogLevel.getByID(getAttributeListValueId(Attributes.LEVEL_OT_LOG.getAttrId()).intValue());
     }
 

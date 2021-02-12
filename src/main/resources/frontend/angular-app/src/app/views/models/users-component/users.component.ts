@@ -3,11 +3,11 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {User} from '../../../entity/User';
 import {UserPage} from '../../../pageable/UserPage';
 import {GlobalConstants} from '../../../constants/global-constants';
-import {Router} from "@angular/router";
-import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
-import {AlertBarService} from "../../../services/AlertBarService";
-import {faArrowUp, faPlus, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
-import {UserInputFormModalComponent} from "./user-input-form-modal/user-input-form-modal.component";
+import {Router} from '@angular/router';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {AlertBarService} from '../../../services/AlertBarService';
+import {faArrowUp, faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {UserInputFormModalComponent} from './user-input-form-modal/user-input-form-modal.component';
 
 @Component({
   selector: 'app-users-component',
@@ -84,8 +84,11 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   promoteUser(user: User) {
+    if (user.role === 'ADMIN') {
+      return;
+    }
     let promotingUser = new User();
-    promotingUser.objectId = user.objectId
+    promotingUser.objectId = user.objectId;
     promotingUser.name = user.name;
     promotingUser.objectTypeId = user.objectTypeId;
     promotingUser.role = 'ADMIN';

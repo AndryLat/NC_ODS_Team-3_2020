@@ -44,7 +44,7 @@ public class ServerService extends AbstractService {
         }
         server.setEnabled(false);
         server.setConnectable(true);
-        server.setLastAccessByJob(new Date());
+        server.setLastAccessByJob(null);
         server.setLastAccessByUser(new Date());
         server.setParentId(parentId);
         validateObjectType(server);
@@ -66,7 +66,7 @@ public class ServerService extends AbstractService {
             throwServerServiceExceptionWithMessage(SERVER_NOT_NULL_MESSAGE);
         }
         if (server.getLastAccessByUser() == null) {
-            throwServerServiceExceptionWithMessage("Server don't have last access by job");
+            throwServerServiceExceptionWithMessage("Server don't have last access by user");
         }
         eavObjectDAO.saveObjectAttributesReferences(server);
     }

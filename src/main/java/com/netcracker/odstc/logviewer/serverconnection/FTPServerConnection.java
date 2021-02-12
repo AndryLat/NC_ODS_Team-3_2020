@@ -95,10 +95,10 @@ public class FTPServerConnection extends AbstractServerConnection {
     }
 
     protected List<Log> collectNewLogs() {
-        if (directories.isEmpty()) {
-            throw new ServerConnectionException("Server " + server.getIp() + " have empty list of active directories. Mark as cant be connected.");
-        }
         List<Log> result = new ArrayList<>();
+        if (directories.isEmpty()) {
+            return result;
+        }
         for (int i = 0; i < directories.size(); i++) {
             HierarchyContainer directory = directories.get(i);
             result.addAll(extractLogsFromDirectory(directory));
