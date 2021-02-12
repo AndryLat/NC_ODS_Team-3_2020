@@ -73,7 +73,11 @@ export class UserInputFormModalComponent implements OnInit {
       this.insertForm.reset({});
       this.dialogRef.close(server);
     }, error => {
-      this.inputError = 'Something gone wrong. Try again later';
+      if(error.error.message==="User don't have unique login."){
+        this.inputError = 'User with login: '+this.insertForm.controls['login'].value+' already exists';
+      }else {
+        this.inputError = 'Something gone wrong. Try again later';
+      }
     });
   }
 }

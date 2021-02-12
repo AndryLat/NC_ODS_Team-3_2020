@@ -85,9 +85,11 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   promoteUser(user: User) {
     let promotingUser = new User();
-    Object.assign(promotingUser, user);
+    promotingUser.objectId = user.objectId
+    promotingUser.name = user.name;
+    promotingUser.objectTypeId = user.objectTypeId;
     promotingUser.role = 'ADMIN';
-    this.http.put(this.localApi + '/update', promotingUser).subscribe(result => {
+    this.http.put(this.localApi + '/promoteToAdmin', promotingUser).subscribe(result => {
         user.role = 'ADMIN';
         this.alertBarService.setConfirmMessage('User ' + promotingUser.login + ' promoted to admin');
       },

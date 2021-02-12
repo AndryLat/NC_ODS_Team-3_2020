@@ -2,8 +2,12 @@
   <label for="{{inputName}}">{{labelText}}</label>
   <input [ngClass]="{ 'is-invalid': containErrors() }" class="form-control" formControlName="{{controlName}}"
          id="{{inputName}}"
-         placeholder="{{placeholder}}" type="{{type}}">{{value}}
+         placeholder="{{placeholder}}" type="{{isPasswordHide?type:'text'}}">{{value}}
   <div *ngIf="containErrors()" class="invalid-feedback">
     <div *ngIf="containErrors()">{{getErrorByControlName(this.parentFormGroup.controls[controlName])}}</div>
+  </div>
+  <div *ngIf="passwordHideCheck && type=='password'" class="form-check">
+    <input class="form-check-input" id="passwordHide" type="checkbox" [(ngModel)]="isPasswordHide" [ngModelOptions]="{standalone: true}">
+    <label class="form-check-label" for="passwordHide">hide</label>
   </div>
 </div>

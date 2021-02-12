@@ -1,9 +1,21 @@
-<div class="mb-5"></div>
+<div class="mb-3"></div>
 <div class="container-fluid">
   <h1 class="text-center">Realtime logs</h1>
-  <div class="form-group">
-    <label for="logArea">Listening for new logs</label>
-    <textarea [ngModel]="getLogs()" class="form-control" disabled id="logArea" rows="30" style="resize: none">
+  <div class="card">
+    <div class="form-group card-body p-0 pt-2 mb-0">
+      <label class="text-muted pl-3" for="logArea">Listening for new logs</label>
+      <textarea [ngModel]="getLogs()" class="form-control text-monospace" disabled id="logArea" rows="30" #logsArea
+                [scrollTop]="isAutoscroll?logsArea.scrollHeight:logsArea.scrollTop" style="resize: none">
     </textarea>
+      <div class="card-footer p-2 d-flex justify-content-between">
+        <div>
+        <input id="autoscroll" type="checkbox" [(ngModel)]="isAutoscroll">
+        <label class="pl-2 mb-0" for="autoscroll">Autoscroll</label>
+        </div>
+        <a [download]="'logviewer_'+getCurrentDate()+'.txt'" [href]="saveLogsToFile()">Save To
+          file</a>
+      </div>
+    </div>
   </div>
 </div>
+<br>

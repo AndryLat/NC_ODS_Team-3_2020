@@ -34,7 +34,7 @@
 
       <app-error-check-input [controlName]="'password'" [errorCheckFunction]="getErrorByControlName"
                              [labelText]="'Password'" [parentFormGroup]="this.updateForm" [placeholder]="'password'"
-                             [type]="'text'">
+                             [type]="'password'" [passwordHideCheck]="true">
       </app-error-check-input>
 
       <app-error-check-select [controlName]="'protocol'" [errorCheckFunction]="getErrorByControlName"

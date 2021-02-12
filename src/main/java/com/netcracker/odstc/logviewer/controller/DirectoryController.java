@@ -58,7 +58,7 @@ public class DirectoryController {
 
     @PutMapping("/updateAttributes")
     public ResponseEntity<Directory> updateDirectoryAttributes(@RequestBody Directory directory) {
-        logger.info("PUT: Requested attributes update for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
+        logger.debug("PUT: Requested attributes update for directory with id {}", (directory.getObjectId() != null ? directory.getObjectId() : "null"));
         directoryService.update(directory);
         return ResponseEntity.noContent().build();
     }

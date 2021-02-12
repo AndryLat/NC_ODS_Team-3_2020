@@ -15,6 +15,8 @@ export class ErrorCheckInputComponent implements OnInit {
   @Input() labelText: string;
   @Input() placeholder: string;
   @Input() value: string;
+  @Input() passwordHideCheck: boolean = false;
+  isPasswordHide: boolean = true;
 
 
   constructor() {

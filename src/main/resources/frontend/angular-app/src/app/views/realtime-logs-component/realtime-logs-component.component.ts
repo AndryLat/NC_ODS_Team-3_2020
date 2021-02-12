@@ -3,6 +3,8 @@ import {WebSocketMessageHandler} from '../../services/socket-service/WebSocketMe
 import {WebSocketService} from '../../services/socket-service/WebSocketService';
 import {Log} from '../../entity/Log';
 import {RouteVariableNameConstants} from '../../constants/route-variable-names-constants';
+import {DomSanitizer} from "@angular/platform-browser";
+import {LogLevel} from "../../entity/list/LogLevel";
 
 @Component({
   selector: 'app-realtime-logs-component',
@@ -14,9 +16,9 @@ export class RealtimeLogsComponentComponent implements OnInit, OnDestroy, WebSoc
   logs: Log[] = [];
 
   fileId: string;
+  isAutoscroll = false;
 
-
-  constructor(private webSocketService: WebSocketService) {
+  constructor(private webSocketService: WebSocketService, private sanitizer: DomSanitizer) {
     this.fileId = localStorage.getItem(RouteVariableNameConstants.logFileToRealTimeVariableName);
     webSocketService.addHandler(this);
     webSocketService.addFileToListen(this.fileId);
@@ -38,7 +40,23 @@ export class RealtimeLogsComponentComponent implements OnInit, OnDestroy, WebSoc
     return res;
   }
 
+  saveLogsToFile(){
+    const content = this.getLogs();
+    const blob = new Blob([content], {type: 'text/plain'});
+    return this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(blob));
+  }
+
   ngOnDestroy() {
     this.webSocketService.removeHandler(this);
+  }
+
+  addLog(){
+    this.logs.push({
+      objectTypeId: "",
+      name: "", objectId: "", parentId: "", text:"Omega",fullText: false, creationDate: new Date(), level: LogLevel.CONFIG})
+  }
+
+  getCurrentDate(): string{
+    return new Date().valueOf().toString();
   }
 }
