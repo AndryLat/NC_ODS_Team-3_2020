@@ -126,6 +126,7 @@ export class LogsComponent implements OnInit {
           console.log("Get accurate count: " + result);
           this.logPage.approximate = false;
           this.logPage.totalElements = result;
+          this.logPage.totalPages = result/this.logPage.size;
         })
       }
       if ((result.approximate && this.logPage !== undefined && !this.logPage.approximate) && (!ruleChange)) {

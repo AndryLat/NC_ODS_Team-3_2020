@@ -91,10 +91,10 @@ export class UsersComponent implements OnInit, OnDestroy {
     promotingUser.role = 'ADMIN';
     this.http.put(this.localApi + '/promoteToAdmin', promotingUser).subscribe(result => {
         user.role = 'ADMIN';
-        this.alertBarService.setConfirmMessage('User ' + promotingUser.login + ' promoted to admin');
+        this.alertBarService.setConfirmMessage('User ' + user.login + ' promoted to admin');
       },
       error => {
-        this.alertBarService.setErrorMessage('Error occurs while promoting ' + promotingUser.login + '. Try again later.');
+        this.alertBarService.setErrorMessage('Error occurs while promoting ' + user.login + '. Try again later.');
       });
   }
 }
