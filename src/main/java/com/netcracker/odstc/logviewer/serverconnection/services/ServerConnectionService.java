@@ -50,7 +50,7 @@ public class ServerConnectionService {
 
     public LogLevel formatLogLevel(String level) {
         if (level == null) {
-            return null;
+            return LogLevel.NO_LEVEL;
         }
         if (LogLevel.contains(level)) {
             return LogLevel.valueOf(level);

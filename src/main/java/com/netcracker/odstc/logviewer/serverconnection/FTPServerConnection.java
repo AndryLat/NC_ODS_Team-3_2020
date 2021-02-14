@@ -32,6 +32,7 @@ public class FTPServerConnection extends AbstractServerConnection {
         validateConnection();
         List<LogFile> logFiles = new ArrayList<>();
         try {
+            ftpClient.changeWorkingDirectory("/");
             for (FTPFile ftpFile : ftpClient.listFiles(directory.getPath())) {
                 if (ftpFile.isFile()) {
                     LogFile logFile = new LogFile(ftpFile.getName(), 0, directory.getObjectId());
@@ -82,9 +83,10 @@ public class FTPServerConnection extends AbstractServerConnection {
         if (!super.isDirectoryValid(directory))
             return false;
         try {
+            ftpClient.changeWorkingDirectory("/");
             boolean isAccessible = ftpClient.changeWorkingDirectory(directory.getPath());
             if (isAccessible) {
-                ftpClient.changeToParentDirectory();
+                ftpClient.changeWorkingDirectory("/");
             }
             return isAccessible;
         } catch (IOException e) {
@@ -98,6 +100,12 @@ public class FTPServerConnection extends AbstractServerConnection {
         List<Log> result = new ArrayList<>();
         if (directories.isEmpty()) {
             return result;
+        }
+        try {
+            ftpClient.changeWorkingDirectory("/");
+        } catch (IOException e) {
+            logger.error("Cant change directory to home on server {}",server.getIp());
+            throw new ServerConnectionException("Cant change directory to home",e);
         }
         for (int i = 0; i < directories.size(); i++) {
             HierarchyContainer directory = directories.get(i);

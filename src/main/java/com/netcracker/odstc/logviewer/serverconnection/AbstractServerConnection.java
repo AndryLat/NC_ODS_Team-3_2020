@@ -115,7 +115,7 @@ abstract class AbstractServerConnection implements ServerConnection {
         if (!result.isEmpty()) {
             server.setLastAccessByJob(new Date());
         } else {
-            if (new Date(server.getLastAccessByJob().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date())) {
+            if (server.getLastAccessByJob()==null||new Date(server.getLastAccessByJob().getTime() + appConfiguration.getServerActivityPeriod().getTime()).before(new Date())) {
                 logger.info("Server {} exceeds allowed Server activity period. Disabling.", server.getIp());
                 server.setEnabled(false);
             }
