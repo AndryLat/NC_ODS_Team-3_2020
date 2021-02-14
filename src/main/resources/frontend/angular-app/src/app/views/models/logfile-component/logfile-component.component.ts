@@ -181,7 +181,7 @@ export class LogfileComponentComponent implements OnInit {
   getFilesFromServer(dir: Directory): void {
     let params = new HttpParams().set('directoryInString', JSON.stringify(dir));
 
-    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/directory/files', {params}).subscribe(result => {
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files', {params}).subscribe(result => {
       result.forEach(result => {
         result.checked = false;
         result.parentId = dir.objectId;
@@ -194,9 +194,9 @@ export class LogfileComponentComponent implements OnInit {
   }
 
   getFilesFromDB(dir: Directory): void {
-    let params = new HttpParams().set('directoryInString', JSON.stringify(dir));
+    let params = new HttpParams().set('objectId', dir.objectId);
 
-    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/filesDB', {params}).subscribe(result => {
+    this.http.get<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files/database', {params}).subscribe(result => {
       result.forEach(result => result.checked = true);
       this.filesFromDB = result;
       console.log(this.filesFromDB);
