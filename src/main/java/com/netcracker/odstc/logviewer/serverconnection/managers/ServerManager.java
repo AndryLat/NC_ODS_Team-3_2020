@@ -169,6 +169,7 @@ public class ServerManager implements DAOChangeListener {
                     logFiles.add((LogFile) logFileContainer.getOriginal());
                 }
             }
+            serverConnection.getDirectories().clear();
         }
         containerDAO.saveObjectsAttributesReferences(servers);
         containerDAO.saveObjectsAttributesReferences(directories);
