@@ -9,7 +9,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="container-fluid col-11">
+    <div class="container-fluid col-12">
       <button (click)="getFilesForUpdate()" class="btn btn-primary" data-target="#updateFilesModal" data-toggle="modal">
         <fa-icon [icon]="plusIcon"></fa-icon>
         Add new File
@@ -17,10 +17,10 @@
     </div>
   </div>
   <hr>
-  <div class="row">
-    <table class="table table-bordered">
+  <div class="col-12">
+    <table class="table table-bordered table-striped">
       <caption>Files table</caption>
-      <thead>
+      <thead class = "p-0">
       <tr>
         <th scope="col" style="width: 75%">Name</th>
         <th scope="col" style="width: 15%">Last Access By Job</th>
