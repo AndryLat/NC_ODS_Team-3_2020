@@ -26,10 +26,10 @@ import java.util.*;
 public class EAVObjectDAO {
 
     private static final String GET_OBJECT_BY_PARENT_ID_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID" +
-            " FROM OBJECTS WHERE PARENT_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            " FROM OBJECTS WHERE PARENT_ID  = ? order by object_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
 
     private static final String GET_OBJECT_BY_TYPE_QUERY_WITH_PAGINATION = "SELECT object_id, NAME, PARENT_ID, OBJECT_TYPE_ID" +
-            " FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+            " FROM OBJECTS WHERE OBJECT_TYPE_ID  = ? order by object_id desc OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     private static final String GET_COUNT_BY_PARENT_ID_QUERY_WITH_PAGINATION = "SELECT COUNT(object_id)" +
             " FROM OBJECTS WHERE PARENT_ID  = ?";

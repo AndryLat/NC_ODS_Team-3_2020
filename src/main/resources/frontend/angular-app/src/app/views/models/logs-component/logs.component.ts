@@ -5,7 +5,7 @@ import {GlobalConstants} from '../../../constants/global-constants';
 import {LogLevel} from '../../../entity/list/LogLevel';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../services/AuthService';
-import {faFilter, faSearch, faSortAmountUp, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faFilter, faSearch, faSortAmountDown, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
 import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
@@ -19,7 +19,7 @@ import {Log} from "../../../entity/Log";
 export class LogsComponent implements OnInit {
   deleteIcon = faTrashAlt;
   fafilter = faFilter;
-  faSortAmountAsc = faSortAmountUp;
+  faSortAmountAsc = faSortAmountDown;
   faSearch = faSearch;
 
   rule: RuleContainer;
