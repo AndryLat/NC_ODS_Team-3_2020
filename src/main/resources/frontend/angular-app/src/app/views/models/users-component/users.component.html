@@ -28,7 +28,7 @@
         <td class="align-middle">{{user.email}}</td>
         <td class="align-middle">{{user.role}}</td>
         <td class="text-center align-middle">
-          <fa-icon (click)="promoteUser(user)" [class.disabled]="user.role==='ADMIN'"
+          <fa-icon (click)="promoteUser(user)" *ngIf="user.role==='USER'"
                    [icon]="promoteIcon" class="btn pointer-event"
                    matTooltip="Promote to admin"></fa-icon>
           <fa-icon (click)="deleteUser(user)" [icon]="deleteIcon" class="btn pointer-event"

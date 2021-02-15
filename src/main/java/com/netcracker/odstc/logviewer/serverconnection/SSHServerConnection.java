@@ -43,6 +43,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         ChannelSftp channelSftp = getChannelSftp();
 
         try {
+            channelSftp.cd("/");
             List files = channelSftp.ls("/" + directory.getPath().replace('\\', '/'));
             for (Object file : files) {
                 ChannelSftp.LsEntry sftpFile = ((ChannelSftp.LsEntry) file);
@@ -97,6 +98,7 @@ public class SSHServerConnection extends AbstractServerConnection {
             return false;
         }
         try {
+            channelSftp.cd("/");
             channelSftp.cd("/" + directory.getPath().replace('\\', '/'));
             channelSftp.cd("/");
             return true;
@@ -113,6 +115,7 @@ public class SSHServerConnection extends AbstractServerConnection {
         }
         try {
             ChannelSftp channelSftp = getChannelSftp();
+            channelSftp.cd("/");
             for (int i = 0; i < directories.size(); i++) {
                 HierarchyContainer directory = directories.get(i);
                 result.addAll(extractLogsFromDirectory(channelSftp, directory));

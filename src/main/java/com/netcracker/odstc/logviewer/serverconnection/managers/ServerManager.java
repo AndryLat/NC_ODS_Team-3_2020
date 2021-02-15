@@ -136,6 +136,7 @@ public class ServerManager implements DAOChangeListener {
             serverConnection.updateDirectory(directory);
         } else {
             serverConnection.removeDirectory(directory);
+            logger.info("Directory with id: {} removed from poll by user",directory.getObjectId());
         }
     }
 
@@ -147,6 +148,7 @@ public class ServerManager implements DAOChangeListener {
         if (!server.isEnabled() && serverConnections.containsKey(server.getObjectId())) {
             serverConnections.remove(server.getObjectId());
             removedObjectsCollector.addRemovedObjectId(ObjectTypes.SERVER, server.getObjectId());
+            logger.info("Server with id: {} removed from poll by user",server.getObjectId());
         } else if (serverConnections.containsKey(server.getObjectId())) {
             ServerConnection serverConnection = serverConnections.get(server.getObjectId());
             serverConnection.setServer(server);
@@ -167,6 +169,7 @@ public class ServerManager implements DAOChangeListener {
                     logFiles.add((LogFile) logFileContainer.getOriginal());
                 }
             }
+            serverConnection.getDirectories().clear();
         }
         containerDAO.saveObjectsAttributesReferences(servers);
         containerDAO.saveObjectsAttributesReferences(directories);
