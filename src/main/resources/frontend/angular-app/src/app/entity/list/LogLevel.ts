@@ -10,4 +10,5 @@ export enum LogLevel {
   TRACE,
   ERROR,
   FATAL,
+  NO_LEVEL
 }

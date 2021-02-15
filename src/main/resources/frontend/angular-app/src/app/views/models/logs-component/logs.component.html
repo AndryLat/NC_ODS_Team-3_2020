@@ -26,7 +26,7 @@
           <td class="text-monospace">
             <a [innerHTML]="getTextWithDelimiter(log)">
             </a>
-            <a *ngIf="log.text.length>90">
+            <a *ngIf="log.text.length>155">
               <a (click)="log.fullText=!log.fullText" class="btn btn-link">{{log.fullText ? "less" : "more"}}</a>
             </a>
           </td>
@@ -37,7 +37,8 @@
         </tr>
         </tbody>
       </table>
-      <app-pagination-controls (pageChange)="getLogsByRule($event,false)" *ngIf="logPage" [approximate]="logPage?.approximate"
+      <app-pagination-controls (pageChange)="getLogsByRule($event,false)" *ngIf="logPage"
+                               [approximate]="logPage?.approximate"
                                id="logs"></app-pagination-controls>
     </div>
     <div class="col-3">Settings
@@ -45,7 +46,9 @@
       <form *ngIf="operationForm" [formGroup]="operationForm" class="classForLateralForm">
         <div class="border rounded">
           <div class="m-2">
-            <label for="searchInput">Search by text</label>
+            <fa-icon [icon]="faSearch"
+                     class="fa fa-search"></fa-icon>
+            <label class="ml-2" for="searchInput">Search by text</label>
             <input class="form-control" formControlName="text" id="searchInput" name="text" placeholder="Text"
                    [ngClass]="{ 'is-invalid': f.text.errors }" type="text">
             <div *ngIf="f.text.errors" class="invalid-feedback">
@@ -56,7 +59,11 @@
         <hr>
         <div class="border rounded">
           <div class="m-2">
-            <p>Sorting</p>
+            <p>
+              <fa-icon [icon]="faSortAmountAsc"
+                       class="fa fa-sort-amount-asc mr-1"></fa-icon>
+              Sorting
+            </p>
             <hr>
             <div class="row input-group-sm">
               <label class="col-10" for="sortByLevel">Sort By Level</label>
@@ -74,7 +81,11 @@
         <hr>
         <div class="border rounded">
           <div class="m-2">
-            <p>Filtration</p>
+            <p>
+              <fa-icon [icon]="fafilter"
+                       class="fa fa-filter mr-1"></fa-icon>
+              Filtration
+            </p>
             <hr>
             <mat-form-field appearance="legacy">
               <input [(ngModel)]="date1" [ngxMatDatetimePicker]="picker1" class="width-85" formControlName="dat1"
@@ -92,9 +103,9 @@
               <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
             </mat-form-field>
             <hr>
-            <div *ngFor="let key of keys()" class="row">
+            <div *ngFor="let key of keys()" class="row mr-1">
               <label [for]="key" class="col-10">{{key}}</label>
-              <input [id]="key" class="form-control  col-2" formControlName="{{key}}" name="logLevel"
+              <input [id]="key" class="form-control col-2 mb-1" formControlName="{{key}}" name="logLevel"
                      type="checkbox">
             </div>
           </div>

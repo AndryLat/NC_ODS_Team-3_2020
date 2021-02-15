@@ -5,7 +5,7 @@ import {GlobalConstants} from '../../../constants/global-constants';
 import {LogLevel} from '../../../entity/list/LogLevel';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../services/AuthService';
-import {faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faFilter, faSearch, faSortAmountUp, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import {RuleContainer} from '../../../containers/RuleContainer';
 import {LogPage} from '../../../pageable/LogPage';
 import {RouteVariableNameConstants} from "../../../constants/route-variable-names-constants";
@@ -18,6 +18,10 @@ import {Log} from "../../../entity/Log";
 })
 export class LogsComponent implements OnInit {
   deleteIcon = faTrashAlt;
+  fafilter = faFilter;
+  faSortAmountAsc = faSortAmountUp;
+  faSearch = faSearch;
+
   rule: RuleContainer;
 
   parentType: string;
@@ -77,12 +81,12 @@ export class LogsComponent implements OnInit {
   deleteLog(objectId: string): void {
     this.http.delete(this.localApi + '/delete/' + objectId).subscribe(result => {
       this.msg = 'Log successfully deleted';
+      let changedServer = this.logPage.content.find(deletedLog => deletedLog.objectId == objectId);
+      let index = this.logPage.content.indexOf(changedServer);
+      this.logPage.content.splice(index, 1);
     }, error => {
       this.msg = 'Something went wrong during deleting logs';
     });
-    let changedServer = this.logPage.content.find(deletedLog => deletedLog.objectId == objectId);
-    let index = this.logPage.content.indexOf(changedServer);
-    this.logPage.content.splice(index, 1);
   }
 
   checkAllCheckBox(ev) {
@@ -160,9 +164,8 @@ export class LogsComponent implements OnInit {
   }
 
   getTextWithDelimiter(log: Log): string {
-
     let logWithEnter = log.text.split('\n').join('<br/>');
-    logWithEnter = logWithEnter.substr(0, !log.fullText ? 90 : logWithEnter.length);
+    logWithEnter = logWithEnter.substr(0, !log.fullText ? 155 : logWithEnter.length);
     return logWithEnter;
   }
 }
