@@ -11,8 +11,8 @@
     <groupId>com.netcracker.odstc</groupId>
     <artifactId>logviewer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Realtime Log Viewer</name>
-    <description>It is study project of NC ODS TC Team 2 (2020)</description>
+    <name>Realtime Logs Viewer</name>
+    <description>It is study project of NC ODS TC Team 1 (2020)</description>
 
     <properties>
         <java.version>11</java.version>
@@ -20,7 +20,6 @@
         <sonar.projectKey>AndryLat_NC_ODS_Team-3_2020</sonar.projectKey>
         <sonar.organization>ncods2020team3</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.coverage.exclusions>**/*.*</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
