@@ -9,10 +9,11 @@
         <form [formGroup]="insertForm">
           <div class="form-group">
             <label for="nameInput">Directory path (from home)</label>
-            <input (change)="changePath()"  class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
-                   required
-                   type="text">
-            <div class="mat-error" *ngIf="insertForm.get('path').invalid && (insertForm.get('path').dirty||insertForm.get('path').touched)">
+            <input (change)="changePath()"
+                   [ngClass]="{ 'is-invalid': insertForm.get('path').invalid && (insertForm.get('path').dirty||insertForm.get('path').touched)}"
+                   class="form-control" formControlName="path" id="nameInput" name="path" placeholder="Directory path"
+                   required type="text">
+            <div class="invalid-feedback" *ngIf="insertForm.get('path').invalid && (insertForm.get('path').dirty||insertForm.get('path').touched)">
                <span *ngIf="insertForm.get('path').errors.required">
                 Field is required
                </span>
@@ -51,15 +52,13 @@
               <caption>Files</caption>
               <thead>
               <tr>
-                <th scope="col">File name</th>
+                <th scope="col" >File name</th>
                 <th scope="col">
-                  <!--<div class="d-flex justify-content-center row">-->
                   <div class="row justify-content-center">Include?</div>
                   <div class="row justify-content-center">
                     <fa-icon *ngIf="flag && testBool" (click)="checkAll(files)" [icon]="icon"
                              class="btn fas fa-2x pointer-event"></fa-icon>
                   </div>
-                  <!--</div>-->
                 </th>
               </tr>
               </thead>
@@ -71,8 +70,9 @@
                      (mouseleave)="$event.stopImmediatePropagation()"
                      #tooltip="matTooltip" (click)="tooltip.toggle()">...</a>
                 </td>
-                <td>
+                <td class ="align-middle" align="middle" content="center">
                   <input (change)="changeStatusFile(file.name, files)" [checked]="file.checked" class="form-control"
+                         style="width:30px;height:30px;"
                          type="checkbox">
                 </td>
               </tr>

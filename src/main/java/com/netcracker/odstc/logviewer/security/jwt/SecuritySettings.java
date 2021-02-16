@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 public class SecuritySettings {
 
     @Value("${security.secret_key}")
-    private String secret_key;
+    private String secretKey;
 
     @Value("${security.header}")
     private String header;
@@ -18,13 +18,13 @@ public class SecuritySettings {
     private String prefix;
 
     @Value("${security.expiration_time}")
-    private long expiration_time;
+    private long expirationTime;
 
     @Value("${security.expiration_time.reset_password}")
-    private long expiration_time_reset_password;
+    private long expirationTimeResetPassword;
 
-    public String getSecret_key() {
-        return secret_key;
+    public String getSecretKey() {
+        return secretKey;
     }
 
     public String getHeader() {
@@ -35,11 +35,11 @@ public class SecuritySettings {
         return prefix;
     }
 
-    public long getExpiration_time() {
-        return expiration_time;
+    public long getExpirationTime() {
+        return expirationTime;
     }
 
-    public long getExpiration_time_reset_password() {
-        return expiration_time_reset_password;
+    public long getExpirationTimeResetPassword() {
+        return expirationTimeResetPassword;
     }
 }

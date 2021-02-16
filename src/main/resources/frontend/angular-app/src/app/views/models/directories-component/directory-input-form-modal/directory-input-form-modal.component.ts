@@ -81,6 +81,7 @@ export class DirectoryInputFormModalComponent{
       });
     }
   }
+
   search(): void {
     const val = this.searchForm.value;
     if(val.searchText == '' || val.searchText == null){
@@ -100,21 +101,16 @@ export class DirectoryInputFormModalComponent{
     if (this.dir === undefined) {
       this.testDirectory();
     }
-    if (this.testBool) {
-      console.log(this.dir);
-      console.log(this.insertForm.value);
       this.http.post<Directory>(GlobalConstants.apiUrl + 'api/directory/add', this.dir).subscribe(result => {
         this.currentDir = result;
         this.dir = undefined;
         this.insertForm.reset({});
         this.flag = false;
         this.msg = 'Directory added';
-        console.log('Add Directory ', result);
         this.addFilesToDb();
       }, error => {
         this.msg = 'Something went wrong with directory';
       });
-    }
   }
 
   addFilesToDb(): void {
@@ -135,7 +131,6 @@ export class DirectoryInputFormModalComponent{
       }
     });
     if (this.addingFiles == []) {
-      console.log('AddingFiles is empty');
       this.msg = 'AddingFiles is empty';
     } else {
       this.http.post<LogFile[]>(GlobalConstants.apiUrl + 'api/logFile/files/add', this.addingFiles).subscribe(result => {
@@ -143,7 +138,6 @@ export class DirectoryInputFormModalComponent{
         this.addingFiles = undefined;
         this.files = undefined;
         this.dialogRef.close(this.currentDir);
-        //this.closeDir();
       }, error => {
         this.msg = 'Something went wrong with files';
       });
@@ -180,6 +174,5 @@ export class DirectoryInputFormModalComponent{
     this.searchForm.reset();
     this.dialogRef.close();
   }
-
 }
 

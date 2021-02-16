@@ -36,11 +36,9 @@ export class DirectoriesComponent implements OnInit {
   connectIcon = faPowerOff;
 
   directories: Directory[] = [];
-
   directoryPage: DirectoryPage;
 
   serverId: string;
-  msg: string;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -91,12 +89,12 @@ export class DirectoriesComponent implements OnInit {
     this.http.put(GlobalConstants.apiUrl + 'api/directory/update', dir).subscribe();
   }
 
-  deleteDirectory(objectId: string): void {
-    this.http.delete(GlobalConstants.apiUrl + 'api/directory/delete/' + objectId).subscribe(() => {
-      let deletedDirectory = this.directoryPage.content.find(deletedElement => deletedElement.objectId == objectId);
+  deleteDirectory(dir: Directory): void {
+    this.http.delete(GlobalConstants.apiUrl + 'api/directory/delete/' + dir.objectId).subscribe(() => {
+      let deletedDirectory = this.directoryPage.content.find(deletedElement => deletedElement.objectId == dir.objectId);
       let index = this.directoryPage.content.indexOf(deletedDirectory);
       this.directoryPage.content.splice(index, 1);
-      this.alertBarService.setConfirmMessage('Directory with id:' + objectId + ' deleted successfully');
+      this.alertBarService.setConfirmMessage('Directory with path:' + dir.path + ' deleted successfully');
     }, error => {
       this.alertBarService.setErrorMessage('Something gone wrong. Try again later.');
     });

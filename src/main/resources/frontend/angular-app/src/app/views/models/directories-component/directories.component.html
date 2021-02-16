@@ -1,11 +1,5 @@
 <div class="container col-12 pl-0 pr-0">
   <div class="mb-5"></div>
-  <br>
-  <div class="row justify-content-center">
-    <div *ngIf="msg" class="alert alert-info" role="alert">
-      {{msg}}
-    </div>
-  </div>
   <div class="col-12">
       <button (click)="openInsertModal()" class="btn btn-primary">
         <fa-icon [icon]="plusIcon"></fa-icon>
@@ -29,22 +23,28 @@
       <tr
         *ngFor="let directory of directoryPage?.content | paginate: {id: 'directories', itemsPerPage: directoryPage?.size,currentPage: directoryPage?.number, totalItems: directoryPage?.totalElements}">
         <td class="align-middle">{{directory.path}}</td>
-        <td class="align-middle">{{directory.lastExistenceCheck | date: 'short'}}</td>
-        <td [ngClass]="'text-center '+(directory.enabled?'table-success':'table-danger')">
-          <fa-icon [icon]="directory.enabled?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        <td class="align-middle">{{directory.lastExistenceCheck | date: 'MM/dd/yyyy, HH:mm:ss.SSS'}}</td>
+        <td [ngClass]="'text-center align-middle h4 '+(directory.enabled?'table-success':'table-danger')">
+          <fa-icon [icon]="directory.enabled?enabledIcon:disabledIcon"></fa-icon>
         </td>
-        <td [ngClass]="'text-center '+(directory.connectable?'table-success':'table-danger')">
-          <fa-icon [icon]="directory.connectable?enabledIcon:disabledIcon" class="h3"></fa-icon>
+        <td [ngClass]="'text-center align-middle h4 '+(directory.connectable?'table-success':'table-danger')">
+          <fa-icon [icon]="directory.connectable?enabledIcon:disabledIcon"></fa-icon>
         </td>
         <td class="d-flex justify-content-around">
-          <fa-icon (click)="routeToLogs(directory)" [icon]="logsIcon"
+          <fa-icon (click)="routeToLogs(directory)"
+                   [icon]="logsIcon" matTooltip="Show logs"
                    class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="routeToLogFiles(directory)" [icon]="proceedIcon"
+          <fa-icon (click)="routeToLogFiles(directory)"
+                   [icon]="proceedIcon" matTooltip="Show files"
                    class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="connectEnabled(directory)" [icon]="connectIcon"
+          <fa-icon (click)="connectEnabled(directory)"
+                   [icon]="connectIcon" matTooltip="Enable/Disable directory"
                    class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="openUpdateModal(directory)" [icon]="updateIcon" class="btn fas fa-2x pointer-event"></fa-icon>
-          <fa-icon (click)="deleteDirectory(directory.objectId)" [icon]="deleteIcon"
+          <fa-icon (click)="openUpdateModal(directory)"
+                   [icon]="updateIcon" matTooltip="Update files"
+                   class="btn fas fa-2x pointer-event"></fa-icon>
+          <fa-icon (click)="deleteDirectory(directory)"
+                   [icon]="deleteIcon" matTooltip="Delete directory"
                    class="btn fas fa-2x pointer-event"></fa-icon>
         </td>
       </tr>

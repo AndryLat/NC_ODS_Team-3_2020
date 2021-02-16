@@ -31,3 +31,7 @@ html, body {
   word-break: break-all !important;
   white-space: normal !important;
 }
+
+.mat-tooltip2{
+  white-space: pre-line;
+}

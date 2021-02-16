@@ -1,91 +1,79 @@
 <div class="mb-5"></div>
 <div class="container">
-  <div *ngIf="msg" class="alert alert-info col-6" role="alert">
-    {{msg}}
-  </div>
   <form *ngIf="insertForm" [formGroup]="insertForm" autocomplete="off">
     <div class="form-group">
       <label for="activityInput">Activity Polling Period</label>
       <fa-icon [icon]="tooltipIcon"
                class="btn fas fa-2x pointer-event" matTooltip="{{activityPollingPeriod}}"></fa-icon>
-      <span class="badge badge-info">ms</span>
+      <span class="badge badge-info" matTooltip="milliseconds">ms</span>
       <input class="form-control" formControlName="activityPollingPeriod" id="activityInput"
              name="activityPollingPeriod" placeholder="Activity Polling Period"
-             required
-             type="number">
-      <div class="mat-error" *ngIf="insertForm.get('activityPollingPeriod').invalid && (insertForm.get('activityPollingPeriod').dirty||insertForm.get('activityPollingPeriod').touched)">
+             [ngClass]="{ 'is-invalid': insertForm.get('activityPollingPeriod').invalid && (insertForm.get('activityPollingPeriod').dirty||insertForm.get('activityPollingPeriod').touched) }"
+             required type="number">
+      <div class="invalid-feedback" *ngIf="insertForm.get('activityPollingPeriod').invalid && (insertForm.get('activityPollingPeriod').dirty||insertForm.get('activityPollingPeriod').touched)">
         <span *ngIf="insertForm.get('activityPollingPeriod').errors.required">
           Field is required
         </span>
-        <span *ngIf="insertForm.get('activityPollingPeriod').errors.maxlength">
-          Field can not be more than 32 symbols
+        <span *ngIf="insertForm.get('activityPollingPeriod').errors.max">
+          Field can not be more than 16 symbols
         </span>
         <span *ngIf="insertForm.get('activityPollingPeriod').errors.min">
-          Field can not be negative
+          Field cannot be less than one
         </span>
       </div>
+
       <label for="changesInput">Changes Polling Period</label>
       <fa-icon [icon]="tooltipIcon"
                class="btn fas fa-2x pointer-event" matTooltip="{{changesPollingPeriod}}"></fa-icon>
-      <span class="badge badge-info">ms</span>
+      <span class="badge badge-info" matTooltip="milliseconds">ms</span>
       <input class="form-control" formControlName="changesPollingPeriod" id="changesInput" name="changesPollingPeriod"
              placeholder="Changes Polling Period"
+             [ngClass]="{ 'is-invalid': insertForm.get('changesPollingPeriod').invalid && (insertForm.get('changesPollingPeriod').dirty||insertForm.get('changesPollingPeriod').touched) }"
              required type="number">
-      <div class="mat-error" *ngIf="insertForm.get('changesPollingPeriod').invalid && (insertForm.get('changesPollingPeriod').dirty||insertForm.get('changesPollingPeriod').touched)">
+      <div class="invalid-feedback" *ngIf="insertForm.get('changesPollingPeriod').invalid && (insertForm.get('changesPollingPeriod').dirty||insertForm.get('changesPollingPeriod').touched)">
         <span *ngIf="insertForm.get('changesPollingPeriod').errors.required">
           Field is required
         </span>
-        <span *ngIf="insertForm.get('changesPollingPeriod').errors.maxlength">
-          Field can not be more than 32 symbols
+        <span *ngIf="insertForm.get('changesPollingPeriod').errors.max">
+          Field can not be more than 16 symbols
         </span>
         <span *ngIf="insertForm.get('changesPollingPeriod').errors.min">
-          Field can not be negative
+          Field cannot be less than one
         </span>
       </div>
+
       <md-input
         [icon]="tooltipIcon"
         [title]="'Storage Log Period'"
         [description]="storageLogPeriod"
+        [parentFormGroup]="this.insertForm"
         formControlName="storageLogPeriod"
+        [controlName]="'storageLogPeriod'"
         [mask]="mask"></md-input>
-      <div class="mat-error" *ngIf="this.insertForm.controls.storageLogPeriod.invalid
-        && (this.insertForm.controls.storageLogPeriod.dirty||this.insertForm.controls.storageLogPeriod.touched)">
-        <span *ngIf="this.insertForm.controls.storageLogPeriod.errors.validatorForNullDate">
-          Field cant be 00/00/00/0000.
-        </span>
-      </div>
       <md-input
         [icon]="tooltipIcon"
         [title]="'Server Activity Period'"
         [description]="serverActivityPeriod"
+        [parentFormGroup]="this.insertForm"
         formControlName="serverActivityPeriod"
+        [controlName]="'serverActivityPeriod'"
         [mask]="mask"></md-input>
-      <div class="mat-error" *ngIf="this.insertForm.controls.serverActivityPeriod.invalid
-        && (this.insertForm.controls.serverActivityPeriod.dirty||this.insertForm.controls.serverActivityPeriod.touched)">
-        <span *ngIf="this.insertForm.controls.serverActivityPeriod.errors.validatorForNullDate">
-          Field cant be 00/00/00/0000.
-        </span>
-      </div>
       <md-input
         [title]="'Directory Activity Period'"
         [description]="directoryActivityPeriod"
-        [icon]="tooltipIcon"
+        [parentFormGroup]="this.insertForm"
         formControlName="directoryActivityPeriod"
+        [controlName]="'directoryActivityPeriod'"
+        [icon]="tooltipIcon"
         [mask]="mask">
       </md-input>
-      <div class="mat-error" *ngIf="this.insertForm.controls.directoryActivityPeriod.invalid
-        && (this.insertForm.controls.directoryActivityPeriod.dirty||this.insertForm.controls.directoryActivityPeriod.touched)">
-        <span *ngIf="this.insertForm.controls.directoryActivityPeriod.errors.validatorForNullDate">
-          Field cant be 00/00/00/0000.
-        </span>
-      </div>
       <hr>
       <div class="row ml-10">
         <div class="ml-10">
-          <button (click)="clickForUpdate()" class="btn btn-info" type="button">Change Settings</button>
-          <!--<button (click)="setValues()" class="btn btn-info ml-3" type="button">
-            <fa-icon [icon]="refreshIcon"></fa-icon>
-          </button>-->
+          <button (click)="clickForUpdate()"
+                  [disabled]="insertForm.invalid"
+                  class="btn btn-info"
+                  type="submit">Change Settings</button>
         </div>
       </div>
       <hr>
