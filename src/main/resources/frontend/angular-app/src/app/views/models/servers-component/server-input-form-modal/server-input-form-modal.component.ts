@@ -19,6 +19,8 @@ export class ServerInputFormModalComponent implements OnInit {
     'SSH', 'FTP'
   ];
 
+  ValidIpv4OrHostNameAddressRegex = /^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])))$/;
+
   testResultMessage: string = undefined;
   testResult: boolean;
 
@@ -26,7 +28,7 @@ export class ServerInputFormModalComponent implements OnInit {
               private dialogRef: MatDialogRef<ServerInputFormModalComponent>) {
     this.insertForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(64)]],
-      ip: ['', [Validators.required, matchPattern(/^[a-zA-Z0-9.-]+$/, 'Special characters is not allowed'), Validators.maxLength(128)]],
+      ip: ['', [Validators.required, matchPattern(this.ValidIpv4OrHostNameAddressRegex, 'Not valid IPv4 or URL address'), Validators.maxLength(128)]],
       port: ['', [Validators.required, Validators.min(0), Validators.max(65535), matchPattern(/[0-9]+/, 'Only numbers allowed'), Validators.maxLength(5)]],
       login: ['', [Validators.required, Validators.maxLength(64)]],
       password: ['', [Validators.required, Validators.maxLength(128)]],

@@ -55,7 +55,7 @@ public class ServerConnectionService {
         if (LogLevel.contains(level)) {
             return LogLevel.valueOf(level);
         } else {
-            return null;
+            return LogLevel.NO_LEVEL;
         }
     }
 
