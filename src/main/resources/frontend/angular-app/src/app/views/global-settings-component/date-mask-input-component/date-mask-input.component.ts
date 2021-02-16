@@ -66,7 +66,6 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
           const placeholderAdditional = this._convertMaskAdditionalToPlaceholder();
 
           const values = this._conformValue(value, placeholder, placeholderAdditional);
-
           const adjustedCursorPosition = this._getCursorPosition(value, placeholderAdditional, values.conformed);
           this.mdInputEl.nativeElement.value = values.conformed;
           this.mdInputEl.nativeElement.setSelectionRange(
@@ -269,18 +268,9 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     } else {
       const normalizedConformedValue = conformedValue.toLowerCase();
       const normalizedValue = value.toLowerCase();
-
       const leftHalfChars = normalizedValue.substr(0, this._currentCursorPosition).split('');
-
       const intersection = leftHalfChars.filter((char) => normalizedConformedValue.indexOf(char) !== -1);
-
       targetChar = intersection[intersection.length - 1];
-
-      const previousLeftMaskChars = this._previousPlaceholder
-        .substr(0, intersection.length)
-        .split('')
-        .filter((char) => char !== this._placeholderChar)
-        .length;
 
       const leftMaskChars = placeholder
         .substr(0, intersection.length)
@@ -288,19 +278,17 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         .filter((char) => char !== this._placeholderChar)
         .length;
 
-      const maskLengthChanged = leftMaskChars !== previousLeftMaskChars;
-
       const targetIsMaskMovingLeft = (
-        this._previousPlaceholder[intersection.length - 1] !== undefined &&
+        placeholder[intersection.length - 1] !== undefined &&
         placeholder[intersection.length - 2] !== undefined &&
-        this._previousPlaceholder[intersection.length - 1] !== this._placeholderChar &&
-        this._previousPlaceholder[intersection.length - 1] !== placeholder[intersection.length - 1] &&
-        this._previousPlaceholder[intersection.length - 1] === placeholder[intersection.length - 2]
+        placeholder[intersection.length - 1] !== this._placeholderChar &&
+        placeholder[intersection.length - 1] !== placeholder[intersection.length - 1] &&
+        placeholder[intersection.length - 1] === placeholder[intersection.length - 2]
       );
 
       if (!isAddition &&
-        (maskLengthChanged || targetIsMaskMovingLeft) &&
-        previousLeftMaskChars > 0 &&
+        targetIsMaskMovingLeft &&
+        leftMaskChars > 0 &&
         placeholder.indexOf(targetChar) > -1 &&
         value[this._currentCursorPosition] !== undefined) {
         trackRightCharacter = true;
@@ -338,7 +326,6 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
     if (isAddition) {
       let lastPlaceholderChar = startingSearchIndex;
-
       for (let i = startingSearchIndex; i <= placeholder.length; i++) {
         if (placeholder[i] === this._placeholderChar) {
           lastPlaceholderChar = i;
