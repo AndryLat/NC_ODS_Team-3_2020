@@ -1,5 +1,5 @@
 import {Component, ElementRef, forwardRef, Input, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 @Component({
   selector: 'md-input',
@@ -20,11 +20,22 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   @Input() mask: any[];
 
+  secondDescription: string = 'hh - hours(00-23)         \n' +
+                              'dd - days(00-28)          \n' +
+                              'mm - months(00-11)        \n' +
+                              'yyyy - years(0000-2999)';
+
+  maskAdditional: any[] = [/[0-2]/,/[0-9]/,'/',/[0-3]/,/[0-9]/,'/',/[0-1]/,/[0-9]/,'/',/[0-2]/,/[0-9]/,/[0-9]/,/[0-9]/];
+
   @Input() title: string;
 
   @Input() description: string;
 
   @Input() icon;
+
+  @Input() parentFormGroup: FormGroup;
+
+  @Input() controlName: string;
 
   public mdInput = new FormControl();
 
@@ -34,12 +45,15 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   private _maxInputValue: number;
 
+  private _maxInputValueAdd: number;
+
   private _currentCursorPosition: number;
 
   private readonly _placeholderChar: string = '0';
 
   public ngOnInit(): void {
     this._maxInputValue = this.mask.length;
+    this._maxInputValueAdd = this.maskAdditional.length;
     this.mdInput.valueChanges
       .subscribe((value: string) => {
           if (!value || value === this._previousValue) {
@@ -49,11 +63,11 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
           const placeholder = this._convertMaskToPlaceholder();
 
-          const values = this._conformValue(value, placeholder);
-          //const values = this._conformValue(value, '00/00/00/0000');
+          const placeholderAdditional = this._convertMaskAdditionalToPlaceholder();
 
-          const adjustedCursorPosition = this._getCursorPosition(value, '00/00/00/0000', values.conformed);
+          const values = this._conformValue(value, placeholder, placeholderAdditional);
 
+          const adjustedCursorPosition = this._getCursorPosition(value, placeholderAdditional, values.conformed);
           this.mdInputEl.nativeElement.value = values.conformed;
           this.mdInputEl.nativeElement.setSelectionRange(
             adjustedCursorPosition,
@@ -73,7 +87,8 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     if(value != null){
       this._currentCursorPosition = this.mdInputEl.nativeElement.selectionEnd;
       const placeholder = this._convertMaskToPlaceholder();
-      let values = this._conformValue(value, placeholder);
+      const placeholderAdditional = this._convertMaskAdditionalToPlaceholder();
+      let values = this._conformValue(value, placeholder, placeholderAdditional);
       this.mdInputEl.nativeElement.value = values.conformed;
       this.mdInput.setValue(values.conformed);
     }
@@ -94,32 +109,32 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   private _convertMaskToPlaceholder(): string {
-    const r =  this.mask.map((char) => {
+    return this.mask.map((char) => {
       return (char instanceof RegExp) ? this._placeholderChar : char;
     }).join('');
-    console.log(r);
-    return r;
   }
 
+  private _convertMaskAdditionalToPlaceholder(): string {
+    return this.maskAdditional.map((char) => {
+      return (char instanceof RegExp) ? this._placeholderChar : char;
+    }).join('');
+  }
 
-  private _conformValue(value: string, placeholder: string): { conformed: string, cleaned: string } {
+  private _conformValue(value: string, placeholder: string, placeholderAdditional: string): { conformed: string, cleaned: string } {
     const editDistance = value.length - this._previousValue.length;
     console.log('editDistance : '+editDistance)
+    console.log('placeholderAdditional : '+placeholderAdditional)
     const isAddition = editDistance > 0;
     const indexOfFirstChange = this._currentCursorPosition + (isAddition ? -editDistance : 0);
     console.log('indexOfFirstChange : '+ indexOfFirstChange)
     const indexOfLastChange = indexOfFirstChange + Math.abs(editDistance);
     console.log('indexOfLastChange : '+ indexOfLastChange)
 
-    const placeholderWithoutMask = '00/00/00/0000';
     if (!isAddition) {
       let compensatingPlaceholderChars = '';
 
       for (let i = indexOfFirstChange; i < indexOfLastChange; i++) {
-        /*if (placehol[i] === this._placeholderChar) {
-          compensatingPlaceholderChars += this._placeholderChar;
-        }*/
-        compensatingPlaceholderChars += placeholderWithoutMask[i];
+        compensatingPlaceholderChars += placeholderAdditional[i];
       }
 
       value =
@@ -129,7 +144,18 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         );
     }
 
-    const prevValue = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
+    let prevValue = value;
+
+    if(isAddition){
+      prevValue = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
+    }
+
+    if(isNaN(Number(((prevValue.slice(0, 1))))) || (prevValue.slice(0, 1) == ' ')){
+      prevValue = '0' + prevValue.slice(1, 13);
+      value = prevValue;
+    }
+
+    console.log('prevValue: '+prevValue);
     let flag : boolean = false;
     if (isAddition && value.length > 13 ) {
       const prevVal = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
@@ -139,9 +165,8 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
       flag = true;
       value = result;
     }
-    //const prevValue = value.slice(0, indexOfFirstChange)+value.slice(indexOfLastChange, value.length);
 
-    //console.log('value : '+ value)
+    console.log('Value : '+ value)
     const valueArray = value.split('');
     const valueArr = (valueArray.length== 10) ? [ valueArray[0] + valueArray[1],
       valueArray[2] + valueArray[3],
@@ -153,10 +178,6 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         valueArray[6] + valueArray[7], valueArray[8],
         valueArray[9] + valueArray[10] + valueArray[11] + valueArray[12]];
 
-    //console.log('valueArr : '+ valueArr)
-    //console.log('valueArray : '+ valueArray)
-
-    //console.log('prevValue: '+ prevValue)
     const valueArrayPrev = prevValue.split('');
     const valueArrPrev = (valueArrayPrev.length==10) ? [valueArrayPrev[0] + valueArrayPrev[1],
     valueArrayPrev[2] + valueArrayPrev[3],
@@ -167,8 +188,6 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         valueArrayPrev[3] + valueArrayPrev[4], valueArrayPrev[5],
         valueArrayPrev[6] + valueArrayPrev[7], valueArrayPrev[8],
         valueArrayPrev[9] + valueArrayPrev[10] + valueArrayPrev[11] + valueArrayPrev[12]];
-    //console.log('valueArrPrev : '+ valueArrPrev)
-    //console.log('valueArrayPrev : '+ valueArrPrev)
 
     for (let i = value.length - 1; i >= 0; i--) {
       let char = value[i];

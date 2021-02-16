@@ -1,18 +1,22 @@
-<div class="group">
+<div [formGroup]="parentFormGroup" class="form-group">
     <label>{{title}}</label>
     <fa-icon [icon]="icon"
              class="btn fas fa-2x pointer-event"
              matTooltip="{{description}}"></fa-icon>
-    <span class="badge badge-info">hh/dd/MM/yyyy</span>
-    <input #mdInputEl class="form-control"
+    <span class="badge badge-info" matTooltipClass="mat-tooltip2" matTooltip="{{secondDescription}}">hh/dd/MM/yyyy</span>
+    <input #mdInputEl
+           [ngClass]="{ 'is-invalid': (mdInput.invalid && (mdInput.dirty||mdInput.touched))||
+           (this.parentFormGroup.controls[controlName].invalid && (this.parentFormGroup.controls[controlName].dirty||this.parentFormGroup.controls[controlName].touched)) }"
+           class="form-control"
            [formControl]="mdInput" required type="text">
-  <div class="mat-error" *ngIf="mdInput.invalid && (mdInput.dirty||mdInput.touched)">
+  <div class="invalid-feedback" *ngIf="mdInput.invalid && (mdInput.dirty||mdInput.touched)">
         <span *ngIf="mdInput.errors.required">
           Field is required
         </span>
-        <span *ngIf="mdInput.errors.maxlength">
-          Max 13 symbols
+  </div>
+  <div class="invalid-feedback" *ngIf="this.parentFormGroup.controls[controlName].invalid && (this.parentFormGroup.controls[controlName].dirty||this.parentFormGroup.controls[controlName].touched) && !mdInput.invalid">
+        <span *ngIf="this.parentFormGroup.controls[controlName].errors.validatorForNullDate">
+          Field cant be 00/00/00/0000
         </span>
   </div>
-
 </div>

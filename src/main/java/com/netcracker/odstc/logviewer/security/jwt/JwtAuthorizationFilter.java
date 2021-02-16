@@ -46,12 +46,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(securitySettings.getHeader());
 
         if (token != null) {
-            String user = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
+            String user = JWT.require(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()))
                     .build()
                     .verify(token.replace(securitySettings.getPrefix(), ""))
                     .getSubject();
 
-            String role = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
+            String role = JWT.require(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()))
                     .build()
                     .verify(token.replace(securitySettings.getPrefix(), ""))
                     .getClaim("Role").asString();

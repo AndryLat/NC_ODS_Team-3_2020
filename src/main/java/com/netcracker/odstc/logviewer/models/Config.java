@@ -10,19 +10,20 @@ import java.util.Date;
 
 public class Config extends EAVObject {
     private static Config instance = null;
-    private SimpleDateFormat format;
+    private final SimpleDateFormat format;
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public Config() {
         super();
         format = new SimpleDateFormat();
-        format.applyPattern("yyyy-MM-dd HH:mm:ss");
+        format.applyPattern(DATE_PATTERN);
         setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 
     public Config(BigInteger objectId) {
         super(objectId);
         format = new SimpleDateFormat();
-        format.applyPattern("yyyy-MM-dd HH:mm:ss");
+        format.applyPattern(DATE_PATTERN);
         setObjectTypeId(ObjectTypes.CONFIG.getObjectTypeID());
     }
 

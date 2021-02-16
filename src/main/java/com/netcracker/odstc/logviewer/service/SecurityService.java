@@ -29,14 +29,14 @@ public class SecurityService {
     public String createPasswordResetTokenForUser(User user) {
         return JWT.create()
                 .withSubject(user.getLogin())
-                .withExpiresAt(new Date(System.currentTimeMillis() + securitySettings.getExpiration_time_reset_password()))
-                .sign(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()));
+                .withExpiresAt(new Date(System.currentTimeMillis() + securitySettings.getExpirationTimeResetPassword()))
+                .sign(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()));
     }
 
     public boolean validateToken(String token) {
         if (token != null) {
             try {
-                JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
+                JWT.require(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()))
                         .build()
                         .verify(token.replace(securitySettings.getPrefix(), ""));
                 return true;
@@ -51,7 +51,7 @@ public class SecurityService {
     public boolean validatePasswordResetToken(String token, BigInteger id) {
         if (token != null) {
             try {
-                String userLogin = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
+                String userLogin = JWT.require(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()))
                         .build()
                         .verify(token)
                         .getSubject();
@@ -82,7 +82,7 @@ public class SecurityService {
         String login;
         if (token != null) {
             try {
-                login = JWT.require(Algorithm.HMAC256(securitySettings.getSecret_key().getBytes()))
+                login = JWT.require(Algorithm.HMAC256(securitySettings.getSecretKey().getBytes()))
                         .build()
                         .verify(token)
                         .getSubject();

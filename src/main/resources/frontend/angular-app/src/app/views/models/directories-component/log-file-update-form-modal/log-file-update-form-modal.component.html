@@ -10,13 +10,18 @@
         <div class="alert alert-danger"
              role="alert">{{errMes}}</div>
       </div>
-      <!-- PUT FORM -->
       <table *ngIf="flag" class="table table-bordered">
         <caption>Files</caption>
         <thead>
         <tr>
           <th scope="col">File name</th>
-          <th scope="col">Include?</th>
+          <th scope="col">
+            <div class="row justify-content-center">Include?</div>
+            <div class="row justify-content-center">
+              <fa-icon  (click)="checkAll()" [icon]="icon"
+                       class="btn fas fa-2x pointer-event"></fa-icon>
+            </div>
+          </th>
         </tr>
         </thead>
         <tbody *ngIf="filesForUpdate">
@@ -27,8 +32,9 @@
                (mouseleave)="$event.stopImmediatePropagation()"
                #tooltip="matTooltip" (click)="tooltip.toggle()">...</a>
           </td>
-          <td>
+          <td class ="align-middle" align="middle" content="center">
             <input (change)="changeStatusFile(file.name, filesForUpdate)" [checked]="file.checked"
+                   style="width:30px;height:30px;"
                    class="form-control" type="checkbox">
           </td>
         </tr>
